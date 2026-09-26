@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Moon, Sun, Laptop } from "lucide-react";
 import { useTheme } from "@/providers/theme-provider";
+import { cn } from "@/lib/utils";
 
 export interface ThemeToggleProps {
   className?: string;
@@ -42,7 +43,10 @@ export function ThemeToggle({ className = "", size = "default" }: ThemeTogglePro
     const itemSize = size === "sm" ? "w-5.5 h-5.5" : "w-6.5 h-6.5";
     return (
       <div
-        className={`inline-flex items-center bg-muted/60 border border-border/80 rounded-full p-0.5 shadow-inner opacity-70 ${className}`}
+        className={cn(
+          "inline-flex items-center bg-muted/60 border border-border/80 rounded-full p-0.5 shadow-inner opacity-70",
+          className
+        )}
         aria-hidden="true"
       >
         <div className={`${itemSize} rounded-full`} />
@@ -56,7 +60,10 @@ export function ThemeToggle({ className = "", size = "default" }: ThemeTogglePro
     <div
       role="radiogroup"
       aria-label="Select color theme"
-      className={`inline-flex items-center bg-muted/80 dark:bg-muted/50 border border-border rounded-full p-0.5 shadow-inner backdrop-blur-xs transition-colors ${className}`}
+      className={cn(
+        "inline-flex items-center bg-muted/80 dark:bg-muted/50 border border-border rounded-full p-0.5 shadow-inner backdrop-blur-xs transition-colors",
+        className
+      )}
     >
       {items.map((item) => {
         const Icon = item.icon;

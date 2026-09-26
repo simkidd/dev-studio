@@ -1,774 +1,698 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import Link from "next/link";
+import Image from "next/image";
 import {
   useProfile,
   useProjects,
   useSkills,
-  useExperiences,
-  usePosts,
   useTestimonials,
+  usePosts,
   useSubmitContactMessage,
 } from "@/hooks";
-import { IProject, ISkill, IExperience, IPost, ITestimonial } from "@/interfaces";
+import { IProject, ITestimonial, IPost } from "@/interfaces";
 import {
-  ArrowRight,
-  Sparkles,
+  ArrowUpRight,
+  ArrowDown,
+  ExternalLink,
+  Mail,
+  Briefcase,
+  MapPin,
+  CheckCircle2,
+  Send,
+  Loader2,
   Layers,
   Code2,
-  Briefcase,
-  FileText,
-  Star,
-  Send,
-  ExternalLink,
-  Calendar,
-  Clock,
-  TrendingUp,
-  Cpu,
-  CheckCircle2,
-  Terminal,
+  Quote,
+  ChevronRight,
 } from "lucide-react";
-import { GithubIcon } from "@/components/ui/icons";
-import { formatDate, formatMonthYear } from "@/lib/date.utils";
-
-export interface ContactFormData {
-  senderName: string;
-  senderEmail: string;
-  company?: string;
-  budgetRange?: string;
-  subject?: string;
-  message: string;
-}
+import {
+  GithubIcon,
+  LinkedinIcon,
+  TwitterIcon,
+  ChromeSparkleIcon,
+} from "@/components/ui/icons";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function HomeView() {
-  const [activeCategory, setActiveCategory] = useState("all");
-
   const { data: profile } = useProfile();
-  const { data: projectsResponse, isLoading: projectsLoading } = useProjects({
-    status: "published",
-    limit: 6,
+  const { data: projectsRes, isLoading: projectsLoading } = useProjects({
+    featured: true,
   });
-  const { data: skills = [], isLoading: skillsLoading } = useSkills();
-  const { data: rawExperiences = [], isLoading: expLoading } = useExperiences();
-  const { data: postsResponse, isLoading: postsLoading } = usePosts({
-    status: "published",
-    limit: 3,
-  });
-  const { data: testimonials = [], isLoading: testLoading } = useTestimonials();
+  const { data: skills = [] } = useSkills();
+  const { data: testimonials = [] } = useTestimonials();
+  const { data: postsRes } = usePosts({ limit: 3 });
+  const submitMessageMutation = useSubmitContactMessage();
 
-  const submitContactMutation = useSubmitContactMessage();
+  const projects: IProject[] = projectsRes?.data || [];
+  const posts: IPost[] = postsRes?.data || [];
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: { errors, isSubmitting },
-  } = useForm<ContactFormData>({
-    defaultValues: {
-      senderName: "",
-      senderEmail: "",
-      company: "",
-      budgetRange: "$10,000 - $25,000",
-      subject: "High-Throughput Full-Stack Project Inquiry",
-      message: "",
-    },
-  });
+  // Contact form local state
+  const [contactName, setContactName] = useState("");
+  const [contactEmail, setContactEmail] = useState("");
+  const [contactSubject, setContactSubject] = useState("");
+  const [contactMessage, setContactMessage] = useState("");
 
-  const onSubmitContact = (data: ContactFormData) => {
-    submitContactMutation.mutate(data, {
-      onSuccess: () => {
-        reset();
+  const handleContactSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
+      toast.error("Please fill in your name, email, and message.");
+      return;
+    }
+
+    submitMessageMutation.mutate(
+      {
+        senderName: contactName.trim(),
+        senderEmail: contactEmail.trim(),
+        subject: contactSubject.trim() || "Project Inquiry via Portfolio",
+        message: contactMessage.trim(),
       },
-    });
+      {
+        onSuccess: () => {
+          setContactName("");
+          setContactEmail("");
+          setContactSubject("");
+          setContactMessage("");
+        },
+      },
+    );
   };
 
-  const projects: IProject[] = projectsResponse?.data || [];
-  const featuredProjects =
-    projects.filter((p: IProject) => p.isFeatured).length > 0
-      ? projects.filter((p: IProject) => p.isFeatured)
-      : projects;
+  const firstName = profile?.firstName || "Alex";
+  const lastName = profile?.lastName || "Morgan";
+  const fullName = `${firstName} ${lastName}`.trim();
+  const headline =
+    profile?.headline || "Senior Full-Stack Architect & Systems Engineer";
+  const bio =
+    profile?.bio ||
+    "I engineer high-throughput systems, resilient web architectures, and high-performance digital flagships for venture-backed startups and enterprise platforms.";
+  const location = profile?.location || "London, UK (Remote)";
+  const avatarUrl = profile?.avatarUrl || "";
+  const isAvailable = profile?.isAvailableForHire ?? true;
 
-  const posts: IPost[] = postsResponse?.data || [];
-
-  const experiences = React.useMemo(() => {
-    return [...rawExperiences].sort((a, b) => {
-      if (a.isCurrent && !b.isCurrent) return -1;
-      if (!a.isCurrent && b.isCurrent) return 1;
-
-      const timeA = new Date(a.startDate).getTime();
-      const timeB = new Date(b.startDate).getTime();
-      if (timeA !== timeB) return timeB - timeA;
-
-      const endA = a.endDate ? new Date(a.endDate).getTime() : 0;
-      const endB = b.endDate ? new Date(b.endDate).getTime() : 0;
-      return endB - endA;
-    });
-  }, [rawExperiences]);
-
-  const skillCategories = [
-    "all",
-    "Languages",
-    "Frontend",
-    "Backend",
-    "Database",
-    "DevOps/Cloud",
-    "Architecture",
+  // Services catalog list
+  const SERVICES = [
+    {
+      title: "Full-Stack Architecture & Web Apps",
+      description:
+        "Building scalable Next.js and React enterprise applications with robust state management, sub-second TTFB, and fluid UX.",
+      tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    },
+    {
+      title: "Distributed Backend & API Systems",
+      description:
+        "Designing high-throughput REST and GraphQL microservices, caching layers, and database architectures.",
+      tags: ["Node.js", "Express", "MongoDB", "PostgreSQL", "Redis"],
+    },
+    {
+      title: "Cloud Infrastructure & DevOps",
+      description:
+        "Automated CI/CD deployment pipelines, containerization with Docker, and cloud orchestrations on AWS & Vercel.",
+      tags: ["AWS", "Docker", "CI/CD", "Vercel", "Monitoring"],
+    },
+    {
+      title: "Technical Advisory & Code Auditing",
+      description:
+        "Guiding engineering teams on architecture decisions, performance optimization, security audits, and code health.",
+      tags: ["System Design", "Auditing", "Refactoring", "Mentorship"],
+    },
   ];
 
-  const filteredSkills =
-    activeCategory === "all"
-      ? skills
-      : skills.filter((s: ISkill) => s.category === activeCategory);
-
   return (
-    <div className="space-y-32 pt-28 pb-16">
-      {/* 1. HERO SECTION */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
-        <div className="max-w-4xl space-y-8">
-          {/* Availability Pill */}
-          <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-card border border-border text-xs font-mono text-muted-foreground shadow-sm">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-sm shadow-emerald-500" />
-            <span className="text-emerald-600 dark:text-emerald-400 font-semibold">Available for Q4/Q1</span>
-            <span className="text-muted-foreground/60">•</span>
-            <span className="text-foreground">Staff Architecture & $10k–$50k Contracts</span>
+    <div className="space-y-28 sm:space-y-36 pb-20">
+      {/* ─────────────────────────────────────────────────────────────
+          1. HERO SECTION (Mega Editorial Headline + Portrait Frame)
+      ───────────────────────────────────────────────────────────── */}
+      <section className="relative pt-28 sm:pt-36 min-h-[90vh] flex flex-col items-center justify-center text-center px-4 overflow-hidden">
+        {/* Ambient Top Glow */}
+        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] sm:w-[850px] h-[350px] bg-primary/10 rounded-full blur-[140px] pointer-events-none" />
+
+        <div className="max-w-5xl mx-auto space-y-8 relative z-10 w-full flex flex-col items-center">
+          {/* Metadata Badges Header */}
+          <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs font-mono text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/80 border border-border/80">
+              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+              <span>
+                {isAvailable
+                  ? "Available for select projects"
+                  : "Engaged in active builds"}
+              </span>
+            </span>
+            <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-muted/80 border border-border/80">
+              <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+              <span>{location}</span>
+            </span>
           </div>
 
-          {/* Headline */}
-          <div className="space-y-4">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold text-foreground tracking-tight leading-[1.08]">
-              Engineering High-Throughput Systems &{" "}
-              <span className="bg-gradient-to-r from-primary via-indigo-400 to-emerald-400 bg-clip-text text-transparent">
-                Exceptional Web Products.
-              </span>
-            </h1>
-            <p className="text-lg sm:text-xl text-muted-foreground font-normal leading-relaxed max-w-2xl">
-              I partner with founders and engineering leaders to design scalable software architectures, reduce p99 latencies, and ship polished digital flagships.
-            </p>
-          </div>
-
-          {/* Metrics Bar */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 py-6 border-y border-border">
-            <div className="space-y-0.5">
-              <span className="text-2xl sm:text-3xl font-bold font-mono text-foreground tracking-tight">
-                $50M+
-              </span>
-              <p className="text-xs text-muted-foreground">Processed ARR Supported</p>
+          {/* Mega Typography Header with 3D Chrome Sparkles */}
+          <div className="space-y-3 relative">
+            <div className="flex items-center justify-center gap-3 sm:gap-6">
+              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0" />
+              <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none">
+                Software
+              </h1>
+              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 hidden xs:block" />
             </div>
-            <div className="space-y-0.5">
-              <span className="text-2xl sm:text-3xl font-bold font-mono text-emerald-600 dark:text-emerald-400 tracking-tight">
-                99.99%
-              </span>
-              <p className="text-xs text-muted-foreground">Production Uptime SLA</p>
-            </div>
-            <div className="space-y-0.5">
-              <span className="text-2xl sm:text-3xl font-bold font-mono text-primary tracking-tight">
-                -65%
-              </span>
-              <p className="text-xs text-muted-foreground">P99 Latency Reduction</p>
-            </div>
-            <div className="space-y-0.5">
-              <span className="text-2xl sm:text-3xl font-bold font-mono text-foreground tracking-tight">
-                10+ Yrs
-              </span>
-              <p className="text-xs text-muted-foreground">Production Experience</p>
+            <div className="flex items-center justify-center gap-3 sm:gap-6">
+              <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/90 to-foreground/60">
+                Engineer
+              </h1>
+              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 block xs:hidden" />
             </div>
           </div>
 
-          {/* Hero CTAs */}
-          <div className="flex flex-wrap items-center gap-4 pt-2">
-            <a
-              href="#projects"
-              className="px-6 py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-sm flex items-center gap-2 group transition-all"
+          {/* Subtitle / Value Proposition */}
+          <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed px-4 pt-2">
+            {headline}. Specializing in modern web platforms, distributed
+            backends, and elegant user experiences.
+          </p>
+
+          {/* CTA Buttons */}
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <Link
+              href="/projects"
+              className="px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-lg shadow-primary/20 flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer"
             >
-              <span>Explore Case Studies</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </a>
-            <a
-              href="#contact"
-              className="px-6 py-3.5 rounded-xl bg-card hover:bg-accent border border-border text-foreground text-xs sm:text-sm font-semibold transition-colors flex items-center gap-2"
+              <span>Explore Selected Works</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+            <Link
+              href="/contact"
+              className="px-6 py-3 rounded-full bg-card hover:bg-muted text-foreground text-xs sm:text-sm font-medium border border-border shadow-xs flex items-center gap-2 transition-all cursor-pointer"
             >
-              <Terminal className="w-4 h-4 text-primary" />
-              <span>Inquire & Book Discovery Call</span>
-            </a>
+              <span>Get in Touch</span>
+              <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+            </Link>
           </div>
         </div>
       </section>
 
-      {/* 2. FEATURED CASE STUDIES / PROJECTS */}
-      <section id="projects" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 scroll-mt-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium mb-3">
-              <Layers className="w-3.5 h-3.5" />
-              <span>SELECTED ARCHITECTURAL WORKS</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              Featured Case Studies & Engineering Deliverables
-            </h2>
-            <p className="text-muted-foreground text-sm mt-1 max-w-2xl">
-              Deep architectural audits, high-scale microservices, and bespoke enterprise user interfaces.
-            </p>
+      {/* ─────────────────────────────────────────────────────────────
+          2. STRATEGIC PHILOSOPHY & ELEVATOR BIO
+      ───────────────────────────────────────────────────────────── */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6">
+        <div className="p-8 sm:p-14 rounded-3xl bg-card/60 dark:bg-card/40 border border-border/80 backdrop-blur-md space-y-8 shadow-xs relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+
+          <div className="flex items-center gap-2 text-primary">
+            <ChromeSparkleIcon className="w-4 h-4" />
+            <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+              Engineering Philosophy
+            </span>
+          </div>
+
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-foreground tracking-tight leading-tight">
+            Building Digital Experiences with Precision and Purpose.
+          </h2>
+
+          <p className="text-sm sm:text-lg text-muted-foreground leading-relaxed">
+            {bio}
+          </p>
+
+          <div className="pt-4 flex flex-wrap items-center gap-4">
+            <Link
+              href="/about"
+              className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-primary hover:underline"
+            >
+              <span>Read complete career journey & values</span>
+              <ChevronRight className="w-4 h-4" />
+            </Link>
           </div>
         </div>
+      </section>
 
-        {/* Projects Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {projectsLoading ? (
-            Array.from({ length: 4 }).map((_, i) => (
+      {/* ─────────────────────────────────────────────────────────────
+          3. CAPABILITIES & SERVICES (Interactive Horizontal Rows)
+      ───────────────────────────────────────────────────────────── */}
+      <section
+        id="services"
+        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
+          <div>
+            <div className="flex items-center gap-2 text-primary pb-1">
+              <ChromeSparkleIcon className="w-3.5 h-3.5" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                Services & Capabilities
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+              What I Bring to the Table
+            </h2>
+          </div>
+          <p className="text-xs text-muted-foreground max-w-xs font-mono">
+            High-caliber technical execution across all layers of the stack.
+          </p>
+        </div>
+
+        <div className="space-y-3">
+          {SERVICES.map((service, index) => (
+            <div
+              key={service.title}
+              className="group p-6 sm:p-8 rounded-2xl bg-card/60 dark:bg-card/40 hover:bg-card border border-border/80 hover:border-primary/40 transition-all duration-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
+            >
+              <div className="space-y-2 max-w-xl">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-mono text-primary font-bold">
+                    0{index + 1}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">
+                    {service.title}
+                  </h3>
+                </div>
+                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed pl-7">
+                  {service.description}
+                </p>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-1.5 pl-7 md:pl-0">
+                {service.tags.map((tag) => (
+                  <span
+                    key={tag}
+                    className="px-2.5 py-1 rounded-lg bg-muted/80 border border-border/80 text-[11px] font-mono text-foreground font-medium"
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* ─────────────────────────────────────────────────────────────
+          4. SELECTED WORKS / FEATURED PROJECTS (Ambient Glow Cards)
+      ───────────────────────────────────────────────────────────── */}
+      <section
+        id="works"
+        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+      >
+        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
+          <div>
+            <div className="flex items-center gap-2 text-primary pb-1">
+              <ChromeSparkleIcon className="w-3.5 h-3.5" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                Portfolio Showcase
+              </span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+              Selected Works & Flagship Builds
+            </h2>
+          </div>
+
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline self-start sm:self-auto"
+          >
+            <span>View All Works ({projects.length})</span>
+            <ArrowUpRight className="w-4 h-4" />
+          </Link>
+        </div>
+
+        {projectsLoading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {[1, 2].map((i) => (
               <div
                 key={i}
-                className="bg-card border border-border rounded-2xl p-6 h-80 animate-pulse"
+                className="h-96 rounded-3xl bg-card border border-border animate-pulse"
               />
-            ))
-          ) : featuredProjects.length === 0 ? (
-            <div className="col-span-full py-20 text-center bg-card border border-border rounded-2xl">
-              <Layers className="w-10 h-10 text-muted-foreground mx-auto mb-2 opacity-60" />
-              <p className="text-sm font-semibold text-foreground">No projects published yet</p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Add case studies via the Admin CMS.
-              </p>
-            </div>
-          ) : (
-            featuredProjects.map((project: IProject) => (
+            ))}
+          </div>
+        ) : projects.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {projects.slice(0, 4).map((project: IProject) => (
               <div
                 key={project._id}
-                className="bg-card border border-border hover:border-primary/40 rounded-2xl overflow-hidden transition-all group flex flex-col justify-between shadow-sm hover:shadow-md"
+                className="group relative rounded-3xl bg-card border border-border/80 hover:border-primary/50 overflow-hidden shadow-xs hover:shadow-2xl transition-all duration-300 flex flex-col"
               >
-                {/* Project Header Image / Preview */}
-                <div className="relative h-60 bg-muted overflow-hidden border-b border-border">
+                {/* Thumbnail */}
+                <div className="relative aspect-[16/10] w-full bg-muted/80 overflow-hidden">
                   {project.thumbnailUrl ? (
-                    <img
+                    <Image
                       src={project.thumbnailUrl}
                       alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-muted/60 p-6 text-center">
-                      <Cpu className="w-10 h-10 text-primary/40 mb-2" />
-                      <span className="text-sm font-bold text-foreground">
-                        {project.title}
-                      </span>
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono text-xs">
+                      No Preview Available
                     </div>
                   )}
 
-                  {/* Impact Metric Overlay Badge */}
-                  {project.metrics && project.metrics.length > 0 && (
-                    <div className="absolute bottom-3 left-3 bg-background/90 backdrop-blur-md border border-border px-3 py-1.5 rounded-lg flex items-center gap-2 shadow-sm">
-                      <TrendingUp className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
-                      <span className="text-xs font-mono font-bold text-foreground">
-                        {project.metrics[0].value}
-                      </span>
-                      <span className="text-[10px] text-muted-foreground">
-                        {project.metrics[0].label}
-                      </span>
-                    </div>
-                  )}
+                  <div className="absolute top-3 left-3">
+                    <span className="px-3 py-1 rounded-full bg-background/85 border border-border backdrop-blur-md text-[10px] font-mono font-semibold text-foreground">
+                      {project.category || "Full-Stack"}
+                    </span>
+                  </div>
                 </div>
 
-                {/* Body Content */}
-                <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+                {/* Content Details */}
+                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
                   <div className="space-y-2">
                     <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                      <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">
                         {project.title}
                       </h3>
-                      <span className="text-xs font-mono text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
-                        {project.category}
-                      </span>
+                      {project.liveUrl && (
+                        <a
+                          href={project.liveUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                          title="Live Demo"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
                     </div>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
                       {project.summary}
                     </p>
                   </div>
 
-                  {/* Tech stack badges */}
-                  <div className="space-y-4 pt-4 border-t border-border">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      {project.technologies.slice(0, 5).map((tech: string) => (
-                        <span
-                          key={tech}
-                          className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                  {/* Tech Tags & Read More */}
+                  <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-2">
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      {(project.technologies || [])
+                        .slice(0, 3)
+                        .map((tech: string) => (
+                          <span
+                            key={tech}
+                            className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground"
+                          >
+                            {tech}
+                          </span>
+                        ))}
                     </div>
 
-                    {/* Links */}
-                    <div className="flex items-center justify-between pt-2">
-                      <div className="flex items-center gap-3">
-                        {project.liveUrl && (
-                          <a
-                            href={project.liveUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-                          >
-                            <span>Live System</span>
-                            <ExternalLink className="w-3.5 h-3.5" />
-                          </a>
-                        )}
-                        {project.githubUrl && (
-                          <a
-                            href={project.githubUrl}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground hover:text-foreground"
-                          >
-                            <GithubIcon className="w-3.5 h-3.5" />
-                            <span>Repository</span>
-                          </a>
-                        )}
-                      </div>
-
-                      {project.metrics && project.metrics.length > 1 && (
-                        <span className="text-[11px] font-mono text-emerald-600 dark:text-emerald-400 font-medium">
-                          +{project.metrics[1].value} {project.metrics[1].label}
-                        </span>
-                      )}
-                    </div>
+                    <Link
+                      href={`/projects/${project.slug}`}
+                      className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 shrink-0"
+                    >
+                      <span>Details</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
+                    </Link>
                   </div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
+            ))}
+          </div>
+        ) : (
+          <div className="p-12 text-center rounded-3xl bg-card border border-border space-y-2">
+            <Layers className="w-8 h-8 text-muted-foreground mx-auto" />
+            <p className="text-sm font-semibold text-foreground">
+              No featured projects yet
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Add projects marked as featured in the CMS.
+            </p>
+          </div>
+        )}
       </section>
 
-      {/* 3. INTERACTIVE TECH MATRIX */}
-      <section id="tech-stack" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 scroll-mt-24">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium">
-            <Code2 className="w-3.5 h-3.5" />
-            <span>CORE ARCHITECTURAL COMPETENCIES</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            Technical Stack & Production Mastery
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-            Battle-tested frameworks, distributed paradigms, and cloud primitives utilized in enterprise production.
-          </p>
-        </div>
-
-        {/* Category Pills */}
-        <div className="flex items-center justify-center gap-2 flex-wrap">
-          {skillCategories.map((cat) => (
-            <button
-              key={cat}
-              onClick={() => setActiveCategory(cat)}
-              className={`px-3.5 py-1.5 rounded-lg text-xs font-mono font-medium transition-all cursor-pointer ${
-                activeCategory === cat
-                  ? "bg-primary text-primary-foreground shadow-sm"
-                  : "bg-card border border-border text-muted-foreground hover:text-foreground hover:bg-accent"
-              }`}
-            >
-              {cat === "all" ? "All Domains" : cat}
-            </button>
-          ))}
-        </div>
-
-        {/* Skill Matrix Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {skillsLoading ? (
-            Array.from({ length: 6 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-xl p-4 h-24 animate-pulse"
-              />
-            ))
-          ) : filteredSkills.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-muted-foreground text-xs font-mono">
-              No skills listed for this category.
+      {/* ─────────────────────────────────────────────────────────────
+          5. SKILLS & TECHNICAL STACK MATRIX
+      ───────────────────────────────────────────────────────────── */}
+      {skills.length > 0 && (
+        <section
+          id="skills"
+          className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-primary pb-1">
+                <ChromeSparkleIcon className="w-3.5 h-3.5" />
+                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                  Technical Stack
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                Technologies & Tooling
+              </h2>
             </div>
-          ) : (
-            filteredSkills.map((skill: ISkill) => (
+            <p className="text-xs font-mono text-muted-foreground">
+              {skills.length} core technical proficiencies
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            {skills.map((skill) => (
               <div
                 key={skill._id}
-                className="bg-card border border-border hover:border-primary/40 rounded-xl p-4 transition-all group shadow-sm"
+                className="p-4 rounded-2xl bg-card/60 dark:bg-card/40 border border-border/80 hover:border-primary/50 text-center space-y-2 transition-all hover:scale-102 shadow-xs group"
               >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-bold text-foreground group-hover:text-primary transition-colors">
-                        {skill.name}
-                      </span>
-                      {skill.isTopSkill && (
-                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                          CORE
-                        </span>
-                      )}
-                    </div>
-                    <span className="text-[10px] font-mono text-primary">
-                      {skill.category}
-                    </span>
-                  </div>
-
-                  <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400">
-                    {skill.proficiency ?? 90}%
-                  </span>
+                <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center mx-auto text-primary font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                  <Code2 className="w-4 h-4" />
                 </div>
-
-                <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden mt-3">
-                  <div
-                    className="h-full bg-gradient-to-r from-primary via-indigo-400 to-emerald-400 rounded-full"
-                    style={{ width: `${skill.proficiency ?? 90}%` }}
-                  />
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* 4. CAREER TIMELINE & LEADERSHIP */}
-      <section id="experience" className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 scroll-mt-24">
-        <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium mb-3">
-            <Briefcase className="w-3.5 h-3.5" />
-            <span>PROVEN TRACK RECORD</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            Career Timeline & Measurable Impact
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm mt-1 max-w-xl">
-            A history of driving technical roadmaps, leading distributed engineering teams, and solving complex scalability challenges.
-          </p>
-        </div>
-
-        <div className="space-y-6 relative before:absolute before:inset-0 before:left-3.5 sm:before:left-4 before:w-0.5 before:bg-border">
-          {expLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-xl p-6 ml-10 animate-pulse h-36"
-              />
-            ))
-          ) : experiences.length === 0 ? (
-            <div className="py-12 text-center text-muted-foreground text-xs font-mono bg-card rounded-xl border border-border ml-10">
-              No career history recorded.
-            </div>
-          ) : (
-            experiences.map((exp: IExperience) => (
-              <div key={exp._id} className="relative pl-10">
-                {/* Timeline node icon */}
-                <div className="absolute left-1.5 sm:left-2 top-4 -translate-x-1/2 w-4 h-4 rounded-full bg-primary border-2 border-background shadow-sm" />
-
-                <div className="bg-card border border-border hover:border-primary/40 rounded-xl p-6 transition-all space-y-3 shadow-sm">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-                    <div>
-                      <div className="flex items-center gap-2.5 flex-wrap">
-                        <span className="text-base font-bold text-foreground">
-                          {exp.role}
-                        </span>
-                        <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded border border-primary/20">
-                          @{exp.company}
-                        </span>
-                        {exp.isCurrent && (
-                          <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
-                            Present Role
-                          </span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-xs font-mono text-muted-foreground flex items-center gap-1.5">
-                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                      {formatMonthYear(exp.startDate)} -{" "}
-                      {exp.isCurrent
-                        ? "Present"
-                        : exp.endDate
-                        ? formatMonthYear(exp.endDate)
-                        : "Present"}
-                    </div>
-                  </div>
-
-                  {exp.summary && (
-                    <p className="text-xs sm:text-sm text-foreground/80 leading-relaxed">
-                      {exp.summary}
-                    </p>
-                  )}
-
-                  {exp.achievements && exp.achievements.length > 0 && (
-                    <ul className="space-y-1.5 pt-1">
-                      {exp.achievements.map((h: string, idx: number) => (
-                        <li
-                          key={idx}
-                          className="flex items-start gap-2 text-xs text-foreground/80"
-                        >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
-                          <span>{h}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-
-                  {exp.technologies && exp.technologies.length > 0 && (
-                    <div className="flex items-center gap-1.5 flex-wrap pt-2">
-                      {exp.technologies.map((t: string) => (
-                        <span
-                          key={t}
-                          className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* 5. CLIENT & PEER ENDORSEMENTS / TESTIMONIALS */}
-      <section id="testimonials" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 scroll-mt-24">
-        <div className="text-center max-w-2xl mx-auto space-y-3">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>LEADERSHIP SOCIAL PROOF</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-            Client & Executive Endorsements
-          </h2>
-          <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">
-            Recommendations from VP of Engineering leaders, startup founders, and technical directors.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {testLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-2xl p-6 h-56 animate-pulse"
-              />
-            ))
-          ) : testimonials.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-muted-foreground text-xs font-mono bg-card rounded-2xl border border-border">
-              No testimonials yet.
-            </div>
-          ) : (
-            testimonials.map((t: ITestimonial) => (
-              <div
-                key={t._id}
-                className="bg-card border border-border hover:border-primary/40 rounded-2xl p-6 flex flex-col justify-between transition-all group shadow-sm"
-              >
-                <div className="space-y-4">
-                  {/* Star rating */}
-                  <div className="flex items-center gap-1 text-amber-400">
-                    {Array.from({ length: t.rating || 5 }).map((_, i) => (
-                      <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                    ))}
-                  </div>
-
-                  <p className="text-xs sm:text-sm text-foreground/85 italic leading-relaxed">
-                    "{t.quote}"
+                <div>
+                  <p className="text-xs font-bold text-foreground truncate">
+                    {skill.name}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-mono capitalize">
+                    {skill.category || "Tool"}
                   </p>
                 </div>
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
 
-                <div className="flex items-center gap-3 pt-6 border-t border-border mt-6">
-                  <div className="w-9 h-9 rounded-full bg-muted border border-border flex items-center justify-center font-bold text-foreground text-xs overflow-hidden shrink-0">
-                    {t.avatarUrl ? (
-                      <img
-                        src={t.avatarUrl}
-                        alt={t.clientName}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      t.clientName.charAt(0).toUpperCase()
-                    )}
-                  </div>
+      {/* ─────────────────────────────────────────────────────────────
+          7. TESTIMONIALS & ENDORSEMENTS
+      ───────────────────────────────────────────────────────────── */}
+      {testimonials.length > 0 && (
+        <section
+          id="testimonials"
+          className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-primary pb-1">
+                <ChromeSparkleIcon className="w-3.5 h-3.5" />
+                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                  Social Proof
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                Client & Peer Endorsements
+              </h2>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((test: ITestimonial) => (
+              <div
+                key={test._id}
+                className="p-6 sm:p-8 rounded-3xl bg-card/60 dark:bg-card/40 border border-border/80 space-y-4 shadow-xs flex flex-col justify-between"
+              >
+                <Quote className="w-6 h-6 text-primary/40" />
+                <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed italic">
+                  &ldquo;{test.quote}&rdquo;
+                </p>
+
+                <div className="flex items-center gap-3 pt-3 border-t border-border/60">
+                  <Avatar className="w-10 h-10 rounded-full border border-border">
+                    <AvatarImage src={test.avatarUrl} alt={test.clientName} />
+                    <AvatarFallback className="font-bold text-xs bg-primary/15 text-primary">
+                      {test.clientName.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
                   <div>
-                    <span className="font-bold text-foreground text-xs block">
-                      {t.clientName}
-                    </span>
-                    <span className="text-[11px] text-muted-foreground font-mono block">
-                      {t.clientRole}
-                      {t.company ? ` @ ${t.company}` : ""}
-                    </span>
+                    <h4 className="text-xs font-bold text-foreground">
+                      {test.clientName}
+                    </h4>
+                    <p className="text-[11px] text-muted-foreground">
+                      {test.clientRole} {test.company && `@ ${test.company}`}
+                    </p>
                   </div>
                 </div>
               </div>
-            ))
-          )}
-        </div>
-      </section>
-
-      {/* 6. ENGINEERING INSIGHTS & ARTICLES */}
-      <section id="articles" className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 scroll-mt-24">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium mb-3">
-              <FileText className="w-3.5 h-3.5" />
-              <span>TECHNICAL WRITING</span>
-            </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              Engineering Insights & Deep Dives
-            </h2>
-            <p className="text-muted-foreground text-xs sm:text-sm mt-1 max-w-xl">
-              Architectural breakdowns, concurrency patterns, and lessons from building scalable systems.
-            </p>
+            ))}
           </div>
-        </div>
+        </section>
+      )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {postsLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div
-                key={i}
-                className="bg-card border border-border rounded-2xl p-6 h-64 animate-pulse"
-              />
-            ))
-          ) : posts.length === 0 ? (
-            <div className="col-span-full py-12 text-center text-muted-foreground text-xs font-mono bg-card rounded-2xl border border-border">
-              No articles published yet.
+      {/* ─────────────────────────────────────────────────────────────
+          8. RECENT WRITING & INSIGHTS
+      ───────────────────────────────────────────────────────────── */}
+      {posts.length > 0 && (
+        <section
+          id="articles"
+          className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+        >
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-primary pb-1">
+                <ChromeSparkleIcon className="w-3.5 h-3.5" />
+                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                  Technical Writing
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                Articles & Architecture Thoughts
+              </h2>
             </div>
-          ) : (
-            posts.map((post: IPost) => (
-              <div
+
+            <Link
+              href="/blog"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline self-start sm:self-auto"
+            >
+              <span>View All Articles</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <div className="space-y-3">
+            {posts.map((post: IPost) => (
+              <Link
                 key={post._id}
-                className="bg-card border border-border hover:border-primary/40 rounded-2xl p-6 flex flex-col justify-between transition-all group shadow-sm"
+                href={`/blog/${post.slug}`}
+                className="group p-5 sm:p-6 rounded-2xl bg-card/60 dark:bg-card/40 hover:bg-card border border-border/80 hover:border-primary/50 transition-all duration-200 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4"
               >
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between text-[11px] font-mono text-muted-foreground">
-                    <span>{formatDate(post.createdAt)}</span>
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-muted-foreground" />
-                      {post.readingTimeMinutes || 5} min
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      {new Date(
+                        post.createdAt || Date.now(),
+                      ).toLocaleDateString("en-US", {
+                        month: "short",
+                        day: "numeric",
+                        year: "numeric",
+                      })}
+                    </span>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      •
+                    </span>
+                    <span className="text-[10px] font-mono text-primary font-medium">
+                      {post.tags?.[0] || "Engineering"}
                     </span>
                   </div>
-
-                  <h3 className="font-bold text-foreground text-base group-hover:text-primary transition-colors leading-snug">
+                  <h3 className="text-sm sm:text-base font-bold text-foreground group-hover:text-primary transition-colors">
                     {post.title}
                   </h3>
-
-                  <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-                    {post.excerpt}
-                  </p>
                 </div>
 
-                <div className="flex items-center gap-1.5 flex-wrap pt-4 mt-4 border-t border-border">
-                  {post.tags.slice(0, 3).map((t: string) => (
-                    <span
-                      key={t}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
-                    >
-                      {t}
-                    </span>
-                  ))}
+                <div className="inline-flex items-center gap-1 text-xs font-semibold text-muted-foreground group-hover:text-primary transition-colors shrink-0">
+                  <span>Read Article</span>
+                  <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </div>
-              </div>
-            ))
-          )}
-        </div>
-      </section>
+              </Link>
+            ))}
+          </div>
+        </section>
+      )}
 
-      {/* 7. INQUIRY / DISCOVERY CONTACT FORM (react-hook-form) */}
-      <section id="contact" className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 scroll-mt-24">
-        <div className="bg-card border border-border rounded-3xl p-6 sm:p-12 shadow-md relative overflow-hidden">
-          {/* Ambient corner glow */}
-          <div className="absolute top-0 right-0 w-80 h-80 bg-primary/10 rounded-full blur-[100px] pointer-events-none" />
+      {/* ─────────────────────────────────────────────────────────────
+          9. INTERACTIVE CONTACT TERMINAL & INQUIRY FORM
+      ───────────────────────────────────────────────────────────── */}
+      <section
+        id="contact"
+        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+      >
+        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-border shadow-xl space-y-8 relative overflow-hidden">
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
 
-          <div className="space-y-4 mb-8">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-primary/10 text-primary border border-primary/20 text-xs font-mono font-medium">
-              <Send className="w-3.5 h-3.5" />
-              <span>DIRECT INQUIRY CHANNEL</span>
+          <div className="space-y-3 relative z-10">
+            <div className="flex items-center gap-2 text-primary">
+              <ChromeSparkleIcon className="w-4 h-4" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                Direct Inquiry
+              </span>
             </div>
-            <h2 className="text-3xl sm:text-4xl font-bold text-foreground tracking-tight">
-              Start an Architectural Consultation
+            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
+              Let&apos;s Build Something Remarkable Together.
             </h2>
-            <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed max-w-xl">
-              Tell me about your system scope, timeline, and architectural objectives. I review every submission personally and respond within 12 hours.
+            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
+              Have an upcoming product build, architecture advisory need, or
+              contracting role? Send a message directly to my inbox.
             </p>
           </div>
 
-          <form onSubmit={handleSubmit(onSubmitContact)} className="space-y-5 relative z-10">
+          <form
+            onSubmit={handleContactSubmit}
+            className="space-y-4 relative z-10"
+          >
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Your Name *</label>
+                <label className="text-xs font-medium text-foreground">
+                  Your Name *
+                </label>
                 <input
                   type="text"
-                  {...register("senderName", { required: "Name is required" })}
-                  placeholder="e.g. David Vance"
-                  className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors"
+                  required
+                  value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="Alex Rivers"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
-                {errors.senderName && (
-                  <span className="text-[10px] text-destructive">{errors.senderName.message}</span>
-                )}
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Work Email *</label>
+                <label className="text-xs font-medium text-foreground">
+                  Your Email Address *
+                </label>
                 <input
                   type="email"
-                  {...register("senderEmail", {
-                    required: "Email is required",
-                    pattern: {
-                      value: /^\S+@\S+$/i,
-                      message: "Invalid email address",
-                    },
-                  })}
-                  placeholder="e.g. david@company.com"
-                  className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors"
+                  required
+                  value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="alex@company.com"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
-                {errors.senderEmail && (
-                  <span className="text-[10px] text-destructive">{errors.senderEmail.message}</span>
-                )}
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Company / Organization</label>
-                <input
-                  type="text"
-                  {...register("company")}
-                  placeholder="e.g. Fintech Dynamics"
-                  className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Target Budget / Engagement Scope</label>
-                <select
-                  {...register("budgetRange")}
-                  className="w-full bg-background border border-border focus:border-primary rounded-xl px-4 py-3 text-xs text-foreground focus:outline-none transition-colors"
-                >
-                  <option value="$5,000 - $10,000">$5,000 - $10,000 (Sprint Audit / POC)</option>
-                  <option value="$10,000 - $25,000">$10,000 - $25,000 (Full-Stack Architecture / Build)</option>
-                  <option value="$25,000 - $50,000+">$25,000 - $50,000+ (Flagship Platform / Re-Architecture)</option>
-                  <option value="Full-Time ($150k - $250k+ / yr)">Full-Time Staff/Lead Role ($150k - $250k+ / yr)</option>
-                </select>
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Project Overview & Objectives *</label>
-              <textarea
-                {...register("message", { required: "Message is required" })}
-                placeholder="Describe your product requirements, current architectural bottlenecks, target timelines..."
-                rows={5}
-                className="w-full bg-background border border-border focus:border-primary rounded-xl p-4 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors resize-none"
+              <label className="text-xs font-medium text-foreground">
+                Subject / Project Scope
+              </label>
+              <input
+                type="text"
+                value={contactSubject}
+                onChange={(e) => setContactSubject(e.target.value)}
+                placeholder="e.g. Next.js Enterprise Re-architecture & Staff Advisory"
+                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
-              {errors.message && (
-                <span className="text-[10px] text-destructive">{errors.message.message}</span>
-              )}
             </div>
 
-            <button
-              type="submit"
-              disabled={isSubmitting || submitContactMutation.isPending}
-              className="w-full py-3.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-sm flex items-center justify-center gap-2 group transition-all disabled:opacity-50 cursor-pointer"
-            >
-              <Send className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-              <span>
-                {submitContactMutation.isPending
-                  ? "Transmitting Inquiry..."
-                  : "Dispatch Inquiry to Alex Morgan"}
-              </span>
-            </button>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-foreground">
+                Project Details & Requirements *
+              </label>
+              <textarea
+                required
+                rows={4}
+                value={contactMessage}
+                onChange={(e) => setContactMessage(e.target.value)}
+                placeholder="Tell me about your product vision, timeline, stack, and goals..."
+                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none leading-relaxed"
+              />
+            </div>
+
+            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                <span>Encrypted transmission directly to CRM</span>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitMessageMutation.isPending}
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 flex items-center justify-center gap-2 transition-all hover:scale-102 active:scale-98 disabled:opacity-50 cursor-pointer"
+              >
+                {submitMessageMutation.isPending ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+                <span>Send Direct Inquiry</span>
+              </button>
+            </div>
           </form>
         </div>
       </section>
