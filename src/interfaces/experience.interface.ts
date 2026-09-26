@@ -20,7 +20,6 @@ export interface IExperience {
   technologies: string[];
   companyLogoUrl?: string;
   companyWebsiteUrl?: string;
-  order: number;
   createdAt: string;
   updatedAt: string;
 }

@@ -2,11 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
-import {
-  useMessages,
-  useUpdateMessageStatus,
-  useDeleteMessage,
-} from "@/hooks";
+import { useMessages, useUpdateMessageStatus, useDeleteMessage } from "@/hooks";
 import { IMessage } from "@/interfaces";
 import {
   Mail,
@@ -80,7 +76,11 @@ export function MessagesView() {
 
   const handleOpenMessage = (msg: IMessage) => {
     if (msg.status === "unread") {
-      updateStatusMutation.mutate({ id: msg._id, status: "read", showToast: false });
+      updateStatusMutation.mutate({
+        id: msg._id,
+        status: "read",
+        showToast: false,
+      });
     }
     router.push(`/admin/messages/${msg._id}`);
   };
@@ -100,7 +100,8 @@ export function MessagesView() {
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Client project briefs, high-throughput inquiries, and proposal communication telemetry.
+            Client project briefs, high-throughput inquiries, and proposal
+            communication telemetry.
           </p>
         </div>
 
@@ -205,7 +206,9 @@ export function MessagesView() {
               <Inbox className="w-5 h-5 opacity-80" />
             </div>
             <div className="space-y-0.5">
-              <h3 className="text-sm font-semibold text-foreground">No Inquiries Found</h3>
+              <h3 className="text-sm font-semibold text-foreground">
+                No Inquiries Found
+              </h3>
               <p className="text-xs text-muted-foreground max-w-sm mx-auto">
                 {search
                   ? "No inquiries matched your search criteria."
@@ -272,7 +275,9 @@ export function MessagesView() {
                       {msg.company && (
                         <span className="text-[9px] px-1 py-0.2 rounded bg-muted text-muted-foreground border border-border font-medium flex items-center gap-0.5 shrink-0">
                           <Building className="w-2 h-2 opacity-70" />
-                          <span className="truncate max-w-[80px]">{msg.company}</span>
+                          <span className="truncate max-w-[80px]">
+                            {msg.company}
+                          </span>
                         </span>
                       )}
                     </div>
