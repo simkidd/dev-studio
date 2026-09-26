@@ -68,3 +68,24 @@ export const useDeleteExperience = () => {
     },
   });
 };
+
+export const useReorderExperiences = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (orders: { id: string; order: number }[]) => {
+      const res = await experiencesApi.reorder(orders);
+      return res;
+    },
+    onSuccess: () => {
+      toast.success("Career timeline order saved");
+      queryClient.invalidateQueries({ queryKey: ["experiences"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to reorder experiences"
+      );
+    },
+  });
+};
+

@@ -24,7 +24,7 @@ export function AdminDashboardShell({ children }: AdminDashboardShellProps) {
         <AdminSidebar />
         <SidebarInset className="flex-1 flex flex-col min-w-0 bg-background text-foreground font-sans">
           <AdminHeader />
-          <main className="flex-1 overflow-y-auto bg-background p-4 sm:p-6">
+          <main className="flex-1 overflow-y-auto overflow-x-hidden min-w-0 bg-background p-4 sm:p-6">
             {children}
           </main>
         </SidebarInset>

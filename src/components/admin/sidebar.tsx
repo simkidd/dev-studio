@@ -12,7 +12,7 @@ import {
   Cpu,
   Briefcase,
   Quote,
-  UserCheck,
+  Settings,
   Terminal,
   LogOut,
   ExternalLink,
@@ -31,6 +31,7 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export interface NavItem {
   title: string;
@@ -103,9 +104,9 @@ export function AdminSidebar() {
       title: "SYSTEM",
       items: [
         {
-          title: "Profile & SEO",
+          title: "Settings",
           href: "/admin/profile",
-          icon: UserCheck,
+          icon: Settings,
         },
       ],
     },
@@ -219,26 +220,14 @@ export function AdminSidebar() {
       <SidebarFooter className="p-2 border-t border-sidebar-border bg-sidebar/50">
         <div className="flex items-center justify-between p-1.5 rounded-lg bg-sidebar-accent/50 border border-sidebar-border group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
           <div className="flex items-center gap-2.5 min-w-0 group-data-[collapsible=icon]:justify-center">
-            <div
-              className="w-8 h-8 rounded-lg bg-gradient-to-tr from-slate-700 to-slate-600 flex items-center justify-center text-xs font-bold text-white shrink-0 shadow-sm overflow-hidden"
-              title={
-                user?.firstName
-                  ? `${user.firstName} ${user.lastName || ""}`
-                  : user?.email || "Admin"
-              }
-            >
-              {user?.avatarUrl ? (
-                <img
-                  src={user.avatarUrl}
-                  alt={user.firstName || "Admin"}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                user?.firstName?.charAt(0).toUpperCase() ||
-                user?.email?.charAt(0).toUpperCase() ||
-                "A"
-              )}
-            </div>
+            <Avatar className="w-8 h-8 rounded-lg border border-sidebar-border shrink-0">
+              <AvatarImage src={user?.avatarUrl} alt={user?.firstName || "Admin"} className="object-cover rounded-lg" />
+              <AvatarFallback className="rounded-lg bg-sidebar-accent text-sidebar-foreground font-bold text-xs">
+                {user?.firstName?.charAt(0).toUpperCase() ||
+                  user?.email?.charAt(0).toUpperCase() ||
+                  "A"}
+              </AvatarFallback>
+            </Avatar>
             <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <p className="text-xs font-medium text-sidebar-foreground truncate">
                 {user?.firstName && user?.lastName

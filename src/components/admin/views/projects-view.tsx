@@ -49,6 +49,8 @@ import {
 import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { formatMonthYear } from "@/lib/date.utils";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 
 export function ProjectsView() {
   const router = useRouter();
@@ -69,6 +71,7 @@ export function ProjectsView() {
     id: string;
     title: string;
   } | null>(null);
+  const [togglePublishedTarget, setTogglePublishedTarget] = useState<IProject | null>(null);
 
   const {
     data: projectsResponse,
@@ -165,8 +168,9 @@ export function ProjectsView() {
   };
 
   const handleTogglePublished = (project: IProject) => {
-    togglePublishedMutation.mutate(project._id);
+    setTogglePublishedTarget(project);
   };
+
 
   const totalProjects = allProjects.length;
   const publishedCount = allProjects.filter(
@@ -248,13 +252,13 @@ export function ProjectsView() {
       <div className="bg-card border border-border rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
         {/* Left: Search input */}
         <div className="relative min-w-[240px] flex-1 max-w-sm">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" />
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Filter projects by title, stack, keyword..."
-            className="w-full bg-background border border-border rounded-lg pl-8.5 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            className="pl-8 text-xs h-9"
           />
         </div>
 
@@ -325,14 +329,19 @@ export function ProjectsView() {
           <TableHeader className="border-b border-border bg-muted/50">
             <TableRow className="border-b border-border hover:bg-transparent text-[11px] font-semibold text-muted-foreground uppercase tracking-wider select-none">
               <TableHead className="w-10 px-3.5 py-3 text-center">
-                <input
-                  type="checkbox"
+                <Checkbox
                   checked={
                     paginatedProjects.length > 0 &&
                     selectedIds.length === paginatedProjects.length
                   }
-                  onChange={handleSelectAll}
-                  className="w-3.5 h-3.5 rounded bg-background border-border text-primary focus:ring-0 cursor-pointer"
+                  onCheckedChange={(checked) => {
+                    if (checked) {
+                      setSelectedIds(paginatedProjects.map((p: IProject) => p._id));
+                    } else {
+                      setSelectedIds([]);
+                    }
+                  }}
+                  aria-label="Select all"
                 />
               </TableHead>
               <TableHead className="px-3.5 py-3 text-muted-foreground">
@@ -431,11 +440,10 @@ export function ProjectsView() {
                   >
                     {/* Checkbox */}
                     <TableCell className="px-3.5 py-3.5 text-center">
-                      <input
-                        type="checkbox"
+                      <Checkbox
                         checked={isSelected}
-                        onChange={() => handleToggleSelect(proj._id)}
-                        className="w-3.5 h-3.5 rounded bg-background border-border text-primary focus:ring-0 cursor-pointer"
+                        onCheckedChange={() => handleToggleSelect(proj._id)}
+                        aria-label={`Select ${proj.title}`}
                       />
                     </TableCell>
 
@@ -594,76 +602,71 @@ export function ProjectsView() {
 
                     {/* Context Action Menu */}
                     <TableCell className="px-3.5 py-3.5 text-right whitespace-nowrap">
-                      <div className="flex items-center justify-end gap-1.5">
-                        <button
-                          onClick={() => handleOpenDetails(proj)}
-                          className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-primary cursor-pointer"
-                          title="View Details"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
-                        <button
-                          onClick={() => handleEdit(proj)}
-                          className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer"
-                          title="Edit"
-                        >
-                          <Edit className="w-3.5 h-3.5" />
-                        </button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <button
-                              className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground cursor-pointer"
-                              title="More Options"
-                            >
-                              <MoreHorizontal className="w-3.5 h-3.5" />
-                            </button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent
-                            align="end"
-                            className="bg-popover border-border text-popover-foreground text-xs shadow-2xl"
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <button
+                            className="p-1.5 rounded-lg hover:bg-muted text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                            title="More Options"
                           >
-                            <DropdownMenuItem
-                              onClick={() => handleOpenDetails(proj)}
-                              className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                            >
-                              <Eye className="w-3.5 h-3.5 mr-2" /> View Details
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleEdit(proj)}
-                              className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                            >
-                              <Edit className="w-3.5 h-3.5 mr-2" /> Edit Project
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleToggleFeatured(proj)}
-                              className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                            >
-                              <Star className="w-3.5 h-3.5 mr-2 text-amber-500 dark:text-amber-400" />
-                              {proj.isFeatured ? "Unstar" : "Set Featured"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleTogglePublished(proj)}
-                              className="cursor-pointer hover:bg-accent hover:text-accent-foreground"
-                            >
-                              {proj.isPublished ? (
-                                <XCircle className="w-3.5 h-3.5 mr-2 text-amber-500 dark:text-amber-400" />
-                              ) : (
-                                <CheckCircle2 className="w-3.5 h-3.5 mr-2 text-emerald-500 dark:text-emerald-400" />
-                              )}
-                              {proj.isPublished
-                                ? "Set to Draft"
-                                : "Publish Live"}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator className="bg-border" />
-                            <DropdownMenuItem
-                              onClick={() => handleDelete(proj._id, proj.title)}
-                              className="cursor-pointer text-destructive hover:bg-destructive/10 hover:text-destructive"
-                            >
-                              <Trash2 className="w-3.5 h-3.5 mr-2" /> Delete
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
+                            <MoreHorizontal className="w-4 h-4" />
+                          </button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent
+                          align="end"
+                          className="w-44 bg-popover border-border text-popover-foreground text-[11px] shadow-xl p-1"
+                        >
+                          <DropdownMenuItem
+                            onClick={() => handleOpenDetails(proj)}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <Eye className="w-3 h-3 mr-2 text-muted-foreground" /> View Details
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleEdit(proj)}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <Edit className="w-3 h-3 mr-2 text-muted-foreground" /> Edit Project
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => window.open(`/projects/${proj.slug}`, "_blank")}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <ExternalLink className="w-3 h-3 mr-2 text-muted-foreground" /> View Public Page
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator className="bg-border my-1" />
+
+                          <DropdownMenuItem
+                            onClick={() => handleToggleFeatured(proj)}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          >
+                            <Star className="w-3 h-3 mr-2 text-amber-500 dark:text-amber-400" />
+                            {proj.isFeatured ? "Unstar Highlight" : "Feature on Homepage"}
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={() => handleTogglePublished(proj)}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
+                          >
+                            {proj.isPublished ? (
+                              <XCircle className="w-3 h-3 mr-2 text-amber-500 dark:text-amber-400" />
+                            ) : (
+                              <CheckCircle2 className="w-3 h-3 mr-2 text-emerald-500 dark:text-emerald-400" />
+                            )}
+                            {proj.isPublished
+                              ? "Set to Draft"
+                              : "Publish Live"}
+                          </DropdownMenuItem>
+
+                          <DropdownMenuSeparator className="bg-border my-1" />
+
+                          <DropdownMenuItem
+                            onClick={() => handleDelete(proj._id, proj.title)}
+                            className="text-[11px] py-1.5 px-2 cursor-pointer text-destructive focus:bg-destructive/10 focus:text-destructive"
+                          >
+                            <Trash2 className="w-3 h-3 mr-2" /> Delete Project
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
                         </DropdownMenu>
-                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -708,6 +711,36 @@ export function ProjectsView() {
         confirmText="Delete Project"
         isLoading={deleteProjectMutation.isPending}
         variant="destructive"
+      />
+
+      {/* Toggle Published Confirmation Modal */}
+      <ConfirmationModal
+        open={!!togglePublishedTarget}
+        onOpenChange={(open) => !open && setTogglePublishedTarget(null)}
+        onConfirm={() => {
+          if (togglePublishedTarget) {
+            togglePublishedMutation.mutate(togglePublishedTarget._id, {
+              onSuccess: () => setTogglePublishedTarget(null),
+            });
+          }
+        }}
+        title={
+          togglePublishedTarget?.isPublished
+            ? "Unpublish Project"
+            : "Publish Project"
+        }
+        description={`Are you sure you want to ${
+          togglePublishedTarget?.isPublished
+            ? "unpublish and set this project to draft"
+            : "publish this showcase project live"
+        }?`}
+        confirmText={
+          togglePublishedTarget?.isPublished
+            ? "Set to Draft"
+            : "Publish Live"
+        }
+        isLoading={togglePublishedMutation.isPending}
+        variant={togglePublishedTarget?.isPublished ? "destructive" : "default"}
       />
     </div>
   );

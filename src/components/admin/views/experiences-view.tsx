@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import {
   useExperiences,
   useCreateExperience,
   useUpdateExperience,
   useDeleteExperience,
+  useReorderExperiences,
 } from "@/hooks";
 import { IExperience, ExperienceType } from "@/interfaces";
 import {
@@ -17,6 +18,8 @@ import {
   Calendar,
   MapPin,
   RefreshCw,
+  ChevronUp,
+  ChevronDown,
 } from "lucide-react";
 import {
   Dialog,
@@ -31,6 +34,16 @@ import { PillFilter } from "@/components/ui/pill-filter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { formatMonthYear } from "@/lib/date.utils";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export interface ExperienceFormData {
   company: string;
@@ -90,6 +103,23 @@ export function ExperiencesView() {
   const createMutation = useCreateExperience();
   const updateMutation = useUpdateExperience();
   const deleteMutation = useDeleteExperience();
+  const reorderMutation = useReorderExperiences();
+
+  const handleMove = (index: number, direction: "up" | "down") => {
+    const targetIndex = direction === "up" ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= experiences.length) return;
+
+    const newExperiences = [...experiences];
+    const [moved] = newExperiences.splice(index, 1);
+    newExperiences.splice(targetIndex, 0, moved);
+
+    const orders = newExperiences.map((item, idx) => ({
+      id: item._id,
+      order: idx + 1,
+    }));
+
+    reorderMutation.mutate(orders);
+  };
 
   const handleOpenCreate = () => {
     setEditingExp(null);
@@ -152,7 +182,7 @@ export function ExperiencesView() {
       summary: data.summary,
       technologies: techList,
       achievements: achievementList,
-      order: 0,
+      order: editingExp ? (editingExp.order ?? 0) : experiences.length + 1,
     };
 
     if (editingExp) {
@@ -249,7 +279,7 @@ export function ExperiencesView() {
             </p>
           </div>
         ) : (
-          experiences.map((exp: IExperience) => (
+          experiences.map((exp: IExperience, idx: number) => (
             <div
               key={exp._id}
               className="bg-card border border-border hover:border-primary/40 rounded-xl p-5 transition-all group shadow-sm"
@@ -290,15 +320,39 @@ export function ExperiencesView() {
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0 opacity-80 group-hover:opacity-100">
+                  {/* Reorder Up / Down */}
+                  <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5 mr-1">
+                    <button
+                      type="button"
+                      disabled={idx === 0 || reorderMutation.isPending}
+                      onClick={() => handleMove(idx, "up")}
+                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                      title="Move position up"
+                    >
+                      <ChevronUp className="w-3.5 h-3.5" />
+                    </button>
+                    <button
+                      type="button"
+                      disabled={idx === experiences.length - 1 || reorderMutation.isPending}
+                      onClick={() => handleMove(idx, "down")}
+                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
+                      title="Move position down"
+                    >
+                      <ChevronDown className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+
                   <button
                     onClick={() => handleOpenEdit(exp)}
                     className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
+                    title="Edit experience"
                   >
                     <Edit className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => handleDelete(exp._id, exp.company)}
                     className="p-1.5 rounded hover:bg-destructive/10 text-muted-foreground hover:text-destructive transition-colors cursor-pointer"
+                    title="Delete experience"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -343,8 +397,8 @@ export function ExperiencesView() {
 
       {/* Add / Edit Experience Dialog Form with ScrollArea */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-2xl bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl">
-          <DialogHeader className="p-6 pb-3 border-b border-border">
+        <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0">
+          <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
             <DialogTitle className="text-base font-bold text-foreground">
               {editingExp ? "Edit Career Experience" : "Add Career Experience"}
             </DialogTitle>
@@ -353,18 +407,18 @@ export function ExperiencesView() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ScrollArea className="max-h-[68vh] p-6 space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col min-h-0 flex-1 overflow-hidden">
+            <ScrollArea className="flex-1 min-h-0 w-full p-6">
               <div className="space-y-4 pr-2">
                 {/* Company & Role */}
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Company Name *</label>
-                    <input
+                    <Input
                       type="text"
                       {...register("company", { required: "Company is required" })}
                       placeholder="e.g. Stripe, Vercel"
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                     {errors.company && (
                       <span className="text-[10px] text-destructive">{errors.company.message}</span>
@@ -373,11 +427,11 @@ export function ExperiencesView() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Job Title / Role *</label>
-                    <input
+                    <Input
                       type="text"
                       {...register("role", { required: "Role is required" })}
                       placeholder="e.g. Staff Full-Stack Engineer"
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                     {errors.role && (
                       <span className="text-[10px] text-destructive">{errors.role.message}</span>
@@ -388,26 +442,34 @@ export function ExperiencesView() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Location</label>
-                    <input
+                    <Input
                       type="text"
                       {...register("location")}
                       placeholder="e.g. San Francisco, CA (Remote)"
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Type</label>
-                    <select
-                      {...register("employmentType")}
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer"
-                    >
-                      <option value="full-time">Full-Time</option>
-                      <option value="contract">Contract</option>
-                      <option value="freelance">Freelance</option>
-                      <option value="part-time">Part-Time</option>
-                      <option value="internship">Internship</option>
-                    </select>
+                    <Controller
+                      name="employmentType"
+                      control={control}
+                      render={({ field }) => (
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="text-xs h-9">
+                            <SelectValue placeholder="Select type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="full-time">Full-Time</SelectItem>
+                            <SelectItem value="contract">Contract</SelectItem>
+                            <SelectItem value="freelance">Freelance</SelectItem>
+                            <SelectItem value="part-time">Part-Time</SelectItem>
+                            <SelectItem value="internship">Internship</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                 </div>
 
@@ -415,10 +477,10 @@ export function ExperiencesView() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Start Date *</label>
-                    <input
+                    <Input
                       type="date"
                       {...register("startDate", { required: "Start date is required" })}
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                     {errors.startDate && (
                       <span className="text-[10px] text-destructive">{errors.startDate.message}</span>
@@ -427,23 +489,28 @@ export function ExperiencesView() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">End Date</label>
-                    <input
+                    <Input
                       type="date"
                       {...register("endDate")}
                       disabled={isCurrent}
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary disabled:opacity-40"
+                      className="text-xs h-9 disabled:opacity-40"
                     />
                   </div>
                 </div>
 
                 <div className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="isCurrentExp"
-                    {...register("isCurrent")}
-                    className="w-4 h-4 rounded bg-background border-border text-primary focus:ring-0"
+                  <Controller
+                    name="isCurrent"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="isCurrentExp"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
                   />
-                  <label htmlFor="isCurrentExp" className="text-xs text-foreground cursor-pointer">
+                  <label htmlFor="isCurrentExp" className="text-xs text-foreground cursor-pointer select-none">
                     I currently work in this role
                   </label>
                 </div>
@@ -451,22 +518,22 @@ export function ExperiencesView() {
                 {/* Technologies */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Technologies (comma-separated)</label>
-                  <input
+                  <Input
                     type="text"
                     {...register("technologies")}
                     placeholder="TypeScript, React, GraphQL, Tailwind CSS"
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    className="text-xs h-9 font-mono"
                   />
                 </div>
 
                 {/* Summary */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Role Summary</label>
-                  <textarea
+                  <Textarea
                     {...register("summary")}
                     placeholder="High-level description of responsibilities and scope..."
                     rows={2}
-                    className="w-full bg-background border border-border rounded-lg p-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+                    className="text-xs resize-none"
                   />
                 </div>
 
@@ -486,11 +553,11 @@ export function ExperiencesView() {
                   </div>
                   {fields.map((field, i) => (
                     <div key={field.id} className="flex items-center gap-2">
-                      <input
+                      <Input
                         type="text"
                         {...register(`achievements.${i}.value` as const)}
                         placeholder="e.g. Led migration to Next.js reducing bundle size by 55%"
-                        className="flex-1 bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                        className="flex-1 text-xs h-9"
                       />
                       {fields.length > 1 && (
                         <button
@@ -507,7 +574,7 @@ export function ExperiencesView() {
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2">
+            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}

@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm, useFieldArray } from "react-hook-form";
+import { useForm, useFieldArray, Controller } from "react-hook-form";
 import { IProject, ProjectCategory } from "@/interfaces";
-import { useCreateProject, useUpdateProject, useUploadFile } from "@/hooks";
+import { useCreateProject, useUpdateProject } from "@/hooks";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +14,18 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Button } from "@/components/ui/button";
-import { Loader2, UploadCloud, Plus, Trash2, Save, Globe } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import { Loader2, Plus, Trash2, Save, Globe } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { toast } from "sonner";
 
@@ -39,6 +50,16 @@ export interface ProjectEditorDialogProps {
   project?: IProject | null;
   onSaved: () => void;
 }
+
+const CATEGORIES: ProjectCategory[] = [
+  "Full-Stack",
+  "Frontend",
+  "Backend",
+  "Mobile",
+  "DevOps",
+  "AI/ML",
+  "System Design",
+];
 
 export function ProjectEditorDialog({
   isOpen,
@@ -162,10 +183,7 @@ export function ProjectEditorDialog({
     );
   };
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
+  const handleCoverSelect = (file: File) => {
     setSelectedImageFile(file);
     setImagePreview(URL.createObjectURL(file));
   };
@@ -227,11 +245,10 @@ export function ProjectEditorDialog({
     }
   };
 
-
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0">
-        <DialogHeader className="p-6 pb-3 border-b border-border">
+      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0">
+        <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
           <DialogTitle className="text-lg font-bold text-foreground">
             {project ? "Edit Project" : "Create New Project"}
           </DialogTitle>
@@ -241,134 +258,110 @@ export function ProjectEditorDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <ScrollArea className="max-h-[68vh] p-6 space-y-4 overflow-y-auto">
-            <div className="space-y-4">
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="flex flex-col min-h-0 flex-1 overflow-hidden"
+        >
+          <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto">
+            <div className="p-6 space-y-4">
               {/* Title & Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">
                     Project Title *
                   </label>
-                  <input
+                  <Input
                     {...register("title", { required: "Title is required" })}
                     onChange={handleTitleChange}
                     placeholder="e.g. Distributed Task Queue Engine"
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
                   />
                   {errors.title && (
-                    <p className="text-[11px] text-destructive mt-1">
+                    <p className="text-[11px] text-destructive">
                       {errors.title.message}
                     </p>
                   )}
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">
                     Slug *
                   </label>
-                  <input
+                  <Input
                     {...register("slug", { required: "Slug is required" })}
                     placeholder="e.g. distributed-task-queue"
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    className="font-mono"
                   />
                   {errors.slug && (
-                    <p className="text-[11px] text-destructive mt-1">
+                    <p className="text-[11px] text-destructive">
                       {errors.slug.message}
                     </p>
                   )}
                 </div>
               </div>
 
-              {/* Category, Order & Thumbnail URL */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
+              {/* Category, Order */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">
                     Category *
                   </label>
-                  <select
-                    {...register("category", { required: true })}
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer"
-                  >
-                    <option value="Full-Stack">Full-Stack Application</option>
-                    <option value="Frontend">Frontend Architecture</option>
-                    <option value="Backend">Backend & Distributed</option>
-                    <option value="Mobile">Mobile (React Native)</option>
-                    <option value="DevOps">Cloud & DevOps</option>
-                    <option value="AI/ML">AI & Machine Learning</option>
-                    <option value="System Design">System Design</option>
-                  </select>
+                  <Controller
+                    name="category"
+                    control={control}
+                    rules={{ required: true }}
+                    render={({ field }) => (
+                      <Select
+                        value={field.value}
+                        onValueChange={field.onChange}
+                      >
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select Category" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CATEGORIES.map((cat) => (
+                            <SelectItem key={cat} value={cat}>
+                              {cat}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    )}
+                  />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">
                     Display Order
                   </label>
-                  <input
+                  <Input
                     type="number"
                     {...register("order", { valueAsNumber: true })}
                     placeholder="0"
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    className="font-mono"
                   />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1">
-                    Cover Image *
-                  </label>
-                  <label className="flex items-center justify-between gap-2 px-3 py-2 bg-background hover:bg-muted/50 border border-border rounded-lg text-xs cursor-pointer transition-colors">
-                    <span className="text-muted-foreground truncate">
-                      {selectedImageFile
-                        ? selectedImageFile.name
-                        : imagePreview
-                          ? "Change current cover image..."
-                          : "Choose cover image..."}
-                    </span>
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-muted text-foreground font-medium text-[11px] shrink-0 border border-border">
-                      <UploadCloud className="w-3.5 h-3.5" />
-                      <span>Browse</span>
-                    </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleFileChange}
-                      className="hidden"
-                    />
-                  </label>
                 </div>
               </div>
 
-              {/* Cover Image Preview */}
-              {imagePreview && (
-                <div className="rounded-lg overflow-hidden border border-border h-36 bg-muted relative group">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={imagePreview}
-                    alt="Cover Preview"
-                    className="w-full h-full object-cover object-center opacity-90"
-                  />
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <label className="px-3 py-1.5 rounded-lg bg-black/70 hover:bg-black/90 text-white text-xs font-medium cursor-pointer transition-colors inline-flex items-center gap-1.5 border border-white/20">
-                      <UploadCloud className="w-3.5 h-3.5" />
-                      <span>Replace Image</span>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={handleFileChange}
-                        className="hidden"
-                      />
-                    </label>
-                  </div>
-                  <span className="absolute bottom-2 right-2 px-2 py-0.5 rounded text-[10px] bg-black/70 text-white font-mono">
-                    {selectedImageFile ? "New Upload Selected" : "Current Cover"}
-                  </span>
-                </div>
-              )}
-
+              {/* Cover Image Upload (React Dropzone) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">
+                  Cover Showcase Image *
+                </label>
+                <FileDropzone
+                  previewUrl={imagePreview}
+                  onFileSelect={handleCoverSelect}
+                  onClear={() => {
+                    setSelectedImageFile(null);
+                    setImagePreview("");
+                  }}
+                  label="Click or drag cover image to upload"
+                  sublabel="Recommended 16:9 ratio (1200x675)"
+                />
+              </div>
 
               {/* Summary with 300 char counter */}
-              <div>
-                <div className="flex items-center justify-between mb-1">
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
                   <label className="text-xs font-medium text-foreground">
                     Executive Summary *
                   </label>
@@ -382,7 +375,7 @@ export function ProjectEditorDialog({
                     {summaryValue.length}/300
                   </span>
                 </div>
-                <textarea
+                <Textarea
                   {...register("summary", {
                     required: "Summary is required",
                     maxLength: {
@@ -393,22 +386,22 @@ export function ProjectEditorDialog({
                   maxLength={300}
                   placeholder="A high-level architectural overview of what this project accomplishes..."
                   rows={3}
-                  className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+                  className="resize-none"
                 />
                 {errors.summary && (
-                  <p className="text-[11px] text-destructive mt-1">
+                  <p className="text-[11px] text-destructive">
                     {errors.summary.message}
                   </p>
                 )}
               </div>
 
               {/* Technologies Tags */}
-              <div>
-                <label className="block text-xs font-medium text-foreground mb-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">
                   Technologies & Frameworks *
                 </label>
-                <div className="flex gap-2 mb-2">
-                  <input
+                <div className="flex gap-2">
+                  <Input
                     value={techInput}
                     onChange={(e) => setTechInput(e.target.value)}
                     onKeyDown={(e) => {
@@ -417,18 +410,19 @@ export function ProjectEditorDialog({
                         handleAddTechnology();
                       }
                     }}
-                    placeholder="e.g. Next.js 16, TypeScript, Redis"
-                    className="flex-1 bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    placeholder="e.g. Next.js 16, TypeScript, Redis (Press Enter to add)"
+                    className="font-mono"
                   />
-                  <button
+                  <Button
                     type="button"
+                    variant="outline"
                     onClick={handleAddTechnology}
-                    className="px-3.5 py-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg text-xs font-medium cursor-pointer"
+                    className="shrink-0 cursor-pointer"
                   >
                     Add
-                  </button>
+                  </Button>
                 </div>
-                <div className="flex flex-wrap gap-1.5 min-h-[30px] p-2 bg-muted/40 border border-border rounded-lg">
+                <div className="flex flex-wrap gap-1.5 min-h-[32px] p-2 bg-muted/40 border border-border rounded-lg">
                   {technologies.length === 0 ? (
                     <span className="text-[11px] text-muted-foreground italic">
                       No technologies added yet
@@ -443,7 +437,7 @@ export function ProjectEditorDialog({
                         <button
                           type="button"
                           onClick={() => handleRemoveTechnology(t)}
-                          className="text-muted-foreground hover:text-destructive cursor-pointer"
+                          className="text-muted-foreground hover:text-destructive cursor-pointer font-bold"
                         >
                           &times;
                         </button>
@@ -452,7 +446,7 @@ export function ProjectEditorDialog({
                   )}
                 </div>
                 {errors.technologies && (
-                  <p className="text-[11px] text-destructive mt-1">
+                  <p className="text-[11px] text-destructive">
                     {errors.technologies.message}
                   </p>
                 )}
@@ -460,34 +454,34 @@ export function ProjectEditorDialog({
 
               {/* URLs: Live & GitHub */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-muted-foreground" />
                     <span>Live Demo URL</span>
                   </label>
-                  <input
+                  <Input
                     {...register("liveUrl")}
                     placeholder="https://demo.portfolio.dev"
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    className="font-mono"
                   />
                 </div>
 
-                <div>
-                  <label className="block text-xs font-medium text-foreground mb-1 flex items-center gap-1.5">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <GithubIcon className="w-3.5 h-3.5 text-muted-foreground" />
                     <span>GitHub Repository URL</span>
                   </label>
-                  <input
+                  <Input
                     {...register("githubUrl")}
                     placeholder="https://github.com/alexmorgan/project"
-                    className="w-full bg-background border border-border rounded-lg px-3.5 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                    className="font-mono"
                   />
                 </div>
               </div>
 
               {/* Dynamic Metrics */}
-              <div>
-                <div className="flex items-center justify-between mb-2">
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
                   <label className="text-xs font-medium text-foreground">
                     Impact Metrics & Benchmarks
                   </label>
@@ -503,19 +497,19 @@ export function ProjectEditorDialog({
                 <div className="space-y-2">
                   {fields.map((field, index) => (
                     <div key={field.id} className="flex gap-2 items-center">
-                      <input
+                      <Input
                         {...register(`metrics.${index}.label` as const, {
                           required: true,
                         })}
                         placeholder="Metric label (e.g. Latency P99)"
-                        className="flex-1 bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                        className="flex-1"
                       />
-                      <input
+                      <Input
                         {...register(`metrics.${index}.value` as const, {
                           required: true,
                         })}
                         placeholder="Value (e.g. 18ms)"
-                        className="w-32 bg-background border border-border rounded-lg px-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                        className="w-32 font-mono"
                       />
                       <button
                         type="button"
@@ -530,46 +524,64 @@ export function ProjectEditorDialog({
               </div>
 
               {/* Case Study Markdown */}
-              <div>
-                <label className="block text-xs font-medium text-foreground mb-1">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">
                   Full Technical Case Study (Markdown)
                 </label>
-                <textarea
+                <Textarea
                   {...register("caseStudy")}
                   placeholder="## Problem Statement&#10;&#10;Explain architectural decisions, challenges, and measurable solutions..."
                   rows={6}
-                  className="w-full bg-background border border-border rounded-lg px-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono resize-y"
+                  className="font-mono resize-y"
                 />
               </div>
 
               {/* Flags: Featured & Published */}
               <div className="flex items-center gap-6 pt-2">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register("isFeatured")}
-                    className="w-4 h-4 rounded bg-background border-border text-primary focus:ring-0"
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="isFeatured"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="isFeatured"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
                   />
-                  <span className="text-xs font-medium text-foreground">
+                  <label
+                    htmlFor="isFeatured"
+                    className="text-xs font-medium text-foreground cursor-pointer select-none"
+                  >
                     Feature on Homepage
-                  </span>
-                </label>
+                  </label>
+                </div>
 
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    {...register("isPublished")}
-                    className="w-4 h-4 rounded bg-background border-border text-primary focus:ring-0"
+                <div className="flex items-center gap-2">
+                  <Controller
+                    name="isPublished"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="isPublished"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
                   />
-                  <span className="text-xs font-medium text-foreground">
+                  <label
+                    htmlFor="isPublished"
+                    className="text-xs font-medium text-foreground cursor-pointer select-none"
+                  >
                     Published Live
-                  </span>
-                </label>
+                  </label>
+                </div>
               </div>
             </div>
           </ScrollArea>
 
-          <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40">
+          <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
               variant="outline"

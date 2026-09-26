@@ -31,10 +31,10 @@ export const experiencesApi = {
     return data;
   },
 
-  reorder: async (items: { id: string; order: number }[]): Promise<ApiResponse<null>> => {
+  reorder: async (orders: { id: string; order: number }[]): Promise<ApiResponse<null>> => {
     const { data } = await apiClient.put<ApiResponse<null>>(
       "/experiences/reorder",
-      { items }
+      { orders }
     );
     return data;
   },

@@ -5,6 +5,7 @@ import { Bell } from "lucide-react";
 import { useAuthStore } from "@/stores";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AdminHeader() {
   const { user } = useAuthStore();
@@ -32,19 +33,14 @@ export function AdminHeader() {
 
         {/* User Pill */}
         <div className="flex items-center gap-2 pl-2 border-l border-border">
-          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-indigo-600 to-violet-600 flex items-center justify-center text-[10px] font-bold text-white shadow-sm overflow-hidden">
-            {user?.avatarUrl ? (
-              <img
-                src={user.avatarUrl}
-                alt={user.firstName || "Admin"}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              user?.firstName?.charAt(0).toUpperCase() ||
-              user?.email?.charAt(0).toUpperCase() ||
-              "A"
-            )}
-          </div>
+          <Avatar className="w-7 h-7 border border-border">
+            <AvatarImage src={user?.avatarUrl} alt={user?.firstName || "Admin"} className="object-cover" />
+            <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">
+              {user?.firstName?.charAt(0).toUpperCase() ||
+                user?.email?.charAt(0).toUpperCase() ||
+                "A"}
+            </AvatarFallback>
+          </Avatar>
           <span className="text-xs font-medium text-foreground hidden md:inline-block">
             {user?.firstName && user?.lastName
               ? `${user.firstName} ${user.lastName}`

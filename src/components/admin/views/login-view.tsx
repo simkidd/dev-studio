@@ -5,6 +5,8 @@ import { useForm } from "react-hook-form";
 import { useLogin } from "@/hooks";
 import { ILoginCredentials } from "@/interfaces";
 import { Terminal, Lock, Mail, Loader2, ArrowRight } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export function LoginView() {
   const loginMutation = useLogin();
@@ -51,12 +53,12 @@ export function LoginView() {
                 Admin Email
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
+                <Mail className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <Input
                   type="email"
                   {...register("email", { required: "Email is required" })}
                   placeholder="admin@portfolio.dev"
-                  className="w-full bg-background border border-border rounded-lg pl-9 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="pl-9 text-xs h-10"
                 />
               </div>
               {errors.email && (
@@ -71,12 +73,12 @@ export function LoginView() {
                 Password
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-                <input
+                <Lock className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
+                <Input
                   type="password"
                   {...register("password", { required: "Password is required" })}
                   placeholder="••••••••"
-                  className="w-full bg-background border border-border rounded-lg pl-9 pr-3.5 py-2.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all"
+                  className="pl-9 text-xs h-10"
                 />
               </div>
               {errors.password && (
@@ -86,10 +88,10 @@ export function LoginView() {
               )}
             </div>
 
-            <button
+            <Button
               type="submit"
               disabled={loginMutation.isPending}
-              className="w-full mt-2 bg-primary hover:bg-primary/90 text-primary-foreground font-medium py-2.5 px-4 rounded-lg text-xs transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+              className="w-full mt-2 text-xs font-medium h-10 shadow-lg shadow-primary/20 flex items-center justify-center gap-2 cursor-pointer"
             >
               {loginMutation.isPending ? (
                 <>
@@ -102,7 +104,7 @@ export function LoginView() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </>
               )}
-            </button>
+            </Button>
           </form>
 
           <div className="mt-6 pt-4 border-t border-border text-center">

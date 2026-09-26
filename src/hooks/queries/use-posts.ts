@@ -18,3 +18,14 @@ export const usePostBySlug = (slug: string, enabled = true) => {
     enabled: !!slug && enabled,
   });
 };
+
+export const usePostById = (id: string, enabled = true) => {
+  return useQuery({
+    queryKey: ["post", id],
+    queryFn: async () => {
+      const res = await postsApi.getById(id);
+      return res.data;
+    },
+    enabled: !!id && enabled,
+  });
+};

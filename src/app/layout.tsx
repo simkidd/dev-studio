@@ -4,16 +4,46 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import Providers from "@/providers/providers";
 
-const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-sans",
+  display: "swap",
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
+});
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
+  display: "swap",
+  fallback: [
+    "system-ui",
+    "-apple-system",
+    "BlinkMacSystemFont",
+    "Segoe UI",
+    "Roboto",
+    "sans-serif",
+  ],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
+  display: "swap",
+  fallback: [
+    "ui-monospace",
+    "SFMono-Regular",
+    "Menlo",
+    "Monaco",
+    "Consolas",
+    "monospace",
+  ],
 });
 
 export const metadata: Metadata = {

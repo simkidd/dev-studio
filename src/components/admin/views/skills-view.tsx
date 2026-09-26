@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   useSkills,
   useCreateSkill,
@@ -29,6 +29,15 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { PillFilter } from "@/components/ui/pill-filter";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const CATEGORIES: SkillCategory[] = [
   "Languages",
@@ -60,6 +69,7 @@ export function SkillsView() {
     register,
     handleSubmit,
     watch,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<SkillFormData>({
@@ -181,13 +191,13 @@ export function SkillsView() {
       {/* Filter Bar */}
       <div className="bg-card border border-border rounded-xl p-3 flex flex-wrap items-center justify-between gap-3">
         <div className="relative min-w-[240px] flex-1 max-w-sm">
-          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-          <input
+          <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground z-10 pointer-events-none" />
+          <Input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search skills by name..."
-            className="w-full bg-background border border-border rounded-lg pl-8.5 pr-3 py-1.5 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            className="pl-8 text-xs h-9"
           />
         </div>
 
@@ -285,8 +295,8 @@ export function SkillsView() {
 
       {/* Add/Edit Skill Dialog Form with ScrollArea */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-md bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl">
-          <DialogHeader className="p-6 pb-3 border-b border-border">
+        <DialogContent className="sm:max-w-md max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0">
+          <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
             <DialogTitle className="text-base font-bold text-foreground">
               {editingSkill ? "Edit Skill" : "Add Technical Skill"}
             </DialogTitle>
@@ -295,16 +305,16 @@ export function SkillsView() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ScrollArea className="max-h-[65vh] p-6 space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col min-h-0 flex-1 overflow-hidden">
+            <ScrollArea className="flex-1 min-h-0 w-full p-6">
               <div className="space-y-4 pr-2">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Skill Name *</label>
-                  <input
+                  <Input
                     type="text"
                     {...register("name", { required: "Skill name is required" })}
                     placeholder="e.g. Next.js, Kubernetes, Rust"
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    className="text-xs h-9"
                   />
                   {errors.name && (
                     <span className="text-[10px] text-destructive">{errors.name.message}</span>
@@ -314,29 +324,45 @@ export function SkillsView() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Category</label>
-                    <select
-                      {...register("category")}
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer"
-                    >
-                      {CATEGORIES.map((c) => (
-                        <option key={c} value={c}>
-                          {c}
-                        </option>
-                      ))}
-                    </select>
+                    <Controller
+                      name="category"
+                      control={control}
+                      render={({ field }) => (
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="text-xs h-9">
+                            <SelectValue placeholder="Select category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {CATEGORIES.map((c) => (
+                              <SelectItem key={c} value={c}>
+                                {c}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Mastery Level</label>
-                    <select
-                      {...register("level")}
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground focus:outline-none focus:border-primary cursor-pointer"
-                    >
-                      <option value="Beginner">Beginner</option>
-                      <option value="Intermediate">Intermediate</option>
-                      <option value="Advanced">Advanced</option>
-                      <option value="Expert">Expert</option>
-                    </select>
+                    <Controller
+                      name="level"
+                      control={control}
+                      render={({ field }) => (
+                        <Select value={field.value} onValueChange={field.onChange}>
+                          <SelectTrigger className="text-xs h-9">
+                            <SelectValue placeholder="Select level" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="Beginner">Beginner</SelectItem>
+                            <SelectItem value="Intermediate">Intermediate</SelectItem>
+                            <SelectItem value="Advanced">Advanced</SelectItem>
+                            <SelectItem value="Expert">Expert</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                 </div>
 
@@ -355,20 +381,25 @@ export function SkillsView() {
                 </div>
 
                 <div className="flex items-center gap-2 pt-1">
-                  <input
-                    type="checkbox"
-                    id="featSkill"
-                    {...register("isTopSkill")}
-                    className="w-4 h-4 rounded bg-background border-border text-primary focus:ring-0"
+                  <Controller
+                    name="isTopSkill"
+                    control={control}
+                    render={({ field }) => (
+                      <Checkbox
+                        id="featSkill"
+                        checked={field.value}
+                        onCheckedChange={field.onChange}
+                      />
+                    )}
                   />
-                  <label htmlFor="featSkill" className="text-xs text-foreground cursor-pointer">
+                  <label htmlFor="featSkill" className="text-xs text-foreground cursor-pointer select-none">
                     Highlight as Top Skill on Homepage
                   </label>
                 </div>
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2">
+            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}

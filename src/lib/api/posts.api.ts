@@ -18,7 +18,12 @@ export const postsApi = {
   },
 
   getBySlug: async (slug: string): Promise<ApiResponse<IPost>> => {
-    const { data } = await apiClient.get<ApiResponse<IPost>>(`/posts/${slug}`);
+    const { data } = await apiClient.get<ApiResponse<IPost>>(`/posts/slug/${slug}`);
+    return data;
+  },
+
+  getById: async (id: string): Promise<ApiResponse<IPost>> => {
+    const { data } = await apiClient.get<ApiResponse<IPost>>(`/posts/admin/${id}`);
     return data;
   },
 

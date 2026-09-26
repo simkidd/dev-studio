@@ -65,3 +65,34 @@ export const useDeletePost = () => {
     },
   });
 };
+
+export const useTogglePublishedPost = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      id,
+      isPublished,
+    }: {
+      id: string;
+      isPublished: boolean;
+    }) => {
+      const res = await postsApi.update(id, { isPublished });
+      return res.data;
+    },
+    onSuccess: (updated) => {
+      toast.success(
+        updated?.isPublished ? "Article published live" : "Article set to Draft"
+      );
+      queryClient.invalidateQueries({ queryKey: ["posts"] });
+      queryClient.invalidateQueries({ queryKey: ["post"] });
+      queryClient.invalidateQueries({ queryKey: ["dashboard", "stats"] });
+    },
+    onError: (error: any) => {
+      toast.error(
+        error.response?.data?.message || "Failed to update article status"
+      );
+    },
+  });
+};
+

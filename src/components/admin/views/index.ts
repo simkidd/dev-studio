@@ -5,6 +5,7 @@ export * from "./messages-view";
 export * from "./skills-view";
 export * from "./experiences-view";
 export * from "./posts-view";
+export * from "./post-detail-view";
 export * from "./testimonials-view";
 export * from "./profile-view";
 export * from "./login-view";

@@ -51,3 +51,38 @@ export function TwitterIcon({ className = "w-4 h-4" }: { className?: string }) {
     </svg>
   );
 }
+
+export function DiscordIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M18 6a14 14 0 0 0-4-1.5 9.8 9.8 0 0 0-.5 1.5 13.9 13.9 0 0 0-3 0 9.8 9.8 0 0 0-.5-1.5A14 14 0 0 0 6 6a15.8 15.8 0 0 0-2 10.5 14 14 0 0 0 4.5 2.5 11 11 0 0 0 1-1.5 9 9 0 0 1-1.5-.7c.1-.1.2-.2.3-.3a10.5 10.5 0 0 0 9.4 0c.1.1.2.2.3.3a9 9 0 0 1-1.5.7 11 11 0 0 0 1 1.5 14 14 0 0 0 4.5-2.5A15.8 15.8 0 0 0 18 6Z" />
+      <circle cx="9.5" cy="12" r="1" fill="currentColor" />
+      <circle cx="14.5" cy="12" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+export function YoutubeIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M2.5 17a24.12 24.12 0 0 1 0-10 2 2 0 0 1 1.4-1.4 49.56 49.56 0 0 1 16.2 0A2 2 0 0 1 21.5 7a24.12 24.12 0 0 1 0 10 2 2 0 0 1-1.4 1.4 49.55 49.55 0 0 1-16.2 0A2 2 0 0 1 2.5 17" />
+      <path d="m10 15 5-3-5-3z" fill="currentColor" />
+    </svg>
+  );
+}

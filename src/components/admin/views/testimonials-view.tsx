@@ -1,12 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import {
   useTestimonials,
   useCreateTestimonial,
   useUpdateTestimonial,
   useDeleteTestimonial,
+  useUploadFile,
 } from "@/hooks";
 import { ITestimonial } from "@/interfaces";
 import {
@@ -28,6 +29,19 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { FileDropzone } from "@/components/ui/file-dropzone";
+import { toast } from "sonner";
 
 export interface TestimonialFormData {
   clientName: string;
@@ -45,9 +59,14 @@ export function TestimonialsView() {
     useState<ITestimonial | null>(null);
   const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
 
+  const uploadFileMutation = useUploadFile();
+
   const {
     register,
     handleSubmit,
+    setValue,
+    watch,
+    control,
     reset,
     formState: { errors, isSubmitting },
   } = useForm<TestimonialFormData>({
@@ -201,17 +220,12 @@ export function TestimonialsView() {
               <div>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center font-bold text-foreground text-xs overflow-hidden shrink-0">
-                      {t.avatarUrl ? (
-                        <img
-                          src={t.avatarUrl}
-                          alt={t.clientName}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        t.clientName.charAt(0).toUpperCase()
-                      )}
-                    </div>
+                    <Avatar className="w-10 h-10 border border-border shrink-0">
+                      <AvatarImage src={t.avatarUrl} alt={t.clientName} className="object-cover" />
+                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
+                        {t.clientName ? t.clientName.charAt(0).toUpperCase() : "C"}
+                      </AvatarFallback>
+                    </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-foreground text-sm">
@@ -265,8 +279,8 @@ export function TestimonialsView() {
 
       {/* Add / Edit Testimonial Dialog Form with ScrollArea */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <DialogContent className="sm:max-w-xl bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl">
-          <DialogHeader className="p-6 pb-3 border-b border-border">
+        <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0">
+          <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
             <DialogTitle className="text-base font-bold text-foreground">
               {editingTestimonial ? "Edit Endorsement" : "Add Client Testimonial"}
             </DialogTitle>
@@ -275,16 +289,16 @@ export function TestimonialsView() {
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)}>
-            <ScrollArea className="max-h-[65vh] p-6 space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col min-h-0 flex-1 overflow-hidden">
+            <ScrollArea className="flex-1 min-h-0 w-full p-6">
               <div className="space-y-4 pr-2">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Client / Endorser Name *</label>
-                  <input
+                  <Input
                     type="text"
                     {...register("clientName", { required: "Client name is required" })}
                     placeholder="e.g. Sarah Jenkins"
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                    className="text-xs h-9"
                   />
                   {errors.clientName && (
                     <span className="text-[10px] text-destructive">{errors.clientName.message}</span>
@@ -294,11 +308,11 @@ export function TestimonialsView() {
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Title / Role *</label>
-                    <input
+                    <Input
                       type="text"
                       {...register("clientRole", { required: "Role is required" })}
                       placeholder="e.g. VP of Engineering"
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                     {errors.clientRole && (
                       <span className="text-[10px] text-destructive">{errors.clientRole.message}</span>
@@ -307,32 +321,46 @@ export function TestimonialsView() {
 
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">Company</label>
-                    <input
+                    <Input
                       type="text"
                       {...register("company")}
                       placeholder="e.g. Series-B FinTech"
-                      className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary"
+                      className="text-xs h-9"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Avatar Image URL</label>
-                  <input
-                    type="url"
-                    {...register("avatarUrl")}
-                    placeholder="https://images.unsplash.com/..."
-                    className="w-full bg-background border border-border rounded-lg px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary font-mono"
+                  <label className="text-xs font-medium text-foreground">Client Avatar</label>
+                  <FileDropzone
+                    variant="avatar"
+                    previewUrl={watch("avatarUrl")}
+                    onFileSelect={(file: File) => {
+                      uploadFileMutation.mutate(
+                        { file, folder: "testimonials" },
+                        {
+                          onSuccess: (res) => {
+                            if (res?.url) {
+                              setValue("avatarUrl", res.url);
+                              toast.success("Client avatar uploaded");
+                            }
+                          },
+                        }
+                      );
+                    }}
+                    onClear={() => setValue("avatarUrl", "")}
+                    isUploading={uploadFileMutation.isPending}
+                    label="Upload client photo"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">Endorsement Quote *</label>
-                  <textarea
+                  <Textarea
                     {...register("quote", { required: "Quote is required" })}
                     placeholder="He delivered exceptional high-throughput code on time..."
                     rows={4}
-                    className="w-full bg-background border border-border rounded-lg p-3 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary resize-none"
+                    className="text-xs resize-none"
                   />
                   {errors.quote && (
                     <span className="text-[10px] text-destructive">{errors.quote.message}</span>
@@ -341,32 +369,49 @@ export function TestimonialsView() {
 
                 <div className="flex items-center justify-between pt-1">
                   <div className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id="isFeatTest"
-                      {...register("isFeatured")}
-                      className="w-4 h-4 rounded bg-background border-border text-primary focus:ring-0"
+                    <Controller
+                      name="isFeatured"
+                      control={control}
+                      render={({ field }) => (
+                        <Checkbox
+                          id="isFeatTest"
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      )}
                     />
-                    <label htmlFor="isFeatTest" className="text-xs text-foreground cursor-pointer">
+                    <label htmlFor="isFeatTest" className="text-xs text-foreground cursor-pointer select-none">
                       Feature on Homepage
                     </label>
                   </div>
 
                   <div className="flex items-center gap-2">
                     <label className="text-xs text-muted-foreground">Rating:</label>
-                    <select
-                      {...register("rating", { valueAsNumber: true })}
-                      className="bg-background border border-border rounded px-2 py-1 text-xs text-foreground cursor-pointer"
-                    >
-                      <option value={5}>5 Stars</option>
-                      <option value={4}>4 Stars</option>
-                    </select>
+                    <Controller
+                      name="rating"
+                      control={control}
+                      render={({ field }) => (
+                        <Select
+                          value={String(field.value)}
+                          onValueChange={(val) => field.onChange(Number(val))}
+                        >
+                          <SelectTrigger className="w-28 text-xs h-8">
+                            <SelectValue placeholder="Rating" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="5">5 Stars</SelectItem>
+                            <SelectItem value="4">4 Stars</SelectItem>
+                            <SelectItem value="3">3 Stars</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      )}
+                    />
                   </div>
                 </div>
               </div>
             </ScrollArea>
 
-            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2">
+            <DialogFooter className="p-4 px-6 border-t border-border bg-muted/30 flex items-center justify-end gap-2 shrink-0">
               <button
                 type="button"
                 onClick={() => setDialogOpen(false)}
