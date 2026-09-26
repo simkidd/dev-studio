@@ -138,7 +138,7 @@ export function AdminSidebar() {
     >
       {/* Brand Header */}
       <SidebarHeader className="p-3 border-b border-sidebar-border group-data-[collapsible=icon]:p-2">
-        <div className="flex items-center justify-between group-data-[collapsible=icon]:justify-center">
+        <div className="flex items-center group-data-[collapsible=icon]:justify-center">
           <Link href="/admin" className="flex items-center gap-2.5 group">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
               <Terminal className="w-4 h-4" />
@@ -151,14 +151,6 @@ export function AdminSidebar() {
                 Portfolio CMS
               </p>
             </div>
-          </Link>
-          <Link
-            href="/"
-            target="_blank"
-            title="View Live Portfolio"
-            className="p-1.5 text-muted-foreground hover:text-sidebar-foreground hover:bg-sidebar-accent rounded-md transition-colors group-data-[collapsible=icon]:hidden"
-          >
-            <ExternalLink className="w-4 h-4" />
           </Link>
         </div>
       </SidebarHeader>
@@ -326,6 +318,7 @@ export function AdminSidebar() {
                   <DropdownMenuItem
                     asChild
                     className="cursor-pointer text-xs py-1.5 px-2"
+                    onClick={closeMobileSidebar}
                   >
                     <Link
                       href="/admin/profile"
