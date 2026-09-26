@@ -4,7 +4,6 @@ import React from "react";
 import { Bell } from "lucide-react";
 import { useAuthStore } from "@/stores";
 import { SidebarTrigger } from "@/components/ui/sidebar";
-import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export function AdminHeader() {
@@ -19,9 +18,6 @@ export function AdminHeader() {
 
       {/* Right Controls */}
       <div className="flex items-center gap-2 sm:gap-3">
-        {/* Theme Toggle */}
-        <ThemeToggle />
-
         {/* Notification Bell */}
         <button
           title="Notifications"

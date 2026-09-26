@@ -16,6 +16,7 @@ import {
   Terminal,
   LogOut,
   ExternalLink,
+  ChevronsUpDown,
 } from "lucide-react";
 import { useAuthStore } from "@/stores";
 import {
@@ -30,8 +31,19 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 export interface NavItem {
   title: string;
@@ -48,6 +60,13 @@ export interface NavSection {
 export function AdminSidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  const closeMobileSidebar = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
 
   const navSections: NavSection[] = [
     {
@@ -175,6 +194,7 @@ export function AdminSidebar() {
                             ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm border border-sidebar-border"
                             : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60",
                         )}
+                        onClick={closeMobileSidebar}
                       >
                         <Link
                           href={item.href}
@@ -216,46 +236,134 @@ export function AdminSidebar() {
         ))}
       </SidebarContent>
 
-      {/* Footer Profile & Logout */}
+      {/* Footer User Profile & Dropdown Menu */}
       <SidebarFooter className="p-2 border-t border-sidebar-border bg-sidebar/50">
-        <div className="flex items-center justify-between p-1.5 rounded-lg bg-sidebar-accent/50 border border-sidebar-border group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
-          <div className="flex items-center gap-2.5 min-w-0 group-data-[collapsible=icon]:justify-center">
-            <Avatar className="w-8 h-8 rounded-lg border border-sidebar-border shrink-0">
-              <AvatarImage
-                src={user?.avatarUrl}
-                alt={user?.firstName || "Admin"}
-                className="object-cover rounded-lg"
-              />
-              <AvatarFallback className="rounded-lg bg-sidebar-accent text-sidebar-foreground font-bold text-xs">
-                {user?.firstName?.charAt(0).toUpperCase() ||
-                  user?.email?.charAt(0).toUpperCase() ||
-                  "A"}
-              </AvatarFallback>
-            </Avatar>
-            <div className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
-              <p className="text-xs font-medium text-sidebar-foreground truncate">
-                {user?.firstName && user?.lastName
-                  ? `${user.firstName} ${user.lastName}`
-                  : user?.firstName || user?.email || "Admin"}
-              </p>
-              <div className="flex items-center gap-1.5">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] text-muted-foreground font-mono capitalize line-clamp-1">
-                  {user?.headline
-                    ? user.headline.split("|")[0].trim()
-                    : user?.role || "superadmin"}
-                </span>
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => logout()}
-            title="Logout"
-            className="p-1.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded transition-colors cursor-pointer group-data-[collapsible=icon]:w-8 group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:flex group-data-[collapsible=icon]:items-center group-data-[collapsible=icon]:justify-center"
-          >
-            <LogOut className="w-3.5 h-3.5" />
-          </button>
-        </div>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <SidebarMenuButton
+                  size="lg"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/80 transition-colors cursor-pointer rounded-lg p-1.5 w-full flex items-center justify-between"
+                >
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <Avatar className="w-8 h-8 shrink-0">
+                      <AvatarImage
+                        src={user?.avatarUrl}
+                        alt={user?.firstName || "Admin"}
+                      />
+                      <AvatarFallback className="bg-primary/15 text-primary font-bold text-xs">
+                        {user?.firstName?.charAt(0).toUpperCase() ||
+                          user?.email?.charAt(0).toUpperCase() ||
+                          "A"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-xs leading-tight group-data-[collapsible=icon]:hidden">
+                      <span className="truncate font-semibold text-sidebar-foreground">
+                        {user?.firstName && user?.lastName
+                          ? `${user.firstName} ${user.lastName}`
+                          : user?.firstName ||
+                            user?.email?.split("@")[0] ||
+                            "Admin"}
+                      </span>
+                      <span className="truncate text-[10px] text-muted-foreground font-mono">
+                        {user?.email || "admin@portfolio.dev"}
+                      </span>
+                    </div>
+                  </div>
+                  <ChevronsUpDown className="ml-auto size-4 text-muted-foreground group-data-[collapsible=icon]:hidden shrink-0" />
+                </SidebarMenuButton>
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent
+                className="w-64 min-w-56 rounded-xl bg-popover border-border p-2 text-popover-foreground shadow-2xl"
+                side="top"
+                align="start"
+                sideOffset={8}
+              >
+                {/* User Info Header */}
+                <DropdownMenuLabel className="p-0 font-normal">
+                  <div className="flex items-center gap-2.5 px-1 py-1.5 text-left text-xs">
+                    <Avatar className="h-8 w-8 rounded-lg border border-border">
+                      <AvatarImage
+                        src={user?.avatarUrl}
+                        alt={user?.firstName || "Admin"}
+                        className="object-cover rounded-lg"
+                      />
+                      <AvatarFallback className="rounded-lg bg-primary/15 text-primary text-xs font-bold">
+                        {user?.firstName?.charAt(0).toUpperCase() ||
+                          user?.email?.charAt(0).toUpperCase() ||
+                          "A"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="grid flex-1 text-left text-xs leading-tight">
+                      <span className="truncate font-semibold text-foreground">
+                        {user?.firstName && user?.lastName
+                          ? `${user.firstName} ${user.lastName}`
+                          : user?.firstName || "Admin"}
+                      </span>
+                      <span className="truncate text-[10px] text-muted-foreground font-mono">
+                        {user?.email}
+                      </span>
+                    </div>
+                  </div>
+                </DropdownMenuLabel>
+
+                <DropdownMenuSeparator className="my-1.5 bg-border" />
+
+                {/* Theme Selector Section */}
+                <div className="px-2 py-1.5 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground font-medium">
+                    Theme
+                  </span>
+                  <ThemeToggle size="sm" />
+                </div>
+
+                <DropdownMenuSeparator className="my-1.5 bg-border" />
+
+                {/* Quick Navigation Items */}
+                <DropdownMenuGroup>
+                  <DropdownMenuItem
+                    asChild
+                    className="cursor-pointer text-xs py-1.5 px-2"
+                  >
+                    <Link
+                      href="/admin/profile"
+                      className="flex items-center gap-2"
+                    >
+                      <Settings className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span>Account Settings</span>
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    asChild
+                    className="cursor-pointer text-xs py-1.5 px-2"
+                  >
+                    <Link
+                      href="/"
+                      target="_blank"
+                      className="flex items-center gap-2"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span>View Live Portfolio</span>
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuGroup>
+
+                <DropdownMenuSeparator className="my-1.5 bg-border" />
+
+                {/* Logout Action */}
+                <DropdownMenuItem
+                  onClick={() => logout()}
+                  className="cursor-pointer text-xs py-1.5 px-2 text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center gap-2"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Log out</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
 
       <SidebarRail />
