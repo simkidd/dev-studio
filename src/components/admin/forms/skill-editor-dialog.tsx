@@ -7,10 +7,10 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "../../ui/dialog";
 import { useForm, Controller } from "react-hook-form";
-import { Input } from "../ui/input";
-import { ScrollArea } from "../ui/scroll-area";
+import { Input } from "../../ui/input";
+import { ScrollArea } from "../../ui/scroll-area";
 import { ISkill, SkillCategory } from "@/interfaces";
 import { useCreateSkill, useUpdateSkill } from "@/hooks";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -58,13 +58,16 @@ const SkillEditorDialog = ({
   const createSkillMutation = useCreateSkill();
   const updateSkillMutation = useUpdateSkill();
 
+  const isSaving =
+    createSkillMutation.isPending || updateSkillMutation.isPending;
+
   const {
     register,
     handleSubmit,
     watch,
     control,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<SkillFormData>({
     defaultValues: {
       name: "",
@@ -142,10 +145,10 @@ const SkillEditorDialog = ({
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col min-h-0 h-[200px]! flex-1"
+          className="flex flex-col min-h-0 flex-1"
         >
-          <ScrollArea className="flex-1  w-full px-6 py-4 overflow-y-auto">
-            <div className="space-y-4 pr-2">
+          <ScrollArea className="flex-1 w-full p-4 overflow-y-auto">
+            <div className="space-y-4 pl-2">
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-foreground">
                   Skill Name *
@@ -274,7 +277,7 @@ const SkillEditorDialog = ({
             </Button>
             <Button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSaving}
               size="sm"
               className="cursor-pointer text-xs flex items-center gap-1.5 px-4"
             >

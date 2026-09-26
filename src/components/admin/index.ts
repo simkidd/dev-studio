@@ -1,5 +1,4 @@
 export * from "./sidebar";
 export * from "./header";
-export * from "./project-editor-dialog";
-export * from "./post-editor-dialog";
-
+export * from "./forms/project-editor-dialog";
+export * from "./forms/post-editor-dialog";

@@ -247,7 +247,10 @@ export function ProjectEditorDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0">
+      <DialogContent
+        className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
           <DialogTitle className="text-lg font-bold text-foreground">
             {project ? "Edit Project" : "Create New Project"}

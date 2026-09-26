@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import type { Metadata } from "next";
 import { MessagesView } from "@/components/admin/views/messages-view";
 
@@ -8,5 +8,9 @@ export const metadata: Metadata = {
 };
 
 export default function AdminMessagesPage() {
-  return <MessagesView />;
+  return (
+    <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading inquiries...</div>}>
+      <MessagesView />
+    </Suspense>
+  );
 }

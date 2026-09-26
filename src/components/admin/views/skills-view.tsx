@@ -24,7 +24,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Input } from "@/components/ui/input";
 
-import SkillEditorDialog from "../skill-editor-dialog";
+import SkillEditorDialog from "../forms/skill-editor-dialog";
 
 const CATEGORIES: SkillCategory[] = [
   "Languages",

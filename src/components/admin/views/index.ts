@@ -2,6 +2,7 @@ export * from "./dashboard-view";
 export * from "./projects-view";
 export * from "./project-detail-view";
 export * from "./messages-view";
+export * from "./message-detail-view";
 export * from "./skills-view";
 export * from "./experiences-view";
 export * from "./posts-view";

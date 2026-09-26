@@ -10,16 +10,21 @@ export const useUpdateMessageStatus = () => {
     mutationFn: async ({
       id,
       status,
+      showToast = true,
     }: {
       id: string;
       status: MessageStatus;
+      showToast?: boolean;
     }) => {
       const res = await messagesApi.updateStatus(id, status);
-      return res.data;
+      return { data: res.data, showToast };
     },
-    onSuccess: (updated) => {
-      toast.success(`Message marked as ${updated?.status}`);
+    onSuccess: ({ data, showToast }) => {
+      if (showToast) {
+        toast.success(`Message marked as ${data?.status}`);
+      }
       queryClient.invalidateQueries({ queryKey: ["messages"] });
+      queryClient.invalidateQueries({ queryKey: ["message"] });
       queryClient.invalidateQueries({ queryKey: ["dashboard", "stats"] });
     },
     onError: (error: any) => {
