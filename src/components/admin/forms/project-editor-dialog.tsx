@@ -40,7 +40,6 @@ export interface ProjectFormData {
   githubUrl: string;
   isFeatured: boolean;
   isPublished: boolean;
-  order: number;
   metrics: Array<{ label: string; value: string }>;
 }
 
@@ -98,7 +97,6 @@ export function ProjectEditorDialog({
       githubUrl: "",
       isFeatured: false,
       isPublished: true,
-      order: 0,
       metrics: [],
     },
   });
@@ -124,7 +122,6 @@ export function ProjectEditorDialog({
         githubUrl: project.githubUrl || "",
         isFeatured: project.isFeatured,
         isPublished: project.isPublished,
-        order: project.order ?? 0,
         metrics: project.metrics || [],
       });
       setImagePreview(project.thumbnailUrl || "");
@@ -141,7 +138,6 @@ export function ProjectEditorDialog({
         githubUrl: "",
         isFeatured: false,
         isPublished: true,
-        order: 0,
         metrics: [
           { label: "Throughput", value: "10k req/s" },
           { label: "Latency", value: "12ms" },
@@ -214,7 +210,9 @@ export function ProjectEditorDialog({
     formData.append("githubUrl", data.githubUrl || "");
     formData.append("isFeatured", String(data.isFeatured));
     formData.append("isPublished", String(data.isPublished));
-    formData.append("order", String(Number(data.order) || 0));
+    if (project?.order !== undefined) {
+      formData.append("order", String(project.order));
+    }
     formData.append("metrics", JSON.stringify(data.metrics || []));
 
     if (selectedImageFile) {
@@ -302,47 +300,33 @@ export function ProjectEditorDialog({
                 </div>
               </div>
 
-              {/* Category, Order */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Category *
-                  </label>
-                  <Controller
-                    name="category"
-                    control={control}
-                    rules={{ required: true }}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select Category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CATEGORIES.map((cat) => (
-                            <SelectItem key={cat} value={cat}>
-                              {cat}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Display Order
-                  </label>
-                  <Input
-                    type="number"
-                    {...register("order", { valueAsNumber: true })}
-                    placeholder="0"
-                    className="font-mono"
-                  />
-                </div>
+              {/* Category */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">
+                  Category *
+                </label>
+                <Controller
+                  name="category"
+                  control={control}
+                  rules={{ required: true }}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Select Category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((cat) => (
+                          <SelectItem key={cat} value={cat}>
+                            {cat}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
               </div>
 
               {/* Cover Image Upload (React Dropzone) */}

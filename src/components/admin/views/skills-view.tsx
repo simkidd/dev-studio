@@ -1,28 +1,13 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { useForm, Controller } from "react-hook-form";
-import {
-  useSkills,
-  useCreateSkill,
-  useUpdateSkill,
-  useDeleteSkill,
-} from "@/hooks";
-import { ISkill, SkillCategory } from "@/interfaces";
-import { Code2, Plus, Trash2, Edit, Search, RefreshCw } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import { PillFilter } from "@/components/ui/pill-filter";
-import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Input } from "@/components/ui/input";
+import { PillFilter } from "@/components/ui/pill-filter";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useDeleteSkill, useSkills } from "@/hooks";
+import { ISkill, SkillCategory } from "@/interfaces";
+import { Code2, Edit, Plus, RefreshCw, Search, Trash2, X } from "lucide-react";
+import { useState } from "react";
 
 import SkillEditorDialog from "../forms/skill-editor-dialog";
 
@@ -122,8 +107,18 @@ export function SkillsView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search skills by name..."
-            className="pl-8 text-xs h-8"
+            className="pl-8 pr-8 text-xs h-8"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted transition-colors cursor-pointer z-10"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

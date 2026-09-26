@@ -9,6 +9,7 @@ import {
   useDeleteProject,
   useUpdateProject,
   useTogglePublishedProject,
+  useReorderProjects,
 } from "@/hooks";
 import { IProject } from "@/interfaces";
 import {
@@ -24,6 +25,9 @@ import {
   XCircle,
   RefreshCw,
   Eye,
+  ChevronUp,
+  ChevronDown,
+  X,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { Sparkline } from "@/components/ui/sparkline";
@@ -50,7 +54,6 @@ import { DataTablePagination } from "@/components/ui/data-table-pagination";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { formatMonthYear } from "@/lib/date.utils";
 import { Input } from "@/components/ui/input";
-import { Checkbox } from "@/components/ui/checkbox";
 
 export function ProjectsView() {
   const router = useRouter();
@@ -59,7 +62,6 @@ export function ProjectsView() {
   const [selectedStatus, setSelectedStatus] = useState<string>("all");
   const [featuredFilter, setFeaturedFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("order");
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
 
@@ -84,6 +86,32 @@ export function ProjectsView() {
   const toggleFeaturedMutation = useToggleFeaturedProject();
   const togglePublishedMutation = useTogglePublishedProject();
   const deleteProjectMutation = useDeleteProject();
+  const reorderMutation = useReorderProjects();
+
+  const handleMove = (projId: string, direction: "up" | "down") => {
+    const list = [...sortedProjects];
+    const currentIndex = list.findIndex((p) => p._id === projId);
+    if (currentIndex === -1) return;
+
+    const targetIndex =
+      direction === "up" ? currentIndex - 1 : currentIndex + 1;
+    if (targetIndex < 0 || targetIndex >= list.length) return;
+
+    const temp = list[currentIndex];
+    list[currentIndex] = list[targetIndex];
+    list[targetIndex] = temp;
+
+    const orders = list.map((item, idx) => ({
+      id: item._id,
+      order: idx + 1,
+    }));
+
+    if (sortBy !== "order") {
+      setSortBy("order");
+    }
+
+    reorderMutation.mutate(orders);
+  };
 
   const allProjects: IProject[] = projectsResponse?.data || [];
 
@@ -131,20 +159,6 @@ export function ProjectsView() {
     (page - 1) * limit,
     page * limit,
   );
-
-  const handleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) {
-      setSelectedIds(paginatedProjects.map((p: IProject) => p._id));
-    } else {
-      setSelectedIds([]);
-    }
-  };
-
-  const handleToggleSelect = (id: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id],
-    );
-  };
 
   const handleOpenNew = () => {
     setEditingProject(null);
@@ -241,9 +255,9 @@ export function ProjectsView() {
           </span>
         </div>
         <div className="bg-card border border-border rounded-xl p-3 flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">Selected Rows</span>
-          <span className="font-mono font-bold text-primary text-sm">
-            {selectedIds.length}
+          <span className="text-xs text-muted-foreground">Drafts</span>
+          <span className="font-mono font-bold text-muted-foreground text-sm">
+            {totalProjects - publishedCount}
           </span>
         </div>
       </div>
@@ -258,8 +272,18 @@ export function ProjectsView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Filter projects by title, stack, keyword..."
-            className="pl-8 text-xs h-8"
+            className="pl-8 pr-8 text-xs h-8"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted transition-colors cursor-pointer z-10"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         {/* Right: Tokenized Filter Pills */}
@@ -328,23 +352,8 @@ export function ProjectsView() {
         <Table className="w-full text-left border-collapse">
           <TableHeader className="border-b border-border bg-muted/50">
             <TableRow className="border-b border-border hover:bg-transparent text-[11px] font-semibold text-muted-foreground uppercase tracking-wider select-none">
-              <TableHead className="w-10 px-3.5 py-3 text-center">
-                <Checkbox
-                  checked={
-                    paginatedProjects.length > 0 &&
-                    selectedIds.length === paginatedProjects.length
-                  }
-                  onCheckedChange={(checked) => {
-                    if (checked) {
-                      setSelectedIds(
-                        paginatedProjects.map((p: IProject) => p._id),
-                      );
-                    } else {
-                      setSelectedIds([]);
-                    }
-                  }}
-                  aria-label="Select all"
-                />
+              <TableHead className="w-16 px-3.5 py-3 text-center text-muted-foreground">
+                Order
               </TableHead>
               <TableHead className="px-3.5 py-3 text-muted-foreground">
                 Project & Case Study
@@ -378,7 +387,7 @@ export function ProjectsView() {
                   className="animate-pulse border-b border-border"
                 >
                   <TableCell className="px-3.5 py-4 text-center">
-                    <Skeleton className="w-3.5 h-3.5 mx-auto bg-muted" />
+                    <Skeleton className="w-8 h-4 mx-auto bg-muted" />
                   </TableCell>
                   <TableCell className="px-3.5 py-4">
                     <div className="flex items-center gap-3">
@@ -431,22 +440,45 @@ export function ProjectsView() {
               </TableRow>
             ) : (
               paginatedProjects.map((proj: IProject) => {
-                const isSelected = selectedIds.includes(proj._id);
-
                 return (
                   <TableRow
                     key={proj._id}
-                    className={`hover:bg-muted/40 transition-colors group border-b border-border ${
-                      isSelected ? "bg-muted/60" : ""
-                    }`}
+                    className="hover:bg-muted/40 transition-colors group border-b border-border"
                   >
-                    {/* Checkbox */}
-                    <TableCell className="px-3.5 py-3.5 text-center">
-                      <Checkbox
-                        checked={isSelected}
-                        onCheckedChange={() => handleToggleSelect(proj._id)}
-                        aria-label={`Select ${proj.title}`}
-                      />
+
+                    {/* Order / Reorder buttons */}
+                    <TableCell className="px-2 py-3.5 text-center">
+                      <div className="flex items-center justify-center gap-1">
+                        <span className="font-mono text-[11px] text-muted-foreground font-semibold min-w-5 text-center">
+                          #{proj.order ?? (sortedProjects.findIndex((p) => p._id === proj._id) + 1)}
+                        </span>
+                        <div className="flex flex-col -space-y-0.5">
+                          <button
+                            type="button"
+                            onClick={() => handleMove(proj._id, "up")}
+                            disabled={
+                              sortedProjects.findIndex((p) => p._id === proj._id) === 0 ||
+                              reorderMutation.isPending
+                            }
+                            className="p-0.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                            title="Move Up"
+                          >
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => handleMove(proj._id, "down")}
+                            disabled={
+                              sortedProjects.findIndex((p) => p._id === proj._id) ===
+                                sortedProjects.length - 1 || reorderMutation.isPending
+                            }
+                            className="p-0.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground disabled:opacity-20 disabled:pointer-events-none cursor-pointer transition-colors"
+                            title="Move Down"
+                          >
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
                     </TableCell>
 
                     {/* Title & Details */}

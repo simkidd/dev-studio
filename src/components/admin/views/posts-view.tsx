@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   XCircle,
   ExternalLink,
+  X,
 } from "lucide-react";
 import { PillFilter } from "@/components/ui/pill-filter";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -139,8 +140,18 @@ export function PostsView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search posts by title or keyword..."
-            className="pl-8 text-xs h-8"
+            className="pl-8 pr-8 text-xs h-8"
           />
+          {search && (
+            <button
+              type="button"
+              onClick={() => setSearch("")}
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted transition-colors cursor-pointer z-10"
+              title="Clear search"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-2">

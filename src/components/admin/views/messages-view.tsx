@@ -133,8 +133,10 @@ export function MessagesView() {
           />
           {search && (
             <button
+              type="button"
               onClick={() => setSearch("")}
-              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer z-10"
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground p-0.5 rounded-sm hover:bg-muted transition-colors cursor-pointer z-10"
+              title="Clear search"
             >
               <X className="w-3.5 h-3.5" />
             </button>
