@@ -584,7 +584,7 @@ export function ProjectEditorDialog({
           <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={onClose}
               className="cursor-pointer text-xs"

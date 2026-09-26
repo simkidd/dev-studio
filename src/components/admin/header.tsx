@@ -34,7 +34,11 @@ export function AdminHeader() {
         {/* User Pill */}
         <div className="flex items-center gap-2 pl-2 border-l border-border">
           <Avatar className="w-7 h-7 border border-border">
-            <AvatarImage src={user?.avatarUrl} alt={user?.firstName || "Admin"} className="object-cover" />
+            <AvatarImage
+              src={user?.avatarUrl}
+              alt={user?.firstName || "Admin"}
+              className="object-cover"
+            />
             <AvatarFallback className="bg-primary/15 text-primary text-[10px] font-bold">
               {user?.firstName?.charAt(0).toUpperCase() ||
                 user?.email?.charAt(0).toUpperCase() ||

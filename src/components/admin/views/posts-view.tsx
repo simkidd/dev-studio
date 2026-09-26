@@ -55,7 +55,8 @@ export function PostsView() {
     id: string;
     title: string;
   } | null>(null);
-  const [togglePublishedTarget, setTogglePublishedTarget] = useState<IPost | null>(null);
+  const [togglePublishedTarget, setTogglePublishedTarget] =
+    useState<IPost | null>(null);
 
   const {
     data: postsResponse,
@@ -86,7 +87,6 @@ export function PostsView() {
   const handleDelete = (id: string, postTitle: string) => {
     setDeleteTarget({ id, title: postTitle });
   };
-
 
   return (
     <div className="space-y-4 pb-20">
@@ -122,7 +122,7 @@ export function PostsView() {
           </button>
           <button
             onClick={handleOpenCreate}
-            className="px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-lg shadow-primary/20 flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Write Article</span>
@@ -139,7 +139,7 @@ export function PostsView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search posts by title or keyword..."
-            className="pl-8 text-xs h-9"
+            className="pl-8 text-xs h-8"
           />
         </div>
 
@@ -302,22 +302,29 @@ export function PostsView() {
                         className="w-44 bg-popover border-border text-popover-foreground text-[11px] shadow-xl p-1"
                       >
                         <DropdownMenuItem
-                          onClick={() => router.push(`/admin/posts/${post._id}`)}
+                          onClick={() =>
+                            router.push(`/admin/posts/${post._id}`)
+                          }
                           className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                         >
-                          <Eye className="w-3 h-3 mr-2 text-muted-foreground" /> View Details
+                          <Eye className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                          View Details
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleOpenEdit(post)}
                           className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                         >
-                          <Edit className="w-3 h-3 mr-2 text-muted-foreground" /> Edit Article
+                          <Edit className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                          Edit Article
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => window.open(`/blog/${post.slug}`, "_blank")}
+                          onClick={() =>
+                            window.open(`/blog/${post.slug}`, "_blank")
+                          }
                           className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                         >
-                          <ExternalLink className="w-3 h-3 mr-2 text-muted-foreground" /> View Public Page
+                          <ExternalLink className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                          View Public Page
                         </DropdownMenuItem>
 
                         <DropdownMenuSeparator className="bg-border my-1" />
@@ -343,7 +350,7 @@ export function PostsView() {
                           <Trash2 className="w-3 h-3 mr-2" /> Delete Article
                         </DropdownMenuItem>
                       </DropdownMenuContent>
-                      </DropdownMenu>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
               ))
@@ -402,7 +409,7 @@ export function PostsView() {
               },
               {
                 onSuccess: () => setTogglePublishedTarget(null),
-              }
+              },
             );
           }
         }}

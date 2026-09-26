@@ -71,7 +71,8 @@ export function ProjectsView() {
     id: string;
     title: string;
   } | null>(null);
-  const [togglePublishedTarget, setTogglePublishedTarget] = useState<IProject | null>(null);
+  const [togglePublishedTarget, setTogglePublishedTarget] =
+    useState<IProject | null>(null);
 
   const {
     data: projectsResponse,
@@ -171,7 +172,6 @@ export function ProjectsView() {
     setTogglePublishedTarget(project);
   };
 
-
   const totalProjects = allProjects.length;
   const publishedCount = allProjects.filter(
     (p: IProject) => p.isPublished,
@@ -212,7 +212,7 @@ export function ProjectsView() {
           </button>
           <button
             onClick={handleOpenNew}
-            className="px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-lg shadow-primary/20 transition-all flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Plus className="w-4 h-4" />
             <span>Add Showcase Project</span>
@@ -258,7 +258,7 @@ export function ProjectsView() {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Filter projects by title, stack, keyword..."
-            className="pl-8 text-xs h-9"
+            className="pl-8 text-xs h-8"
           />
         </div>
 
@@ -336,7 +336,9 @@ export function ProjectsView() {
                   }
                   onCheckedChange={(checked) => {
                     if (checked) {
-                      setSelectedIds(paginatedProjects.map((p: IProject) => p._id));
+                      setSelectedIds(
+                        paginatedProjects.map((p: IProject) => p._id),
+                      );
                     } else {
                       setSelectedIds([]);
                     }
@@ -619,19 +621,24 @@ export function ProjectsView() {
                             onClick={() => handleOpenDetails(proj)}
                             className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
-                            <Eye className="w-3 h-3 mr-2 text-muted-foreground" /> View Details
+                            <Eye className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                            View Details
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleEdit(proj)}
                             className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
-                            <Edit className="w-3 h-3 mr-2 text-muted-foreground" /> Edit Project
+                            <Edit className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                            Edit Project
                           </DropdownMenuItem>
                           <DropdownMenuItem
-                            onClick={() => window.open(`/projects/${proj.slug}`, "_blank")}
+                            onClick={() =>
+                              window.open(`/projects/${proj.slug}`, "_blank")
+                            }
                             className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
-                            <ExternalLink className="w-3 h-3 mr-2 text-muted-foreground" /> View Public Page
+                            <ExternalLink className="w-3 h-3 mr-2 text-muted-foreground" />{" "}
+                            View Public Page
                           </DropdownMenuItem>
 
                           <DropdownMenuSeparator className="bg-border my-1" />
@@ -641,7 +648,9 @@ export function ProjectsView() {
                             className="text-[11px] py-1.5 px-2 cursor-pointer hover:bg-accent hover:text-accent-foreground"
                           >
                             <Star className="w-3 h-3 mr-2 text-amber-500 dark:text-amber-400" />
-                            {proj.isFeatured ? "Unstar Highlight" : "Feature on Homepage"}
+                            {proj.isFeatured
+                              ? "Unstar Highlight"
+                              : "Feature on Homepage"}
                           </DropdownMenuItem>
                           <DropdownMenuItem
                             onClick={() => handleTogglePublished(proj)}
@@ -652,9 +661,7 @@ export function ProjectsView() {
                             ) : (
                               <CheckCircle2 className="w-3 h-3 mr-2 text-emerald-500 dark:text-emerald-400" />
                             )}
-                            {proj.isPublished
-                              ? "Set to Draft"
-                              : "Publish Live"}
+                            {proj.isPublished ? "Set to Draft" : "Publish Live"}
                           </DropdownMenuItem>
 
                           <DropdownMenuSeparator className="bg-border my-1" />
@@ -666,7 +673,7 @@ export function ProjectsView() {
                             <Trash2 className="w-3 h-3 mr-2" /> Delete Project
                           </DropdownMenuItem>
                         </DropdownMenuContent>
-                        </DropdownMenu>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 );
@@ -735,9 +742,7 @@ export function ProjectsView() {
             : "publish this showcase project live"
         }?`}
         confirmText={
-          togglePublishedTarget?.isPublished
-            ? "Set to Draft"
-            : "Publish Live"
+          togglePublishedTarget?.isPublished ? "Set to Draft" : "Publish Live"
         }
         isLoading={togglePublishedMutation.isPending}
         variant={togglePublishedTarget?.isPublished ? "destructive" : "default"}

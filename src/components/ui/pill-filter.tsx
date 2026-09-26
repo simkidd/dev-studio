@@ -40,8 +40,9 @@ export function PillFilter({
         <button
           type="button"
           className={cn(
-            "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs transition-all border select-none",
+            "inline-flex items-center h-8 gap-1.5 px-2.5 rounded-lg text-xs transition-all border select-none shrink-0",
             "bg-card text-muted-foreground border-border hover:border-border/80 hover:text-foreground",
+            "cursor-pointer",
             isOpen &&
               "border-primary/50 ring-1 ring-primary/20 text-foreground",
             className,

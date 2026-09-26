@@ -40,13 +40,13 @@ export function DashboardView() {
   const projects: IProject[] = Array.isArray(projectsData?.data)
     ? projectsData.data
     : Array.isArray((projectsData?.data as any)?.projects)
-    ? (projectsData?.data as any).projects
-    : [];
+      ? (projectsData?.data as any).projects
+      : [];
   const messages: IMessage[] = Array.isArray(messagesData?.data)
     ? messagesData.data
     : Array.isArray((messagesData?.data as any)?.messages)
-    ? (messagesData?.data as any).messages
-    : [];
+      ? (messagesData?.data as any).messages
+      : [];
 
   return (
     <div className="space-y-6">
@@ -61,21 +61,22 @@ export function DashboardView() {
             </span>
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Real-time pipeline metrics, project showcases, and client inquiry telemetry.
+            Real-time pipeline metrics, project showcases, and client inquiry
+            telemetry.
           </p>
         </div>
 
         <div className="flex items-center gap-2.5">
           <button
             onClick={() => setIsProjectSheetOpen(true)}
-            className="px-3.5 py-1.5 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium shadow-md shadow-primary/20 transition-colors flex items-center gap-1.5 cursor-pointer"
+            className="px-3.5 py-2 rounded-lg bg-primary text-primary-foreground hover:bg-primary/90 text-xs font-medium shadow-sm transition-colors flex items-center gap-1.5 cursor-pointer"
           >
             <FolderGit2 className="w-3.5 h-3.5" />
             <span>New Project</span>
           </button>
           <Link
             href="/admin/messages"
-            className="px-3.5 py-1.5 rounded-lg bg-card hover:bg-accent border border-border text-foreground text-xs font-medium transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-lg bg-card hover:bg-accent border border-border text-foreground text-xs font-medium transition-colors flex items-center gap-1.5"
           >
             <Mail className="w-3.5 h-3.5 text-primary" />
             <span>View Inbound Leads</span>
@@ -88,14 +89,16 @@ export function DashboardView() {
         {/* Total Inquiries */}
         <div className="bg-card border border-border rounded-xl p-4 relative overflow-hidden group hover:border-border/80 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Total Inquiries</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Total Inquiries
+            </span>
             <div className="w-7 h-7 rounded-lg bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-500 dark:text-indigo-400">
               <Mail className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-2xl font-bold text-foreground tracking-tight font-mono">
-              {isStatsLoading ? "..." : stats?.counts?.messages?.total ?? 0}
+              {isStatsLoading ? "..." : (stats?.counts?.messages?.total ?? 0)}
             </span>
             <div className="flex items-center text-[11px] text-emerald-500 dark:text-emerald-400 font-medium">
               <TrendingUp className="w-3 h-3 mr-1" />
@@ -103,43 +106,59 @@ export function DashboardView() {
             </div>
           </div>
           <div className="mt-3 h-8">
-            <Sparkline data={[12, 18, 15, 24, 22, 35, 42, 38, 48]} color="indigo" height={32} />
+            <Sparkline
+              data={[12, 18, 15, 24, 22, 35, 42, 38, 48]}
+              color="indigo"
+              height={32}
+            />
           </div>
           <div className="mt-2 text-[10px] text-muted-foreground flex items-center justify-between">
             <span>Unread: {stats?.counts?.messages?.unread ?? 0}</span>
-            <span className="text-indigo-500 dark:text-indigo-400 font-medium">Active CRM Leads</span>
+            <span className="text-indigo-500 dark:text-indigo-400 font-medium">
+              Active CRM Leads
+            </span>
           </div>
         </div>
 
         {/* Live Projects */}
         <div className="bg-card border border-border rounded-xl p-4 relative overflow-hidden group hover:border-border/80 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Showcase Projects</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Showcase Projects
+            </span>
             <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-500 dark:text-emerald-400">
               <FolderGit2 className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-2xl font-bold text-foreground tracking-tight font-mono">
-              {isStatsLoading ? "..." : stats?.counts?.projects?.total ?? 0}
+              {isStatsLoading ? "..." : (stats?.counts?.projects?.total ?? 0)}
             </span>
             <span className="text-[11px] font-mono text-muted-foreground">
               Featured: {stats?.counts?.projects?.featured ?? 0}
             </span>
           </div>
           <div className="mt-3 h-8">
-            <Sparkline data={[4, 6, 8, 8, 11, 14, 15, 17, 20]} color="emerald" height={32} />
+            <Sparkline
+              data={[4, 6, 8, 8, 11, 14, 15, 17, 20]}
+              color="emerald"
+              height={32}
+            />
           </div>
           <div className="mt-2 text-[10px] text-muted-foreground flex items-center justify-between">
             <span>Published: {stats?.counts?.projects?.published ?? 0}</span>
-            <span className="text-emerald-500 dark:text-emerald-400 font-medium">100% Case Studies</span>
+            <span className="text-emerald-500 dark:text-emerald-400 font-medium">
+              100% Case Studies
+            </span>
           </div>
         </div>
 
         {/* Lead Response Rate */}
         <div className="bg-card border border-border rounded-xl p-4 relative overflow-hidden group hover:border-border/80 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Pipeline Response Rate</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Pipeline Response Rate
+            </span>
             <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 dark:text-amber-400">
               <Activity className="w-3.5 h-3.5" />
             </div>
@@ -148,28 +167,34 @@ export function DashboardView() {
             <span className="text-2xl font-bold text-foreground tracking-tight font-mono">
               94.2%
             </span>
-            <span className="text-[11px] text-amber-500 dark:text-amber-400 font-medium">&lt; 4 hr SLA</span>
+            <span className="text-[11px] text-amber-500 dark:text-amber-400 font-medium">
+              &lt; 4 hr SLA
+            </span>
           </div>
           <div className="mt-4">
             <SegmentedMeter value={94} totalSegments={10} />
           </div>
           <div className="mt-3 text-[10px] text-muted-foreground flex items-center justify-between">
             <span>High-intent leads: 82%</span>
-            <span className="text-amber-500 dark:text-amber-400">Optimized</span>
+            <span className="text-amber-500 dark:text-amber-400">
+              Optimized
+            </span>
           </div>
         </div>
 
         {/* Technical Articles */}
         <div className="bg-card border border-border rounded-xl p-4 relative overflow-hidden group hover:border-border/80 transition-all">
           <div className="flex items-center justify-between">
-            <span className="text-xs font-medium text-muted-foreground">Published Insights</span>
+            <span className="text-xs font-medium text-muted-foreground">
+              Published Insights
+            </span>
             <div className="w-7 h-7 rounded-lg bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-cyan-500 dark:text-cyan-400">
               <FileText className="w-3.5 h-3.5" />
             </div>
           </div>
           <div className="mt-3 flex items-baseline justify-between">
             <span className="text-2xl font-bold text-foreground tracking-tight font-mono">
-              {isStatsLoading ? "..." : stats?.counts?.posts?.total ?? 0}
+              {isStatsLoading ? "..." : (stats?.counts?.posts?.total ?? 0)}
             </span>
             <div className="flex items-center text-[11px] text-cyan-500 dark:text-cyan-400 font-medium">
               <TrendingUp className="w-3 h-3 mr-1" />
@@ -177,11 +202,17 @@ export function DashboardView() {
             </div>
           </div>
           <div className="mt-3 h-8">
-            <Sparkline data={[50, 65, 80, 120, 190, 240, 310, 390, 480]} color="cyan" height={32} />
+            <Sparkline
+              data={[50, 65, 80, 120, 190, 240, 310, 390, 480]}
+              color="cyan"
+              height={32}
+            />
           </div>
           <div className="mt-2 text-[10px] text-muted-foreground flex items-center justify-between">
             <span>Skills Catalog: {stats?.counts?.skills ?? 0}</span>
-            <span className="text-cyan-500 dark:text-cyan-400 font-medium">SEO Indexed</span>
+            <span className="text-cyan-500 dark:text-cyan-400 font-medium">
+              SEO Indexed
+            </span>
           </div>
         </div>
       </div>
@@ -216,7 +247,9 @@ export function DashboardView() {
             ) : messages.length === 0 ? (
               <div className="py-12 px-4 text-center">
                 <Mail className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                <p className="text-xs text-muted-foreground font-medium">No inquiries received yet</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  No inquiries received yet
+                </p>
                 <p className="text-[11px] text-muted-foreground/80 mt-0.5">
                   Incoming contact form submissions will appear here live.
                 </p>
@@ -240,8 +273,8 @@ export function DashboardView() {
                           msg.status === "unread"
                             ? "bg-indigo-500/10 text-indigo-500 dark:text-indigo-400 border border-indigo-500/20"
                             : msg.status === "replied"
-                            ? "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20"
-                            : "bg-muted text-muted-foreground"
+                              ? "bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20"
+                              : "bg-muted text-muted-foreground"
                         }`}
                       >
                         {msg.status}
@@ -316,7 +349,9 @@ export function DashboardView() {
             ) : projects.length === 0 ? (
               <div className="py-12 px-4 text-center">
                 <FolderGit2 className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                <p className="text-xs text-muted-foreground font-medium">No projects added yet</p>
+                <p className="text-xs text-muted-foreground font-medium">
+                  No projects added yet
+                </p>
                 <button
                   onClick={() => setIsProjectSheetOpen(true)}
                   className="mt-2 text-xs text-primary hover:underline cursor-pointer"

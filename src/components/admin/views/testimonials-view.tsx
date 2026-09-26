@@ -10,14 +10,7 @@ import {
   useUploadFile,
 } from "@/hooks";
 import { ITestimonial } from "@/interfaces";
-import {
-  Quote,
-  Plus,
-  Trash2,
-  Edit,
-  Star,
-  RefreshCw,
-} from "lucide-react";
+import { Quote, Plus, Trash2, Edit, Star, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -57,7 +50,10 @@ export function TestimonialsView() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editingTestimonial, setEditingTestimonial] =
     useState<ITestimonial | null>(null);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; name: string } | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    name: string;
+  } | null>(null);
 
   const uploadFileMutation = useUploadFile();
 
@@ -136,7 +132,7 @@ export function TestimonialsView() {
     if (editingTestimonial) {
       updateMutation.mutate(
         { id: editingTestimonial._id, payload },
-        { onSuccess: () => setDialogOpen(false) }
+        { onSuccess: () => setDialogOpen(false) },
       );
     } else {
       createMutation.mutate(payload, {
@@ -163,7 +159,8 @@ export function TestimonialsView() {
             </span>
           </div>
           <p className="text-xs text-muted-foreground mt-0.5">
-            Collect and display high-value endorsements from VP Engineering leaders and founders.
+            Collect and display high-value endorsements from VP Engineering
+            leaders and founders.
           </p>
         </div>
 
@@ -206,7 +203,9 @@ export function TestimonialsView() {
         ) : testimonials.length === 0 ? (
           <div className="col-span-full py-16 text-center bg-card border border-border rounded-xl">
             <Quote className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-60" />
-            <p className="text-sm font-semibold text-foreground">No testimonials yet</p>
+            <p className="text-sm font-semibold text-foreground">
+              No testimonials yet
+            </p>
             <p className="text-xs text-muted-foreground mt-0.5">
               Add client praise, performance recommendations, and peer reviews.
             </p>
@@ -221,9 +220,15 @@ export function TestimonialsView() {
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
                     <Avatar className="w-10 h-10 border border-border shrink-0">
-                      <AvatarImage src={t.avatarUrl} alt={t.clientName} className="object-cover" />
+                      <AvatarImage
+                        src={t.avatarUrl}
+                        alt={t.clientName}
+                        className="object-cover"
+                      />
                       <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                        {t.clientName ? t.clientName.charAt(0).toUpperCase() : "C"}
+                        {t.clientName
+                          ? t.clientName.charAt(0).toUpperCase()
+                          : "C"}
                       </AvatarFallback>
                     </Avatar>
                     <div>
@@ -282,45 +287,65 @@ export function TestimonialsView() {
         <DialogContent className="sm:max-w-xl max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0">
           <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
             <DialogTitle className="text-base font-bold text-foreground">
-              {editingTestimonial ? "Edit Endorsement" : "Add Client Testimonial"}
+              {editingTestimonial
+                ? "Edit Endorsement"
+                : "Add Client Testimonial"}
             </DialogTitle>
             <DialogDescription className="text-xs text-muted-foreground">
-              Add social proof and leadership recommendations to accelerate client trust.
+              Add social proof and leadership recommendations to accelerate
+              client trust.
             </DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col min-h-0 flex-1 overflow-hidden">
+          <form
+            onSubmit={handleSubmit(onSubmit)}
+            className="flex flex-col min-h-0 flex-1 overflow-hidden"
+          >
             <ScrollArea className="flex-1 min-h-0 w-full p-6">
               <div className="space-y-4 pr-2">
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Client / Endorser Name *</label>
+                  <label className="text-xs font-medium text-foreground">
+                    Client / Endorser Name *
+                  </label>
                   <Input
                     type="text"
-                    {...register("clientName", { required: "Client name is required" })}
+                    {...register("clientName", {
+                      required: "Client name is required",
+                    })}
                     placeholder="e.g. Sarah Jenkins"
                     className="text-xs h-9"
                   />
                   {errors.clientName && (
-                    <span className="text-[10px] text-destructive">{errors.clientName.message}</span>
+                    <span className="text-[10px] text-destructive">
+                      {errors.clientName.message}
+                    </span>
                   )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">Title / Role *</label>
+                    <label className="text-xs font-medium text-foreground">
+                      Title / Role *
+                    </label>
                     <Input
                       type="text"
-                      {...register("clientRole", { required: "Role is required" })}
+                      {...register("clientRole", {
+                        required: "Role is required",
+                      })}
                       placeholder="e.g. VP of Engineering"
                       className="text-xs h-9"
                     />
                     {errors.clientRole && (
-                      <span className="text-[10px] text-destructive">{errors.clientRole.message}</span>
+                      <span className="text-[10px] text-destructive">
+                        {errors.clientRole.message}
+                      </span>
                     )}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">Company</label>
+                    <label className="text-xs font-medium text-foreground">
+                      Company
+                    </label>
                     <Input
                       type="text"
                       {...register("company")}
@@ -331,7 +356,9 @@ export function TestimonialsView() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Client Avatar</label>
+                  <label className="text-xs font-medium text-foreground">
+                    Client Avatar
+                  </label>
                   <FileDropzone
                     variant="avatar"
                     previewUrl={watch("avatarUrl")}
@@ -345,7 +372,7 @@ export function TestimonialsView() {
                               toast.success("Client avatar uploaded");
                             }
                           },
-                        }
+                        },
                       );
                     }}
                     onClear={() => setValue("avatarUrl", "")}
@@ -355,7 +382,9 @@ export function TestimonialsView() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Endorsement Quote *</label>
+                  <label className="text-xs font-medium text-foreground">
+                    Endorsement Quote *
+                  </label>
                   <Textarea
                     {...register("quote", { required: "Quote is required" })}
                     placeholder="He delivered exceptional high-throughput code on time..."
@@ -363,7 +392,9 @@ export function TestimonialsView() {
                     className="text-xs resize-none"
                   />
                   {errors.quote && (
-                    <span className="text-[10px] text-destructive">{errors.quote.message}</span>
+                    <span className="text-[10px] text-destructive">
+                      {errors.quote.message}
+                    </span>
                   )}
                 </div>
 
@@ -380,13 +411,18 @@ export function TestimonialsView() {
                         />
                       )}
                     />
-                    <label htmlFor="isFeatTest" className="text-xs text-foreground cursor-pointer select-none">
+                    <label
+                      htmlFor="isFeatTest"
+                      className="text-xs text-foreground cursor-pointer select-none"
+                    >
                       Feature on Homepage
                     </label>
                   </div>
 
                   <div className="flex items-center gap-2">
-                    <label className="text-xs text-muted-foreground">Rating:</label>
+                    <label className="text-xs text-muted-foreground">
+                      Rating:
+                    </label>
                     <Controller
                       name="rating"
                       control={control}

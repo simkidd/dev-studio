@@ -221,7 +221,11 @@ export function AdminSidebar() {
         <div className="flex items-center justify-between p-1.5 rounded-lg bg-sidebar-accent/50 border border-sidebar-border group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:bg-transparent group-data-[collapsible=icon]:border-none group-data-[collapsible=icon]:flex-col group-data-[collapsible=icon]:gap-2">
           <div className="flex items-center gap-2.5 min-w-0 group-data-[collapsible=icon]:justify-center">
             <Avatar className="w-8 h-8 rounded-lg border border-sidebar-border shrink-0">
-              <AvatarImage src={user?.avatarUrl} alt={user?.firstName || "Admin"} className="object-cover rounded-lg" />
+              <AvatarImage
+                src={user?.avatarUrl}
+                alt={user?.firstName || "Admin"}
+                className="object-cover rounded-lg"
+              />
               <AvatarFallback className="rounded-lg bg-sidebar-accent text-sidebar-foreground font-bold text-xs">
                 {user?.firstName?.charAt(0).toUpperCase() ||
                   user?.email?.charAt(0).toUpperCase() ||
@@ -236,7 +240,7 @@ export function AdminSidebar() {
               </p>
               <div className="flex items-center gap-1.5">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <span className="text-[10px] text-muted-foreground font-mono capitalize">
+                <span className="text-[10px] text-muted-foreground font-mono capitalize line-clamp-1">
                   {user?.headline
                     ? user.headline.split("|")[0].trim()
                     : user?.role || "superadmin"}
