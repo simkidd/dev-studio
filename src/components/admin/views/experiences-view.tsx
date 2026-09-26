@@ -7,7 +7,6 @@ import {
   useCreateExperience,
   useUpdateExperience,
   useDeleteExperience,
-  useReorderExperiences,
 } from "@/hooks";
 import { IExperience, ExperienceType } from "@/interfaces";
 import {
@@ -18,8 +17,6 @@ import {
   Calendar,
   MapPin,
   RefreshCw,
-  ChevronUp,
-  ChevronDown,
 } from "lucide-react";
 import {
   Dialog,
@@ -94,32 +91,31 @@ export function ExperiencesView() {
   const isCurrent = watch("isCurrent");
 
   const {
-    data: experiences = [],
+    data: rawExperiences = [],
     isLoading,
     refetch,
     isRefetching,
   } = useExperiences(selectedType !== "all" ? selectedType : undefined);
 
+  // Auto-sort reverse-chronologically: Present roles first, newest start date first
+  const experiences = React.useMemo(() => {
+    return [...rawExperiences].sort((a, b) => {
+      if (a.isCurrent && !b.isCurrent) return -1;
+      if (!a.isCurrent && b.isCurrent) return 1;
+
+      const timeA = new Date(a.startDate).getTime();
+      const timeB = new Date(b.startDate).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+
+      const endA = a.endDate ? new Date(a.endDate).getTime() : 0;
+      const endB = b.endDate ? new Date(b.endDate).getTime() : 0;
+      return endB - endA;
+    });
+  }, [rawExperiences]);
+
   const createMutation = useCreateExperience();
   const updateMutation = useUpdateExperience();
   const deleteMutation = useDeleteExperience();
-  const reorderMutation = useReorderExperiences();
-
-  const handleMove = (index: number, direction: "up" | "down") => {
-    const targetIndex = direction === "up" ? index - 1 : index + 1;
-    if (targetIndex < 0 || targetIndex >= experiences.length) return;
-
-    const newExperiences = [...experiences];
-    const [moved] = newExperiences.splice(index, 1);
-    newExperiences.splice(targetIndex, 0, moved);
-
-    const orders = newExperiences.map((item, idx) => ({
-      id: item._id,
-      order: idx + 1,
-    }));
-
-    reorderMutation.mutate(orders);
-  };
 
   const handleOpenCreate = () => {
     setEditingExp(null);
@@ -182,7 +178,6 @@ export function ExperiencesView() {
       summary: data.summary,
       technologies: techList,
       achievements: achievementList,
-      order: editingExp ? (editingExp.order ?? 0) : experiences.length + 1,
     };
 
     if (editingExp) {
@@ -279,7 +274,7 @@ export function ExperiencesView() {
             </p>
           </div>
         ) : (
-          experiences.map((exp: IExperience, idx: number) => (
+          experiences.map((exp: IExperience) => (
             <div
               key={exp._id}
               className="bg-card border border-border hover:border-primary/40 rounded-xl p-5 transition-all group shadow-sm"
@@ -320,28 +315,6 @@ export function ExperiencesView() {
                 </div>
 
                 <div className="flex items-center gap-1.5 shrink-0 opacity-80 group-hover:opacity-100">
-                  {/* Reorder Up / Down */}
-                  <div className="flex items-center rounded-lg border border-border bg-muted/40 p-0.5 mr-1">
-                    <button
-                      type="button"
-                      disabled={idx === 0 || reorderMutation.isPending}
-                      onClick={() => handleMove(idx, "up")}
-                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
-                      title="Move position up"
-                    >
-                      <ChevronUp className="w-3.5 h-3.5" />
-                    </button>
-                    <button
-                      type="button"
-                      disabled={idx === experiences.length - 1 || reorderMutation.isPending}
-                      onClick={() => handleMove(idx, "down")}
-                      className="p-1 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors disabled:opacity-20 disabled:cursor-not-allowed cursor-pointer"
-                      title="Move position down"
-                    >
-                      <ChevronDown className="w-3.5 h-3.5" />
-                    </button>
-                  </div>
-
                   <button
                     onClick={() => handleOpenEdit(exp)}
                     className="p-1.5 rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors cursor-pointer"

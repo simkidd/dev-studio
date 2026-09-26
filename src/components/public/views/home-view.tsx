@@ -50,7 +50,7 @@ export function HomeView() {
     limit: 6,
   });
   const { data: skills = [], isLoading: skillsLoading } = useSkills();
-  const { data: experiences = [], isLoading: expLoading } = useExperiences();
+  const { data: rawExperiences = [], isLoading: expLoading } = useExperiences();
   const { data: postsResponse, isLoading: postsLoading } = usePosts({
     status: "published",
     limit: 3,
@@ -90,6 +90,21 @@ export function HomeView() {
       : projects;
 
   const posts: IPost[] = postsResponse?.data || [];
+
+  const experiences = React.useMemo(() => {
+    return [...rawExperiences].sort((a, b) => {
+      if (a.isCurrent && !b.isCurrent) return -1;
+      if (!a.isCurrent && b.isCurrent) return 1;
+
+      const timeA = new Date(a.startDate).getTime();
+      const timeB = new Date(b.startDate).getTime();
+      if (timeA !== timeB) return timeB - timeA;
+
+      const endA = a.endDate ? new Date(a.endDate).getTime() : 0;
+      const endB = b.endDate ? new Date(b.endDate).getTime() : 0;
+      return endB - endA;
+    });
+  }, [rawExperiences]);
 
   const skillCategories = [
     "all",
