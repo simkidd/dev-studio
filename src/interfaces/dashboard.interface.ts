@@ -24,6 +24,6 @@ export interface IDashboardStats {
   };
   recent: {
     messages: IMessage[];
-    projects: Partial<IProject>[];
+    projects: IProject[];
   };
 }

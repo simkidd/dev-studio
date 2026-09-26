@@ -4,8 +4,6 @@ import React, { useState } from "react";
 import Link from "next/link";
 import {
   useDashboardStats,
-  useProjects,
-  useMessages,
   useUpdateMessageStatus,
 } from "@/hooks";
 import { IMessage, IProject } from "@/interfaces";
@@ -26,27 +24,13 @@ import { ProjectEditorDialog } from "@/components/admin";
 import { formatDateTime } from "@/lib/date.utils";
 
 export function DashboardView() {
-  const { data: stats, isLoading: isStatsLoading } = useDashboardStats();
-  const { data: projectsData, isLoading: isProjectsLoading } = useProjects({
-    limit: 5,
-  });
-  const { data: messagesData, isLoading: isMessagesLoading } = useMessages({
-    limit: 6,
-  });
+  const { data: stats, isLoading: isStatsLoading, refetch } = useDashboardStats();
 
   const updateMessageStatus = useUpdateMessageStatus();
   const [isProjectSheetOpen, setIsProjectSheetOpen] = useState(false);
 
-  const projects: IProject[] = Array.isArray(projectsData?.data)
-    ? projectsData.data
-    : Array.isArray((projectsData?.data as any)?.projects)
-      ? (projectsData?.data as any).projects
-      : [];
-  const messages: IMessage[] = Array.isArray(messagesData?.data)
-    ? messagesData.data
-    : Array.isArray((messagesData?.data as any)?.messages)
-      ? (messagesData?.data as any).messages
-      : [];
+  const projects: IProject[] = stats?.recent?.projects ?? [];
+  const messages: IMessage[] = stats?.recent?.messages ?? [];
 
   return (
     <div className="space-y-6">
@@ -238,7 +222,7 @@ export function DashboardView() {
           </div>
 
           <div className="divide-y divide-border flex-1">
-            {isMessagesLoading ? (
+            {isStatsLoading ? (
               <div className="p-6 space-y-3">
                 <Skeleton className="h-12 w-full bg-muted" />
                 <Skeleton className="h-12 w-full bg-muted" />
@@ -340,7 +324,7 @@ export function DashboardView() {
           </div>
 
           <div className="divide-y divide-border flex-1">
-            {isProjectsLoading ? (
+            {isStatsLoading ? (
               <div className="p-6 space-y-3">
                 <Skeleton className="h-12 w-full bg-muted" />
                 <Skeleton className="h-12 w-full bg-muted" />
@@ -395,7 +379,9 @@ export function DashboardView() {
                           {proj.category}
                         </span>
                         <span className="text-[10px] text-muted-foreground truncate">
-                          {proj.technologies.slice(0, 3).join(" • ")}
+                          {proj.technologies && proj.technologies.length > 0
+                            ? proj.technologies.slice(0, 3).join(" • ")
+                            : proj.category}
                         </span>
                       </div>
                     </div>
@@ -419,6 +405,7 @@ export function DashboardView() {
         isOpen={isProjectSheetOpen}
         onClose={() => setIsProjectSheetOpen(false)}
         onSaved={() => {
+          refetch();
           setIsProjectSheetOpen(false);
         }}
       />

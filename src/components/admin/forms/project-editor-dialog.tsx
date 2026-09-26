@@ -25,7 +25,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDropzone } from "@/components/ui/file-dropzone";
-import { Loader2, Plus, Trash2, Save, Globe } from "lucide-react";
+import { Loader2, Plus, Trash2, Save, Globe, X } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { toast } from "sonner";
 
@@ -47,7 +47,7 @@ export interface ProjectEditorDialogProps {
   isOpen: boolean;
   onClose: () => void;
   project?: IProject | null;
-  onSaved: () => void;
+  onSaved?: () => void;
 }
 
 const CATEGORIES: ProjectCategory[] = [
@@ -228,7 +228,7 @@ export function ProjectEditorDialog({
         { id: project._id, payload: formData },
         {
           onSuccess: () => {
-            onSaved();
+            onSaved?.();
             onClose();
           },
         },
@@ -236,7 +236,7 @@ export function ProjectEditorDialog({
     } else {
       createProjectMutation.mutate(formData, {
         onSuccess: () => {
-          onSaved();
+          onSaved?.();
           onClose();
         },
       });
@@ -418,15 +418,15 @@ export function ProjectEditorDialog({
                     technologies.map((t) => (
                       <span
                         key={t}
-                        className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[11px] font-mono bg-card text-foreground border border-border"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono bg-muted text-foreground border border-border"
                       >
                         {t}
                         <button
                           type="button"
                           onClick={() => handleRemoveTechnology(t)}
-                          className="text-muted-foreground hover:text-destructive cursor-pointer font-bold"
+                          className="hover:text-destructive text-muted-foreground cursor-pointer ml-0.5"
                         >
-                          &times;
+                          <X className="w-3 h-3" />
                         </button>
                       </span>
                     ))
@@ -571,7 +571,7 @@ export function ProjectEditorDialog({
           <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
-              variant="ghost"
+              variant="outline"
               size="sm"
               onClick={onClose}
               className="cursor-pointer text-xs"
