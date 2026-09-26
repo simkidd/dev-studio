@@ -16,6 +16,13 @@ import {
   ExternalLink,
   MapPin,
   Briefcase,
+  Layers,
+  Award,
+  Users,
+  GitCommit,
+  CheckCircle2,
+  AlertCircle,
+  Eye,
 } from "lucide-react";
 import {
   GithubIcon,
@@ -25,17 +32,19 @@ import {
   YoutubeIcon,
 } from "@/components/ui/icons";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export interface ProfileFormData {
   firstName: string;
+  middleName?: string;
   lastName: string;
   headline: string;
+  subHeadline?: string;
   bio: string;
   aboutMarkdown: string;
   location: string;
@@ -72,12 +81,14 @@ export function ProfileView() {
     watch,
     control,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileFormData>({
     defaultValues: {
       firstName: "",
+      middleName: "",
       lastName: "",
       headline: "",
+      subHeadline: "",
       bio: "",
       aboutMarkdown: "",
       location: "",
@@ -104,13 +115,21 @@ export function ProfileView() {
 
   const avatarUrl = watch("avatarUrl");
   const resumeUrl = watch("resumeUrl");
+  const isAvailable = watch("isAvailableForHire");
+  const firstName = watch("firstName");
+  const lastName = watch("lastName");
+  const headline = watch("headline");
+  const seoTitle = watch("seoTitle");
+  const seoDescription = watch("seoDescription");
 
   useEffect(() => {
     if (profile) {
       reset({
         firstName: profile.firstName || "",
+        middleName: profile.middleName || "",
         lastName: profile.lastName || "",
         headline: profile.headline || "",
+        subHeadline: profile.subHeadline || "",
         bio: profile.bio || "",
         aboutMarkdown: profile.aboutMarkdown || "",
         location: profile.location || "",
@@ -118,10 +137,10 @@ export function ProfileView() {
         availabilityNote: profile.availabilityNote || "",
         avatarUrl: profile.avatarUrl || "",
         resumeUrl: profile.resumeUrl || "",
-        yearsExperience: profile.stats?.yearsExperience || 6,
-        completedProjects: profile.stats?.completedProjects || 40,
-        happyClients: profile.stats?.happyClients || 25,
-        codeCommits: profile.stats?.codeCommits || 1200,
+        yearsExperience: profile.stats?.yearsExperience ?? 6,
+        completedProjects: profile.stats?.completedProjects ?? 40,
+        happyClients: profile.stats?.happyClients ?? 25,
+        codeCommits: profile.stats?.codeCommits ?? 1200,
         github: profile.socialLinks?.github || "",
         linkedin: profile.socialLinks?.linkedin || "",
         twitter: profile.socialLinks?.twitter || "",
@@ -144,11 +163,14 @@ export function ProfileView() {
       {
         onSuccess: (data) => {
           if (data?.url) {
-            setValue("avatarUrl", data.url, { shouldValidate: true });
+            setValue("avatarUrl", data.url, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
             toast.success("Avatar image uploaded successfully");
           }
         },
-      }
+      },
     );
   };
 
@@ -158,11 +180,14 @@ export function ProfileView() {
       {
         onSuccess: (data) => {
           if (data?.url) {
-            setValue("resumeUrl", data.url, { shouldValidate: true });
+            setValue("resumeUrl", data.url, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
             toast.success("Resume document uploaded successfully");
           }
         },
-      }
+      },
     );
   };
 
@@ -175,199 +200,270 @@ export function ProfileView() {
       : [];
 
     const payload: Partial<IProfile> = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      headline: data.headline,
-      bio: data.bio,
+      firstName: data.firstName.trim(),
+      middleName: data.middleName?.trim() || undefined,
+      lastName: data.lastName.trim(),
+      headline: data.headline.trim(),
+      subHeadline: data.subHeadline?.trim() || undefined,
+      bio: data.bio.trim(),
       aboutMarkdown: data.aboutMarkdown,
-      location: data.location,
+      location: data.location.trim(),
       isAvailableForHire: data.isAvailableForHire,
-      availabilityNote: data.availabilityNote,
+      availabilityNote: data.availabilityNote.trim(),
       avatarUrl: data.avatarUrl,
       resumeUrl: data.resumeUrl,
       stats: {
-        yearsExperience: Number(data.yearsExperience),
-        completedProjects: Number(data.completedProjects),
-        happyClients: Number(data.happyClients),
-        codeCommits: Number(data.codeCommits),
+        yearsExperience: Number(data.yearsExperience) || 0,
+        completedProjects: Number(data.completedProjects) || 0,
+        happyClients: Number(data.happyClients) || 0,
+        codeCommits: Number(data.codeCommits) || 0,
       },
       socialLinks: {
-        github: data.github,
-        linkedin: data.linkedin,
-        twitter: data.twitter,
-        discord: data.discord,
-        youtube: data.youtube,
-        website: data.website,
-        email: data.email,
+        github: data.github.trim(),
+        linkedin: data.linkedin.trim(),
+        twitter: data.twitter.trim(),
+        discord: data.discord.trim(),
+        youtube: data.youtube.trim(),
+        website: data.website.trim(),
+        email: data.email.trim(),
       },
-      seoTitle: data.seoTitle,
-      seoDescription: data.seoDescription,
+      seoTitle: data.seoTitle.trim(),
+      seoDescription: data.seoDescription.trim(),
       seoKeywords: keywordsArray,
     };
 
-    updateProfileMutation.mutate(payload);
+    updateProfileMutation.mutate(payload, {
+      onSuccess: () => {
+        reset(data);
+      },
+    });
   };
 
+  if (isLoading) {
+    return (
+      <div className="space-y-6 max-w-5xl mx-auto animate-pulse pb-16">
+        <div className="h-10 bg-muted/60 rounded-xl w-1/3" />
+        <div className="h-12 bg-muted/50 rounded-xl w-full" />
+        <div className="h-96 bg-card border border-border rounded-2xl p-6 space-y-4">
+          <div className="h-20 w-20 bg-muted/60 rounded-full" />
+          <div className="h-8 bg-muted/50 rounded-lg w-1/2" />
+          <div className="h-24 bg-muted/40 rounded-lg w-full" />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-6 pb-20 max-w-4xl">
-      {/* Top Header Bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 pb-24 max-w-5xl mx-auto w-full">
+      {/* Top Header & Floating Save Action */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div>
-          <h1 className="text-xl font-bold text-foreground tracking-tight">
-            Settings & Identity
-          </h1>
-          <p className="text-xs text-muted-foreground mt-0.5">
-            Configure developer bio, availability status, social connectivity, and SEO metadata.
+          <div className="flex items-center gap-2.5">
+            <h1 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+              Settings & Identity
+            </h1>
+            {isDirty && (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-amber-500/10 text-amber-500 border border-amber-500/20">
+                <AlertCircle className="w-3 h-3" />
+                Unsaved changes
+              </span>
+            )}
+          </div>
+          <p className="text-xs text-muted-foreground mt-1 max-w-2xl">
+            Configure developer bio, availability status, key performance
+            metrics, social links, and SEO metadata.
           </p>
         </div>
 
-        <button
-          onClick={handleSubmit(onSubmit)}
-          disabled={updateProfileMutation.isPending || isSubmitting}
-          className="px-4 py-2 rounded-lg bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs flex items-center gap-2 disabled:opacity-50 transition-colors cursor-pointer"
-        >
-          {updateProfileMutation.isPending ? (
-            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-          ) : (
-            <Save className="w-3.5 h-3.5" />
-          )}
-          <span>Save Changes</span>
-        </button>
+        <div className="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            onClick={handleSubmit(onSubmit)}
+            disabled={updateProfileMutation.isPending || isSubmitting}
+            className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm flex items-center justify-center gap-2 disabled:opacity-50 transition-all cursor-pointer hover:shadow-primary/20 hover:shadow-md active:scale-98"
+          >
+            {updateProfileMutation.isPending ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" />
+            ) : (
+              <Save className="w-3.5 h-3.5" />
+            )}
+            <span>Save Profile</span>
+          </button>
+        </div>
       </div>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-          {/* Navigation Tabs List */}
-          <TabsList className="bg-muted/80 rounded-xl grid grid-cols-2 sm:grid-cols-4 gap-1 w-full max-w-2xl border border-border/60">
-            <TabsTrigger
-              value="general"
-              className="text-xs font-medium py-1.5 flex items-center justify-center gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-xs rounded-lg transition-all cursor-pointer"
-            >
-              <User className="w-3.5 h-3.5 text-primary" />
-              <span>General</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="bio"
-              className="text-xs font-medium py-1.5 flex items-center justify-center gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-xs rounded-lg transition-all cursor-pointer"
-            >
-              <FileText className="w-3.5 h-3.5 text-primary" />
-              <span>Bio & Story</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="social"
-              className="text-xs font-medium py-1.5 flex items-center justify-center gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-xs rounded-lg transition-all cursor-pointer"
-            >
-              <Globe className="w-3.5 h-3.5 text-primary" />
-              <span>Social Links</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="seo"
-              className="text-xs font-medium py-1.5 flex items-center justify-center gap-1.5 data-[state=active]:bg-background data-[state=active]:shadow-xs rounded-lg transition-all cursor-pointer"
-            >
-              <Search className="w-3.5 h-3.5 text-primary" />
-              <span>SEO & Meta</span>
-            </TabsTrigger>
-          </TabsList>
+      <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        <Tabs
+          value={activeTab}
+          onValueChange={setActiveTab}
+          className="space-y-6"
+        >
+          {/* Responsive Navigation Tabs List */}
+          <div className="w-full overflow-x-auto pb-1">
+            <TabsList className="inline-flex items-center justify-start gap-1 p-1 bg-muted/80 dark:bg-muted/50 border border-border/80 rounded-xl h-auto shadow-inner">
+              <TabsTrigger
+                value="general"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs transition-all cursor-pointer whitespace-nowrap"
+              >
+                <User className="w-3.5 h-3.5 text-primary" />
+                <span>General & Identity</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="bio"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs transition-all cursor-pointer whitespace-nowrap"
+              >
+                <FileText className="w-3.5 h-3.5 text-primary" />
+                <span>Bio & Story</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="social"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs transition-all cursor-pointer whitespace-nowrap"
+              >
+                <Globe className="w-3.5 h-3.5 text-primary" />
+                <span>Social Links</span>
+              </TabsTrigger>
+              <TabsTrigger
+                value="seo"
+                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-3.5 py-2 text-xs font-medium rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-xs transition-all cursor-pointer whitespace-nowrap"
+              >
+                <Search className="w-3.5 h-3.5 text-primary" />
+                <span>SEO & Search</span>
+              </TabsTrigger>
+            </TabsList>
+          </div>
 
           {/* TAB 1: General & Identity */}
-          <TabsContent value="general" className="space-y-5 focus:outline-none">
-            {/* Avatar & Core Names Card */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4 shadow-xs">
-              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <User className="w-3.5 h-3.5 text-primary" />
-                <span>Master Identity & Photo</span>
-              </h2>
+          <TabsContent value="general" className="space-y-6 focus:outline-none">
+            {/* Identity & Avatar Card */}
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <User className="w-4 h-4 text-primary" />
+                  <span>Master Identity & Profile Photo</span>
+                </h2>
+                <span className="text-[11px] text-muted-foreground font-mono">
+                  {firstName && lastName
+                    ? `${firstName} ${lastName}`
+                    : "Developer Profile"}
+                </span>
+              </div>
 
-              <div className="flex flex-col sm:flex-row items-center gap-5 pt-1">
-                {/* React Dropzone Avatar */}
-                <FileDropzone
-                  variant="avatar"
-                  previewUrl={avatarUrl}
-                  onFileSelect={handleAvatarSelect}
-                  isUploading={uploadFileMutation.isPending}
-                />
+              <div className="flex flex-col lg:flex-row items-center lg:items-start gap-6 pt-1">
+                {/* Avatar Uploader Dropzone */}
+                <div className="flex flex-col items-center gap-2 shrink-0">
+                  <FileDropzone
+                    variant="avatar"
+                    previewUrl={avatarUrl}
+                    onFileSelect={handleAvatarSelect}
+                    isUploading={uploadFileMutation.isPending}
+                  />
+                  <span className="text-[11px] text-muted-foreground text-center">
+                    PNG, JPG or WebP (Square recommended)
+                  </span>
+                </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 flex-1 w-full">
+                {/* Name Fields Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 w-full">
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">First Name *</label>
+                    <label className="text-xs font-medium text-foreground">
+                      First Name *
+                    </label>
                     <Input
-                      {...register("firstName", { required: "First name is required" })}
+                      {...register("firstName", {
+                        required: "First name is required",
+                      })}
                       placeholder="e.g. Alex"
+                      className="rounded-lg"
                     />
                     {errors.firstName && (
-                      <span className="text-[10px] text-destructive">{errors.firstName.message}</span>
+                      <span className="text-[10px] text-destructive">
+                        {errors.firstName.message}
+                      </span>
                     )}
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="text-xs font-medium text-foreground">Last Name *</label>
+                    <label className="text-xs font-medium text-foreground">
+                      Last Name *
+                    </label>
                     <Input
-                      {...register("lastName", { required: "Last name is required" })}
+                      {...register("lastName", {
+                        required: "Last name is required",
+                      })}
                       placeholder="e.g. Morgan"
+                      className="rounded-lg"
                     />
                     {errors.lastName && (
-                      <span className="text-[10px] text-destructive">{errors.lastName.message}</span>
+                      <span className="text-[10px] text-destructive">
+                        {errors.lastName.message}
+                      </span>
                     )}
                   </div>
-                </div>
-              </div>
 
-              {/* Value Hook Headline */}
-              <div className="space-y-1.5 pt-1">
-                <label className="text-xs font-medium text-foreground">
-                  Hero Headline (Value Proposition) *
-                </label>
-                <Input
-                  {...register("headline", { required: "Headline is required" })}
-                  placeholder="e.g. Lead Full-Stack Architect & Cloud Systems Engineer"
-                />
-                {errors.headline && (
-                  <span className="text-[10px] text-destructive">{errors.headline.message}</span>
-                )}
-              </div>
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-medium text-foreground">
+                      Hero Headline (Primary Specialization) *
+                    </label>
+                    <Input
+                      {...register("headline", {
+                        required: "Headline is required",
+                      })}
+                      placeholder="e.g. Senior Full-Stack Architect & Distributed Systems Engineer"
+                      className="rounded-lg"
+                    />
+                    {errors.headline && (
+                      <span className="text-[10px] text-destructive">
+                        {errors.headline.message}
+                      </span>
+                    )}
+                  </div>
 
-              {/* Location & Stats */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-muted-foreground" />
-                    Location
-                  </label>
-                  <Input
-                    {...register("location")}
-                    placeholder="e.g. San Francisco, CA (Remote)"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Years Experience</label>
-                  <Input
-                    type="number"
-                    {...register("yearsExperience", { valueAsNumber: true })}
-                    className="font-mono"
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">Completed Projects</label>
-                  <Input
-                    type="number"
-                    {...register("completedProjects", { valueAsNumber: true })}
-                    className="font-mono"
-                  />
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                      <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                      Current Location / Base
+                    </label>
+                    <Input
+                      {...register("location")}
+                      placeholder="e.g. London, UK (Open to Global Remote)"
+                      className="rounded-lg"
+                    />
+                  </div>
                 </div>
               </div>
             </div>
 
             {/* Availability Status Card */}
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4 shadow-xs">
-              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <Briefcase className="w-3.5 h-3.5 text-primary" />
-                <span>Work Availability Status</span>
-              </h2>
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Briefcase className="w-4 h-4 text-primary" />
+                  <span>Work & Availability Status</span>
+                </h2>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "w-2 h-2 rounded-full",
+                      isAvailable
+                        ? "bg-emerald-500 animate-pulse"
+                        : "bg-muted-foreground/50",
+                    )}
+                  />
+                  <span className="text-[11px] font-medium text-muted-foreground">
+                    {isAvailable ? "Available" : "Occupied"}
+                  </span>
+                </div>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 items-center">
-                <div className="flex items-center gap-3 p-3 rounded-lg bg-background border border-border">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-center pt-1">
+                <div
+                  className={cn(
+                    "flex items-start gap-3.5 p-3.5 rounded-xl border transition-colors cursor-pointer",
+                    isAvailable
+                      ? "bg-emerald-500/5 border-emerald-500/20 dark:bg-emerald-500/10"
+                      : "bg-muted/40 border-border",
+                  )}
+                >
                   <Controller
                     name="isAvailableForHire"
                     control={control}
@@ -376,16 +472,20 @@ export function ProfileView() {
                         id="hireable"
                         checked={field.value}
                         onCheckedChange={field.onChange}
+                        className="mt-0.5"
                       />
                     )}
                   />
                   <label
                     htmlFor="hireable"
-                    className="text-xs font-medium text-foreground cursor-pointer select-none"
+                    className="text-xs font-medium text-foreground cursor-pointer select-none space-y-0.5"
                   >
-                    <span className="block font-semibold">Available for Hire</span>
-                    <span className="text-[11px] text-muted-foreground">
-                      Display "Available for new projects" status dot on header
+                    <span className="block font-semibold text-foreground">
+                      Available for Hire
+                    </span>
+                    <span className="text-[11px] text-muted-foreground block leading-relaxed">
+                      Display an active hiring pulse beacon on the hero and
+                      navigation header.
                     </span>
                   </label>
                 </div>
@@ -396,66 +496,143 @@ export function ProfileView() {
                   </label>
                   <Input
                     {...register("availabilityNote")}
-                    placeholder="e.g. Open for Staff Roles & $10k+ Contracts"
+                    placeholder="e.g. Open for Staff Roles, Advisory & Select Contracts"
+                    className="rounded-lg"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Impact & Metric Numbers Card */}
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-4 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Award className="w-4 h-4 text-primary" />
+                  <span>Key Impact Metrics & Statistics</span>
+                </h2>
+                <span className="text-[11px] text-muted-foreground">
+                  Shown in portfolio hero highlights
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-4 gap-3.5 pt-1">
+                <div className="space-y-1.5 p-3 rounded-xl bg-muted/40 border border-border/60">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <Briefcase className="w-3.5 h-3.5 text-primary" />
+                    Experience (Yrs)
+                  </label>
+                  <Input
+                    type="number"
+                    {...register("yearsExperience", { valueAsNumber: true })}
+                    className="font-mono text-sm font-semibold rounded-lg bg-background"
+                  />
+                </div>
+
+                <div className="space-y-1.5 p-3 rounded-xl bg-muted/40 border border-border/60">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <Layers className="w-3.5 h-3.5 text-emerald-500" />
+                    Completed Projects
+                  </label>
+                  <Input
+                    type="number"
+                    {...register("completedProjects", { valueAsNumber: true })}
+                    className="font-mono text-sm font-semibold rounded-lg bg-background"
+                  />
+                </div>
+
+                <div className="space-y-1.5 p-3 rounded-xl bg-muted/40 border border-border/60">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <Users className="w-3.5 h-3.5 text-indigo-500" />
+                    Happy Clients
+                  </label>
+                  <Input
+                    type="number"
+                    {...register("happyClients", { valueAsNumber: true })}
+                    className="font-mono text-sm font-semibold rounded-lg bg-background"
+                  />
+                </div>
+
+                <div className="space-y-1.5 p-3 rounded-xl bg-muted/40 border border-border/60">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <GitCommit className="w-3.5 h-3.5 text-amber-500" />
+                    Code Commits
+                  </label>
+                  <Input
+                    type="number"
+                    {...register("codeCommits", { valueAsNumber: true })}
+                    className="font-mono text-sm font-semibold rounded-lg bg-background"
                   />
                 </div>
               </div>
             </div>
           </TabsContent>
 
-          {/* TAB 2: Bio & Resume */}
-          <TabsContent value="bio" className="space-y-5 focus:outline-none">
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4 shadow-xs">
-              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <Sparkles className="w-3.5 h-3.5 text-primary" />
-                <span>Bio & Engineering Story</span>
-              </h2>
+          {/* TAB 2: Bio, Story & Resume */}
+          <TabsContent value="bio" className="space-y-6 focus:outline-none">
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Sparkles className="w-4 h-4 text-primary" />
+                  <span>Bio & Engineering Story</span>
+                </h2>
+                <span className="text-[11px] text-muted-foreground">
+                  Markdown enabled
+                </span>
+              </div>
 
+              {/* Elevator Bio */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-foreground">
                   Short Elevator Bio (Homepage Hero) *
                 </label>
                 <Textarea
                   {...register("bio", { required: "Bio is required" })}
-                  placeholder="I build resilient distributed systems, sub-second React platforms, and cloud infrastructure..."
+                  placeholder="I design and build resilient cloud systems, high-performance web applications, and intuitive user experiences..."
                   rows={3}
-                  className="resize-none"
+                  className="rounded-lg resize-y leading-relaxed text-xs"
                 />
                 {errors.bio && (
-                  <span className="text-[10px] text-destructive">{errors.bio.message}</span>
+                  <span className="text-[10px] text-destructive">
+                    {errors.bio.message}
+                  </span>
                 )}
               </div>
 
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
+              {/* Comprehensive About Story */}
+              <div className="space-y-1.5 pt-2">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <label className="text-xs font-medium text-foreground">
                     Comprehensive Story / About Me (Markdown)
                   </label>
-                  <span className="text-[10px] font-mono text-muted-foreground">
-                    Supports GitHub-flavored Markdown
+                  <span className="text-[11px] font-mono text-muted-foreground">
+                    Supports headers (##), bold (**text**), lists, and code
+                    blocks
                   </span>
                 </div>
                 <Textarea
                   {...register("aboutMarkdown")}
-                  placeholder="Detailed background, architecture philosophy, engineering leadership values..."
-                  rows={8}
-                  className="font-mono resize-y"
+                  placeholder="## My Journey&#10;&#10;I have spent over 6 years building modern web architectures...&#10;&#10;### Tech Stack & Philosophy&#10;&#10;- TypeScript & React&#10;- Microservices with Node.js & Go&#10;- Distributed Databases & Cloud Infrastructure"
+                  rows={10}
+                  className="font-mono text-xs rounded-lg resize-y leading-relaxed"
                 />
               </div>
 
               {/* Resume Document Link & Dropzone */}
-              <div className="space-y-3 pt-2 border-t border-border">
+              <div className="space-y-3 pt-4 border-t border-border/60">
                 <div className="flex items-center justify-between">
-                  <label className="text-xs font-medium text-foreground">Resume / CV Document</label>
+                  <label className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                    <FileText className="w-3.5 h-3.5 text-primary" />
+                    <span>Resume / CV Document</span>
+                  </label>
                   {resumeUrl && (
                     <a
                       href={resumeUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-[11px] text-primary hover:underline inline-flex items-center gap-1 font-mono"
+                      className="text-xs text-primary hover:underline inline-flex items-center gap-1.5 font-medium transition-colors"
                     >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>Preview Current File</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Preview Uploaded CV</span>
                     </a>
                   )}
                 </div>
@@ -464,12 +641,16 @@ export function ProfileView() {
                   <Input
                     type="url"
                     {...register("resumeUrl")}
-                    placeholder="https://... or drop file below"
+                    placeholder="https://... or upload PDF below"
+                    className="rounded-lg text-xs"
                   />
                   <FileDropzone
                     variant="compact"
-                    label="Click or drop PDF / Word resume to upload"
-                    accept={{ "application/pdf": [".pdf"], "application/msword": [".doc", ".docx"] }}
+                    label="Click or drop PDF / Word resume to upload to Cloudinary"
+                    accept={{
+                      "application/pdf": [".pdf"],
+                      "application/msword": [".doc", ".docx"],
+                    }}
                     onFileSelect={handleResumeSelect}
                     isUploading={uploadFileMutation.isPending}
                   />
@@ -479,14 +660,19 @@ export function ProfileView() {
           </TabsContent>
 
           {/* TAB 3: Social Links & Connectivity */}
-          <TabsContent value="social" className="space-y-5 focus:outline-none">
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4 shadow-xs">
-              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <Globe className="w-3.5 h-3.5 text-primary" />
-                <span>Online Presence & Social Links</span>
-              </h2>
+          <TabsContent value="social" className="space-y-6 focus:outline-none">
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Globe className="w-4 h-4 text-primary" />
+                  <span>Online Presence & Social Handles</span>
+                </h2>
+                <span className="text-[11px] text-muted-foreground">
+                  Populates footer and contact cards
+                </span>
+              </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <GithubIcon className="w-3.5 h-3.5 text-muted-foreground" />
@@ -495,7 +681,8 @@ export function ProfileView() {
                   <Input
                     type="url"
                     {...register("github")}
-                    placeholder="https://github.com/username"
+                    placeholder="https://github.com/your-handle"
+                    className="rounded-lg text-xs"
                   />
                 </div>
 
@@ -507,7 +694,8 @@ export function ProfileView() {
                   <Input
                     type="url"
                     {...register("linkedin")}
-                    placeholder="https://linkedin.com/in/username"
+                    placeholder="https://linkedin.com/in/your-handle"
+                    className="rounded-lg text-xs"
                   />
                 </div>
 
@@ -519,7 +707,8 @@ export function ProfileView() {
                   <Input
                     type="url"
                     {...register("twitter")}
-                    placeholder="https://x.com/username"
+                    placeholder="https://x.com/your-handle"
+                    className="rounded-lg text-xs"
                   />
                 </div>
 
@@ -531,77 +720,135 @@ export function ProfileView() {
                   <Input
                     type="email"
                     {...register("email")}
-                    placeholder="alex@yourdomain.com"
+                    placeholder="alex@example.com"
+                    className="rounded-lg text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <Globe className="w-3.5 h-3.5 text-muted-foreground" />
-                    Personal Website / Blog
+                    Personal Website / Portfolio
                   </label>
                   <Input
                     type="url"
                     {...register("website")}
                     placeholder="https://alexmorgan.dev"
+                    className="rounded-lg text-xs"
                   />
                 </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <DiscordIcon className="w-3.5 h-3.5 text-muted-foreground" />
-                    Discord Handle / Server URL
+                    Discord Username / Server
                   </label>
                   <Input
                     type="text"
                     {...register("discord")}
                     placeholder="alex_dev or https://discord.gg/..."
+                    className="rounded-lg text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5 md:col-span-2">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <YoutubeIcon className="w-3.5 h-3.5 text-muted-foreground" />
+                    YouTube Channel
+                  </label>
+                  <Input
+                    type="url"
+                    {...register("youtube")}
+                    placeholder="https://youtube.com/@your-channel"
+                    className="rounded-lg text-xs"
                   />
                 </div>
               </div>
             </div>
           </TabsContent>
 
-          {/* TAB 4: SEO & Metadata */}
-          <TabsContent value="seo" className="space-y-5 focus:outline-none">
-            <div className="bg-card border border-border rounded-xl p-5 space-y-4 shadow-xs">
-              <h2 className="text-xs font-semibold text-foreground uppercase tracking-wider flex items-center gap-2">
-                <Search className="w-3.5 h-3.5 text-primary" />
-                <span>Search Engine Optimization & Metadata</span>
-              </h2>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Global Meta Title Tag
-                </label>
-                <Input
-                  type="text"
-                  {...register("seoTitle")}
-                  placeholder="Alex Morgan — Senior Full-Stack Architect & Cloud Specialist"
-                />
+          {/* TAB 4: SEO & Search Metadata */}
+          <TabsContent value="seo" className="space-y-6 focus:outline-none">
+            <div className="bg-card border border-border/80 rounded-2xl p-4 sm:p-6 space-y-5 shadow-xs">
+              <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                <h2 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-2">
+                  <Search className="w-4 h-4 text-primary" />
+                  <span>Search Engine Optimization (SEO) & Metadata</span>
+                </h2>
+                <span className="text-[11px] text-muted-foreground">
+                  Live Google Preview
+                </span>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Global Meta Description Tag
-                </label>
-                <Textarea
-                  {...register("seoDescription")}
-                  placeholder="Portfolio and technical insights of Alex Morgan. Specializing in high-performance Next.js architectures, distributed microservices, and modern UI engineering."
-                  rows={3}
-                  className="resize-none"
-                />
+              {/* Live SERP Preview Box */}
+              <div className="p-4 rounded-xl bg-muted/40 border border-border/80 space-y-1.5">
+                <div className="flex items-center gap-1.5 text-[11px] text-muted-foreground font-mono">
+                  <Eye className="w-3.5 h-3.5 text-primary" />
+                  <span>Google Search Result Snippet Preview</span>
+                </div>
+                <div className="pt-2">
+                  <p className="text-[11px] text-muted-foreground font-mono truncate">
+                    https://yoursite.com
+                  </p>
+                  <h3 className="text-sm font-semibold text-blue-500 dark:text-blue-400 hover:underline cursor-pointer truncate">
+                    {seoTitle ||
+                      (headline
+                        ? `${firstName || "Developer"} — ${headline}`
+                        : "Developer Portfolio")}
+                  </h3>
+                  <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5 leading-relaxed">
+                    {seoDescription ||
+                      "Portfolio and engineering insights of full-stack architect specializing in high-performance cloud applications."}
+                  </p>
+                </div>
               </div>
 
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Keywords (Comma-separated)
-                </label>
-                <Input
-                  type="text"
-                  {...register("seoKeywords")}
-                  placeholder="Full-Stack Engineer, React, Node.js, TypeScript, Cloud Architect, Next.js"
-                />
+              <div className="space-y-4 pt-1">
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-foreground">
+                      Global Meta Title Tag
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      Recommended: 50–60 characters
+                    </span>
+                  </div>
+                  <Input
+                    type="text"
+                    {...register("seoTitle")}
+                    placeholder="Alex Morgan — Senior Full-Stack Architect & Cloud Specialist"
+                    className="rounded-lg text-xs"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-medium text-foreground">
+                      Global Meta Description Tag
+                    </label>
+                    <span className="text-[10px] font-mono text-muted-foreground">
+                      Recommended: 120–160 characters
+                    </span>
+                  </div>
+                  <Textarea
+                    {...register("seoDescription")}
+                    placeholder="Explore the portfolio and projects of Alex Morgan, senior engineer specializing in distributed systems, Next.js web applications, and resilient cloud architectures."
+                    rows={3}
+                    className="rounded-lg text-xs resize-none leading-relaxed"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground">
+                    Target Keywords (Comma-separated)
+                  </label>
+                  <Input
+                    type="text"
+                    {...register("seoKeywords")}
+                    placeholder="Full-Stack Engineer, React, Node.js, TypeScript, Cloud Architect, Next.js, Distributed Systems"
+                    className="rounded-lg text-xs"
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>
