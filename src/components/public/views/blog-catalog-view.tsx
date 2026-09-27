@@ -6,6 +6,7 @@ import { usePosts } from "@/hooks";
 import { IPost } from "@/interfaces";
 import { ChevronRight, FileText } from "lucide-react";
 import { ChromeSparkleIcon } from "@/components/ui/icons";
+import { formatDate } from "@/lib/date.utils";
 
 export function BlogCatalogView() {
   const { data: postsRes, isLoading } = usePosts();
@@ -57,11 +58,7 @@ export function BlogCatalogView() {
               <div className="space-y-2 max-w-2xl">
                 <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground">
                   <span>
-                    {new Date(post.createdAt || Date.now()).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {formatDate(post.createdAt)}
                   </span>
                   <span>•</span>
                   <span className="text-primary font-semibold uppercase">{post.tags?.[0] || "Engineering"}</span>

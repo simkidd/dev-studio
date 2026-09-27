@@ -28,6 +28,7 @@ import {
   LinkedinIcon,
   TwitterIcon,
 } from "@/components/ui/icons";
+import { formatMonthYear } from "@/lib/date.utils";
 
 export function AboutView() {
   const { data: profile } = useProfile();
@@ -236,8 +237,10 @@ export function AboutView() {
                     </div>
 
                     <span className="text-xs font-mono font-semibold text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20 self-start sm:self-auto">
-                      {exp.startDate} —{" "}
-                      {exp.isCurrent ? "Present" : exp.endDate}
+                      {formatMonthYear(exp.startDate) || exp.startDate} —{" "}
+                      {exp.isCurrent
+                        ? "Present"
+                        : formatMonthYear(exp.endDate) || exp.endDate}
                     </span>
                   </div>
 

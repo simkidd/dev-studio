@@ -33,6 +33,7 @@ import {
   TwitterIcon,
   ChromeSparkleIcon,
 } from "@/components/ui/icons";
+import { formatDate } from "@/lib/date.utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
@@ -462,13 +463,7 @@ export function HomeView() {
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] font-mono text-muted-foreground">
-                      {new Date(
-                        post.createdAt || Date.now(),
-                      ).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
+                      {formatDate(post.createdAt)}
                     </span>
                     <span className="text-[10px] font-mono text-muted-foreground">
                       •

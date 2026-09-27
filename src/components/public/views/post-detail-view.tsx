@@ -11,6 +11,7 @@ import {
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
+import { formatDate } from "@/lib/date.utils";
 
 export function PostDetailView({ slug }: { slug: string }) {
   const { data: post, isLoading, error } = usePostBySlug(slug);
@@ -106,11 +107,7 @@ export function PostDetailView({ slug }: { slug: string }) {
             </span>
             <span>•</span>
             <span>
-              {new Date(post.createdAt || Date.now()).toLocaleDateString("en-US", {
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              {formatDate(post.createdAt, "MMMM D, YYYY")}
             </span>
             {post.readingTimeMinutes && (
               <>
