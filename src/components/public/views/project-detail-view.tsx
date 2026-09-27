@@ -3,12 +3,25 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useProjectBySlug } from "@/hooks";
-import { ArrowLeft, ExternalLink, Layers, ChevronRight } from "lucide-react";
+import { useProjectBySlug, useProjects } from "@/hooks";
+import { IProject } from "@/interfaces";
+import { ArrowLeft, ArrowRight, ExternalLink, Layers } from "lucide-react";
 import { ChromeSparkleIcon, GithubIcon } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 
 export function ProjectDetailView({ slug }: { slug: string }) {
   const { data: project, isLoading, error } = useProjectBySlug(slug);
+  const { data: allProjectsRes } = useProjects();
+  const allProjects: IProject[] = allProjectsRes?.data || [];
+
+  const currentIndex = allProjects.findIndex(
+    (p) => p.slug === slug || p._id === project?._id,
+  );
+  const prevProject = currentIndex > 0 ? allProjects[currentIndex - 1] : null;
+  const nextProject =
+    currentIndex >= 0 && currentIndex < allProjects.length - 1
+      ? allProjects[currentIndex + 1]
+      : null;
 
   if (isLoading) {
     return (
@@ -173,9 +186,10 @@ export function ProjectDetailView({ slug }: { slug: string }) {
                     {project.technologies.map((tech: string) => (
                       <span
                         key={tech}
-                        className="px-2.5 py-1 rounded-lg bg-muted text-[11px] font-mono text-foreground font-medium"
+                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-[11px] font-mono text-foreground font-medium border border-border/50"
                       >
-                        {tech}
+                        <TechIcon name={tech} size={13} />
+                        <span>{tech}</span>
                       </span>
                     ))}
                   </div>
@@ -187,22 +201,48 @@ export function ProjectDetailView({ slug }: { slug: string }) {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          4. BACK NAVIGATION & CLOSING CTA
+          4. PREVIOUS / NEXT PROJECT NAVIGATION
       ───────────────────────────────────────────────────────────── */}
-      <div className="pt-10 border-t border-border flex items-center justify-between">
-        <Link
-          href="/projects"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to All Works</span>
-        </Link>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 text-xs font-semibold text-primary hover:underline"
-        >
-          <span>Discuss a similar project ↗</span>
-        </Link>
+      <div className="pt-10 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
+        {prevProject ? (
+          <Link
+            href={`/projects/${prevProject.slug}`}
+            className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group"
+          >
+            <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform shrink-0" />
+            <span className="truncate">
+              Previous: <span className="text-foreground">{prevProject.title}</span>
+            </span>
+          </Link>
+        ) : (
+          <Link
+            href="/projects"
+            className="inline-flex items-center gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to All Works</span>
+          </Link>
+        )}
+
+        {nextProject ? (
+          <Link
+            href={`/projects/${nextProject.slug}`}
+            className="inline-flex items-center justify-end gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors group sm:text-right"
+          >
+            <span className="truncate">
+              Next: <span className="text-foreground">{nextProject.title}</span>
+            </span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform shrink-0" />
+          </Link>
+        ) : (
+          <Link
+            href="/projects"
+            className="inline-flex items-center justify-end gap-2 text-xs font-semibold text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <span>Back to All Works</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        )}
       </div>
     </div>
   );

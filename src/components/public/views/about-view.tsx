@@ -28,6 +28,7 @@ import {
   LinkedinIcon,
   TwitterIcon,
 } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { formatMonthYear } from "@/lib/date.utils";
 
 export function AboutView() {
@@ -53,16 +54,6 @@ export function AboutView() {
     happyClients: 25,
     codeCommits: 1200,
   };
-
-  // Group skills by category
-  const skillsByCategory: Record<string, typeof skills> = {};
-  skills.forEach((skill) => {
-    const category = skill.category || "General";
-    if (!skillsByCategory[category]) {
-      skillsByCategory[category] = [];
-    }
-    skillsByCategory[category].push(skill);
-  });
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-20 sm:space-y-28">
@@ -244,18 +235,35 @@ export function AboutView() {
                     </span>
                   </div>
 
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                    {exp.summary}
-                  </p>
+                  {exp.summary && (
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                      {exp.summary}
+                    </p>
+                  )}
+
+                  {exp.achievements && exp.achievements.length > 0 && (
+                    <ul className="space-y-2 pt-1">
+                      {exp.achievements.map((achievement: string, i: number) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2.5 text-xs sm:text-sm text-foreground/85 leading-relaxed"
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary mt-2 shrink-0" />
+                          <span>{achievement}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
 
                   {exp.technologies && exp.technologies.length > 0 && (
-                    <div className="flex flex-wrap items-center gap-1.5 pt-2 border-t border-border/60">
+                    <div className="flex flex-wrap items-center gap-1.5 pt-3 border-t border-border/60">
                       {exp.technologies.map((tech: string) => (
                         <span
                           key={tech}
-                          className="px-2.5 py-0.5 rounded-lg bg-muted text-[11px] font-mono text-muted-foreground"
+                          className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-[11px] font-mono text-muted-foreground border border-border/40"
                         >
-                          {tech}
+                          <TechIcon name={tech} size={13} />
+                          <span>{tech}</span>
                         </span>
                       ))}
                     </div>
@@ -268,40 +276,48 @@ export function AboutView() {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          5. CATEGORIZED SKILLS & COMPETENCIES MATRIX
+          5. TECHNICAL SKILLS & COMPETENCIES MATRIX
       ───────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
         <section className="space-y-8">
-          <div className="border-b border-border pb-4">
-            <div className="flex items-center gap-2 text-primary pb-1">
-              <ChromeSparkleIcon className="w-3.5 h-3.5" />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-                Technical Matrix
-              </span>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-4">
+            <div>
+              <div className="flex items-center gap-2 text-primary pb-1">
+                <ChromeSparkleIcon className="w-3.5 h-3.5" />
+                <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                  Technical Matrix
+                </span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
+                Skills, Frameworks & Infrastructure
+              </h2>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-              Skills, Frameworks & Infrastructure
-            </h2>
+            <p className="text-xs font-mono text-muted-foreground">
+              {skills.length} core technical proficiencies
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            {Object.entries(skillsByCategory).map(([category, items]) => (
+          <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
+            {skills.map((skill) => (
               <div
-                key={category}
-                className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-4"
+                key={skill._id}
+                className="p-4 rounded-2xl bg-card/60 dark:bg-card/40 border border-border/80 hover:border-primary/50 text-center space-y-2.5 transition-all hover:scale-102 shadow-xs group"
               >
-                <h3 className="text-sm font-bold text-foreground uppercase font-mono tracking-wider text-primary">
-                  {category}
-                </h3>
-                <div className="flex flex-wrap gap-2">
-                  {items.map((skill) => (
-                    <span
-                      key={skill._id}
-                      className="px-3 py-1.5 rounded-xl bg-muted/70 hover:bg-muted border border-border/70 text-xs font-medium text-foreground transition-colors"
-                    >
-                      {skill.name}
-                    </span>
-                  ))}
+                <div className="w-10 h-10 rounded-xl bg-muted/70 border border-border/60 flex items-center justify-center mx-auto p-2 group-hover:border-primary/40 group-hover:shadow-xs transition-all">
+                  <TechIcon
+                    name={skill.name}
+                    icon={skill.icon}
+                    size={22}
+                    className="transition-transform group-hover:scale-110"
+                  />
+                </div>
+                <div>
+                  <p className="text-xs font-bold text-foreground truncate">
+                    {skill.name}
+                  </p>
+                  <p className="text-[10px] text-muted-foreground font-mono capitalize">
+                    {skill.category || "Tool"}
+                  </p>
                 </div>
               </div>
             ))}

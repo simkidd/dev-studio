@@ -1,24 +1,17 @@
 "use client";
 
 import React from "react";
-import Link from "next/link";
 import {
   Layers,
   Cpu,
   Cloud,
   Zap,
   Terminal,
-  ArrowUpRight,
   ShieldCheck,
-  Code2,
-  Database,
   Workflow,
-  Sparkles,
 } from "lucide-react";
 import { ChromeSparkleIcon } from "@/components/ui/icons";
-import { useSkills } from "@/hooks";
-import { ISkill } from "@/interfaces";
-import { cn } from "@/lib/utils";
+import { TechIcon } from "@/components/ui/tech-icon";
 
 interface IDiscipline {
   id: string;
@@ -128,19 +121,6 @@ const PRINCIPLES = [
 ];
 
 export function ServicesView() {
-  const { data: skills = [] } = useSkills();
-
-  // Group backend skills by category
-  const categorizedSkills = skills.reduce(
-    (acc, skill) => {
-      const cat = skill.category || "General";
-      if (!acc[cat]) acc[cat] = [];
-      acc[cat].push(skill);
-      return acc;
-    },
-    {} as Record<string, ISkill[]>,
-  );
-
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-20 sm:space-y-28">
       {/* ─────────────────────────────────────────────────────────────
@@ -235,9 +215,10 @@ export function ServicesView() {
                   {item.techStack.map((tech) => (
                     <span
                       key={tech}
-                      className="px-2.5 py-0.5 rounded-md bg-muted text-[11px] font-mono text-muted-foreground font-medium"
+                      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-muted text-[11px] font-mono text-muted-foreground font-medium border border-border/50 hover:text-foreground transition-colors"
                     >
-                      {tech}
+                      <TechIcon name={tech} size={14} />
+                      <span>{tech}</span>
                     </span>
                   ))}
                 </div>
@@ -248,51 +229,7 @@ export function ServicesView() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. COMPLETE TECH STACK MATRIX (Dynamic from Backend)
-      ───────────────────────────────────────────────────────────── */}
-      {skills.length > 0 && (
-        <section className="space-y-8">
-          <div className="border-b border-border/80 pb-4">
-            <div className="flex items-center gap-2 text-primary pb-1">
-              <Code2 className="w-3.5 h-3.5" />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-                Technologies
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-              Technical Stack & Tooling
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {Object.entries(categorizedSkills).map(([category, catSkills]) => (
-              <div
-                key={category}
-                className="p-6 rounded-3xl bg-card border border-border space-y-4"
-              >
-                <h3 className="text-sm font-bold text-foreground capitalize flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-primary" />
-                  <span>{category}</span>
-                </h3>
-
-                <div className="flex flex-wrap gap-1.5">
-                  {catSkills.map((skill) => (
-                    <span
-                      key={skill._id || skill.name}
-                      className="px-2.5 py-1 rounded-lg bg-muted text-xs font-mono text-foreground font-medium border border-border/60"
-                    >
-                      {skill.name}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          4. ENGINEERING PRINCIPLES & STANDARDS
+          3. ENGINEERING PRINCIPLES & STANDARDS
       ───────────────────────────────────────────────────────────── */}
       <section className="space-y-8">
         <div className="border-b border-border/80 pb-4">

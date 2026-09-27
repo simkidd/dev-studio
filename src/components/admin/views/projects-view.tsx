@@ -30,6 +30,7 @@ import {
   X,
 } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { Sparkline } from "@/components/ui/sparkline";
 import { SegmentedMeter } from "@/components/ui/segmented-meter";
 import { PillFilter } from "@/components/ui/pill-filter";
@@ -565,9 +566,10 @@ export function ProjectsView() {
                         {proj.technologies.slice(0, 3).map((tech: string) => (
                           <span
                             key={tech}
-                            className="px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
+                            className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
                           >
-                            {tech}
+                            <TechIcon name={tech} size={11} />
+                            <span>{tech}</span>
                           </span>
                         ))}
                         {proj.technologies.length > 3 && (

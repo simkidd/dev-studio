@@ -28,6 +28,7 @@ import {
 } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { PillFilter } from "@/components/ui/pill-filter";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { formatMonthYear } from "@/lib/date.utils";
@@ -254,9 +255,10 @@ export function ExperiencesView() {
                   {exp.technologies.map((tech: string) => (
                     <span
                       key={tech}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
+                      className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-mono bg-muted text-muted-foreground border border-border"
                     >
-                      {tech}
+                      <TechIcon name={tech} size={11} />
+                      <span>{tech}</span>
                     </span>
                   ))}
                 </div>

@@ -23,13 +23,13 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 
+import { TechIcon } from "@/components/ui/tech-icon";
+import { POPULAR_TECH_NAMES } from "@/lib/tech-icons";
+
 export interface SkillFormData {
   name: string;
   category: SkillCategory;
-  proficiency: number;
-  level: "Beginner" | "Intermediate" | "Advanced" | "Expert";
   isTopSkill: boolean;
-  icon: string;
 }
 
 export interface SkillEditorDialogProps {
@@ -67,38 +67,30 @@ const SkillEditorDialog = ({
     watch,
     control,
     reset,
+    setValue,
     formState: { errors },
   } = useForm<SkillFormData>({
     defaultValues: {
       name: "",
       category: "Languages",
-      proficiency: 90,
-      level: "Expert",
       isTopSkill: false,
-      icon: "",
     },
   });
 
-  const proficiency = watch("proficiency");
+  const currentName = watch("name");
 
   useEffect(() => {
     if (skill) {
       reset({
         name: skill.name,
         category: skill.category,
-        proficiency: skill.proficiency ?? 90,
-        level: skill.level || "Expert",
         isTopSkill: skill.isTopSkill,
-        icon: skill.icon || "",
       });
     } else {
       reset({
         name: "",
         category: "Languages",
-        proficiency: 90,
-        level: "Expert",
         isTopSkill: false,
-        icon: "",
       });
     }
   }, [skill, reset, isOpen]);
@@ -107,22 +99,25 @@ const SkillEditorDialog = ({
     const payload = {
       name: data.name,
       category: data.category,
-      proficiency: Number(data.proficiency),
-      level: data.level,
       isTopSkill: data.isTopSkill,
-      icon: data.icon,
     };
 
     if (skill) {
       updateSkillMutation.mutate(
         { id: skill._id, payload },
         {
-          onSuccess: () => onClose(),
+          onSuccess: () => {
+            onSaved();
+            onClose();
+          },
         },
       );
     } else {
       createSkillMutation.mutate(payload, {
-        onSuccess: () => onClose(),
+        onSuccess: () => {
+          onSaved();
+          onClose();
+        },
       });
     }
   };
@@ -138,8 +133,7 @@ const SkillEditorDialog = ({
             {skill ? "Edit Skill" : "Add Technical Skill"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Showcase specific tools, languages, and systems in your interactive
-            tech stack matrix.
+            Showcase specific tools, languages, and frameworks with authentic brand logos.
           </DialogDescription>
         </DialogHeader>
 
@@ -148,102 +142,89 @@ const SkillEditorDialog = ({
           className="flex flex-col min-h-0 flex-1"
         >
           <ScrollArea className="flex-1 w-full p-4 overflow-y-auto">
-            <div className="space-y-4 pl-2">
+            <div className="space-y-4 px-2">
+              {/* Skill Name with Live Icon Preview */}
               <div className="space-y-1.5">
                 <label className="text-xs font-medium text-foreground">
-                  Skill Name *
+                  Skill / Technology Name *
                 </label>
-                <Input
-                  type="text"
-                  {...register("name", {
-                    required: "Skill name is required",
-                  })}
-                  placeholder="e.g. Next.js, Kubernetes, Rust"
-                  className="text-xs h-9"
-                />
+                <div className="flex items-center gap-2.5">
+                  <div className="w-10 h-10 rounded-xl bg-muted/70 border border-border flex items-center justify-center shrink-0 shadow-xs p-2">
+                    <TechIcon
+                      name={currentName || "Tech"}
+                      size={24}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <Input
+                      type="text"
+                      {...register("name", {
+                        required: "Skill name is required",
+                      })}
+                      placeholder="e.g. React, Ruby, .NET, Docker"
+                      className="text-xs h-9"
+                    />
+                  </div>
+                </div>
                 {errors.name && (
                   <span className="text-[10px] text-destructive">
                     {errors.name.message}
                   </span>
                 )}
+
+                {/* Quick tech suggestions */}
+                {!skill && !currentName && (
+                  <div className="pt-1">
+                    <p className="text-[10px] text-muted-foreground mb-1.5 font-medium">
+                      Quick suggestions:
+                    </p>
+                    <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+                      {POPULAR_TECH_NAMES.slice(0, 12).map((tech) => (
+                        <button
+                          key={tech}
+                          type="button"
+                          onClick={() => setValue("name", tech)}
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted/80 hover:bg-primary/10 hover:text-primary text-[10px] border border-border/60 transition-colors cursor-pointer"
+                        >
+                          <TechIcon name={tech} size={12} />
+                          <span>{tech}</span>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Category
-                  </label>
-                  <Controller
-                    name="category"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="text-xs h-9 w-full">
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CATEGORIES.map((c) => (
-                            <SelectItem key={c} value={c}>
-                              {c}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Mastery Level
-                  </label>
-                  <Controller
-                    name="level"
-                    control={control}
-                    render={({ field }) => (
-                      <Select
-                        value={field.value}
-                        onValueChange={field.onChange}
-                      >
-                        <SelectTrigger className="text-xs h-9 w-full">
-                          <SelectValue placeholder="Select level" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Beginner">Beginner</SelectItem>
-                          <SelectItem value="Intermediate">
-                            Intermediate
-                          </SelectItem>
-                          <SelectItem value="Advanced">Advanced</SelectItem>
-                          <SelectItem value="Expert">Expert</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    )}
-                  />
-                </div>
-              </div>
-
+              {/* Category */}
               <div className="space-y-1.5">
-                <div className="flex justify-between text-xs">
-                  <label className="font-medium text-foreground">
-                    Proficiency Percentage
-                  </label>
-                  <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">
-                    {proficiency}%
-                  </span>
-                </div>
-                <input
-                  type="range"
-                  min={10}
-                  max={100}
-                  {...register("proficiency", { valueAsNumber: true })}
-                  className="w-full accent-primary cursor-pointer"
+                <label className="text-xs font-medium text-foreground">
+                  Category
+                </label>
+                <Controller
+                  name="category"
+                  control={control}
+                  render={({ field }) => (
+                    <Select
+                      value={field.value}
+                      onValueChange={field.onChange}
+                    >
+                      <SelectTrigger className="text-xs h-9 w-full">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {CATEGORIES.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
                 />
               </div>
 
-              <div className="flex items-center gap-2 pt-1">
+              {/* Highlight as Top Skill */}
+              <div className="flex items-center gap-2 pt-2 border-t border-border/60">
                 <Controller
                   name="isTopSkill"
                   control={control}

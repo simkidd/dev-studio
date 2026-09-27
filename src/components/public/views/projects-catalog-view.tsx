@@ -7,6 +7,7 @@ import { useProjects } from "@/hooks";
 import { IProject } from "@/interfaces";
 import { ChevronRight, Layers } from "lucide-react";
 import { ChromeSparkleIcon } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 
 export function ProjectsCatalogView() {
   const { data: projectsRes, isLoading } = useProjects();
@@ -95,15 +96,16 @@ export function ProjectsCatalogView() {
 
                 {/* Tech Badges & Details Link */}
                 <div className="pt-3 border-t border-border/60 flex items-center justify-between gap-2">
-                  <div className="flex flex-wrap items-center gap-1">
+                  <div className="flex flex-wrap items-center gap-1.5">
                     {(project.technologies || [])
                       .slice(0, 3)
                       .map((tech: string) => (
                         <span
                           key={tech}
-                          className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground"
+                          className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground border border-border/40"
                         >
-                          {tech}
+                          <TechIcon name={tech} size={11} />
+                          <span>{tech}</span>
                         </span>
                       ))}
                   </div>

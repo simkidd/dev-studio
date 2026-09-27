@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import Image from "next/image";
 import {
@@ -9,7 +9,6 @@ import {
   useSkills,
   useTestimonials,
   usePosts,
-  useSubmitContactMessage,
 } from "@/hooks";
 import { IProject, ITestimonial, IPost } from "@/interfaces";
 import {
@@ -20,8 +19,6 @@ import {
   Briefcase,
   MapPin,
   CheckCircle2,
-  Send,
-  Loader2,
   Layers,
   Code2,
   Quote,
@@ -33,9 +30,9 @@ import {
   TwitterIcon,
   ChromeSparkleIcon,
 } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { formatDate } from "@/lib/date.utils";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export function HomeView() {
@@ -46,41 +43,14 @@ export function HomeView() {
   const { data: skills = [] } = useSkills();
   const { data: testimonials = [] } = useTestimonials();
   const { data: postsRes } = usePosts({ limit: 3 });
-  const submitMessageMutation = useSubmitContactMessage();
 
   const projects: IProject[] = projectsRes?.data || [];
   const posts: IPost[] = postsRes?.data || [];
 
-  // Contact form local state
-  const [contactName, setContactName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactSubject, setContactSubject] = useState("");
-  const [contactMessage, setContactMessage] = useState("");
-
-  const handleContactSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!contactName.trim() || !contactEmail.trim() || !contactMessage.trim()) {
-      toast.error("Please fill in your name, email, and message.");
-      return;
-    }
-
-    submitMessageMutation.mutate(
-      {
-        senderName: contactName.trim(),
-        senderEmail: contactEmail.trim(),
-        subject: contactSubject.trim() || "Project Inquiry via Portfolio",
-        message: contactMessage.trim(),
-      },
-      {
-        onSuccess: () => {
-          setContactName("");
-          setContactEmail("");
-          setContactSubject("");
-          setContactMessage("");
-        },
-      },
-    );
-  };
+  // Featured top skills selected in dashboard CMS
+  const topSkills = skills.filter((s) => s.isTopSkill);
+  const displayFeaturedSkills =
+    topSkills.length > 0 ? topSkills : skills.slice(0, 8);
 
   const firstName = profile?.firstName || "Developer";
   const lastName = profile?.lastName || "Portfolio";
@@ -216,7 +186,7 @@ export function HomeView() {
             href="/projects"
             className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline self-start sm:self-auto"
           >
-            <span>View All Works ({projects.length})</span>
+            <span>View All Works</span>
             <ArrowUpRight className="w-4 h-4" />
           </Link>
         </div>
@@ -291,9 +261,10 @@ export function HomeView() {
                         .map((tech: string) => (
                           <span
                             key={tech}
-                            className="px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground"
+                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground border border-border/40"
                           >
-                            {tech}
+                            <TechIcon name={tech} size={11} />
+                            <span>{tech}</span>
                           </span>
                         ))}
                     </div>
@@ -324,10 +295,13 @@ export function HomeView() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          5. SKILLS & TECHNICAL STACK MATRIX
+          5. FEATURED CORE SKILLS & TECHNICAL STACK
       ───────────────────────────────────────────────────────────── */}
-      {skills.length > 0 && (
-        <section className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24">
+      {displayFeaturedSkills.length > 0 && (
+        <section
+          id="skills"
+          className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
+        >
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
             <div>
               <div className="flex items-center gap-2 text-primary pb-1">
@@ -337,22 +311,33 @@ export function HomeView() {
                 </span>
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-                Technologies & Tooling
+                Technologies & Core Tooling
               </h2>
             </div>
-            <p className="text-xs font-mono text-muted-foreground">
-              {skills.length} core technical proficiencies
-            </p>
+
+            <Link
+              href="/services"
+              className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline self-start sm:self-auto"
+            >
+              <span>View All Technologies</span>
+              <ArrowUpRight className="w-4 h-4" />
+            </Link>
           </div>
 
+          {/* Featured Skills Grid */}
           <div className="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3">
-            {skills.map((skill) => (
+            {displayFeaturedSkills.map((skill) => (
               <div
-                key={skill._id}
-                className="p-4 rounded-2xl bg-card/60 dark:bg-card/40 border border-border/80 hover:border-primary/50 text-center space-y-2 transition-all hover:scale-102 shadow-xs group"
+                key={skill._id || skill.name}
+                className="p-4 rounded-2xl bg-card/60 dark:bg-card/40 border border-border/80 hover:border-primary/50 text-center space-y-2.5 transition-all hover:scale-102 shadow-xs group"
               >
-                <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center mx-auto text-primary font-bold text-xs group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
-                  <Code2 className="w-4 h-4" />
+                <div className="w-10 h-10 rounded-xl bg-muted/70 border border-border/60 flex items-center justify-center mx-auto p-2 group-hover:border-primary/40 group-hover:shadow-xs transition-all">
+                  <TechIcon
+                    name={skill.name}
+                    icon={skill.icon}
+                    size={22}
+                    className="transition-transform group-hover:scale-110"
+                  />
                 </div>
                 <div>
                   <p className="text-xs font-bold text-foreground truncate">
@@ -486,116 +471,6 @@ export function HomeView() {
           </div>
         </section>
       )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          9. INTERACTIVE CONTACT TERMINAL & INQUIRY FORM
-      ───────────────────────────────────────────────────────────── */}
-      <section
-        id="contact"
-        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
-      >
-        <div className="p-8 sm:p-12 rounded-3xl bg-card border border-border shadow-xl space-y-8 relative overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[200px] bg-primary/10 rounded-full blur-[120px] pointer-events-none" />
-
-          <div className="space-y-3 relative z-10">
-            <div className="flex items-center gap-2 text-primary">
-              <ChromeSparkleIcon className="w-4 h-4" />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-                Direct Inquiry
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-4xl font-extrabold text-foreground tracking-tight">
-              Let&apos;s Build Something Remarkable Together.
-            </h2>
-            <p className="text-xs sm:text-sm text-muted-foreground max-w-xl leading-relaxed">
-              Have an upcoming product build, architecture advisory need, or
-              contracting role? Send a message directly to my inbox.
-            </p>
-          </div>
-
-          <form
-            onSubmit={handleContactSubmit}
-            className="space-y-4 relative z-10"
-          >
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Your Name *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Your Name"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Your Email Address *
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="your.email@company.com"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-                />
-              </div>
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">
-                Subject / Project Scope
-              </label>
-              <input
-                type="text"
-                value={contactSubject}
-                onChange={(e) => setContactSubject(e.target.value)}
-                placeholder="e.g. Next.js Enterprise Re-architecture & Staff Advisory"
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
-              />
-            </div>
-
-            <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">
-                Project Details & Requirements *
-              </label>
-              <textarea
-                required
-                rows={4}
-                value={contactMessage}
-                onChange={(e) => setContactMessage(e.target.value)}
-                placeholder="Tell me about your product vision, timeline, stack, and goals..."
-                className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none leading-relaxed"
-              />
-            </div>
-
-            <div className="pt-2 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-2 text-[11px] font-mono text-muted-foreground">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
-                <span>Encrypted transmission directly to CRM</span>
-              </div>
-
-              <button
-                type="submit"
-                disabled={submitMessageMutation.isPending}
-                className="w-full sm:w-auto px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 flex items-center justify-center gap-2 transition-all hover:scale-102 active:scale-98 disabled:opacity-50 cursor-pointer"
-              >
-                {submitMessageMutation.isPending ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <Send className="w-4 h-4" />
-                )}
-                <span>Send Direct Inquiry</span>
-              </button>
-            </div>
-          </form>
-        </div>
-      </section>
     </div>
   );
 }

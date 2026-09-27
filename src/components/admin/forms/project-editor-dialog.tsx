@@ -27,6 +27,7 @@ import {
 import { FileDropzone } from "@/components/ui/file-dropzone";
 import { Loader2, Plus, Trash2, Globe, X } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
 import { toast } from "sonner";
 import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
@@ -420,7 +421,8 @@ export function ProjectEditorDialog({
                         key={t}
                         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-mono bg-muted text-foreground border border-border"
                       >
-                        {t}
+                        <TechIcon name={t} size={13} />
+                        <span>{t}</span>
                         <button
                           type="button"
                           onClick={() => handleRemoveTechnology(t)}

@@ -10,6 +10,7 @@ import { Code2, Edit, Plus, RefreshCw, Search, Trash2, X } from "lucide-react";
 import { useState } from "react";
 
 import SkillEditorDialog from "../forms/skill-editor-dialog";
+import { TechIcon } from "@/components/ui/tech-icon";
 
 const CATEGORIES: SkillCategory[] = [
   "Languages",
@@ -164,20 +165,25 @@ export function SkillsView() {
               className="bg-card border border-border hover:border-primary/40 rounded-xl p-4 transition-all group relative shadow-sm"
             >
               <div className="flex items-start justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-sm font-bold text-foreground">
-                      {skill.name}
-                    </span>
-                    {skill.isTopSkill && (
-                      <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
-                        TOP
-                      </span>
-                    )}
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-xl bg-muted/60 border border-border/80 flex items-center justify-center p-2 shrink-0">
+                    <TechIcon name={skill.name} icon={skill.icon} size={22} />
                   </div>
-                  <span className="text-[10px] font-mono text-primary">
-                    {skill.category}
-                  </span>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-bold text-foreground">
+                        {skill.name}
+                      </span>
+                      {skill.isTopSkill && (
+                        <span className="text-[9px] font-bold px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+                          TOP
+                        </span>
+                      )}
+                    </div>
+                    <span className="text-[10px] font-mono text-primary">
+                      {skill.category}
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -193,24 +199,6 @@ export function SkillsView() {
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
-                </div>
-              </div>
-
-              {/* Progress Bar & Proficiency */}
-              <div className="mt-3 space-y-1.5">
-                <div className="flex items-center justify-between text-[11px] font-mono">
-                  <span className="text-muted-foreground">
-                    {skill.level || "Proficiency"}
-                  </span>
-                  <span className="text-emerald-600 dark:text-emerald-400 font-semibold">
-                    {skill.proficiency ?? 90}%
-                  </span>
-                </div>
-                <div className="w-full h-1.5 bg-muted rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-linear-to-r from-primary to-emerald-400 rounded-full"
-                    style={{ width: `${skill.proficiency ?? 90}%` }}
-                  />
                 </div>
               </div>
             </div>
