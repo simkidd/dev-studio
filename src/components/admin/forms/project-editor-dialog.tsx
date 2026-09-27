@@ -25,9 +25,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { FileDropzone } from "@/components/ui/file-dropzone";
-import { Loader2, Plus, Trash2, Save, Globe, X } from "lucide-react";
+import { Loader2, Plus, Trash2, Globe, X } from "lucide-react";
 import { GithubIcon } from "@/components/ui/icons";
 import { toast } from "sonner";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export interface ProjectFormData {
   title: string;
@@ -246,25 +247,24 @@ export function ProjectEditorDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent
-        className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0"
+        className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0 w-full min-w-0 max-w-full"
         onInteractOutside={(e) => e.preventDefault()}
       >
         <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
-          <DialogTitle className="text-lg font-bold text-foreground">
-            {project ? "Edit Project" : "Create New Project"}
+          <DialogTitle className="text-base font-bold text-foreground">
+            {project ? "Edit Project" : "Create Project"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Define architectural metadata, metrics, live URLs, and tech stack
-            tags.
+            Define architectural metadata, metrics, live URLs, and tech stack tags.
           </DialogDescription>
         </DialogHeader>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col min-h-0 flex-1 overflow-hidden"
+          className="flex flex-col min-h-0 flex-1 overflow-hidden w-full min-w-0 max-w-full"
         >
-          <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto">
-            <div className="p-6 space-y-4">
+          <ScrollArea className="flex-1 min-h-0 w-full min-w-0 max-w-full overflow-y-auto overflow-x-hidden">
+            <div className="p-6 space-y-4 w-full min-w-0 max-w-full overflow-x-hidden">
               {/* Title & Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -510,16 +510,27 @@ export function ProjectEditorDialog({
                 </div>
               </div>
 
-              {/* Case Study Markdown */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Full Technical Case Study (Markdown)
-                </label>
-                <Textarea
-                  {...register("caseStudy")}
-                  placeholder="## Problem Statement&#10;&#10;Explain architectural decisions, challenges, and measurable solutions..."
-                  rows={6}
-                  className="font-mono resize-y"
+              {/* Case Study Rich Text */}
+              <div className="space-y-1.5 w-full min-w-0 max-w-full overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-foreground">
+                    Full Technical Case Study
+                  </label>
+                  <span className="text-[11px] font-mono text-muted-foreground">
+                    Rich text formatted with code blocks, headings & architecture notes
+                  </span>
+                </div>
+                <Controller
+                  name="caseStudy"
+                  control={control}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="Explain architectural decisions, system design challenges, benchmarks, and measurable solutions..."
+                      height="h-60 sm:h-72"
+                    />
+                  )}
                 />
               </div>
 
@@ -571,10 +582,10 @@ export function ProjectEditorDialog({
           <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={onClose}
-              className="cursor-pointer text-xs"
+              className="cursor-pointer text-xs px-4"
             >
               Cancel
             </Button>
@@ -582,14 +593,10 @@ export function ProjectEditorDialog({
               type="submit"
               disabled={isSaving}
               size="sm"
-              className="cursor-pointer text-xs flex items-center gap-1.5"
+              className="cursor-pointer text-xs flex items-center gap-1.5 px-4"
             >
-              {isSaving ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Save className="w-3.5 h-3.5" />
-              )}
-              <span>{project ? "Update Project" : "Create Project"}</span>
+              {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{project ? "Save Changes" : "Create Project"}</span>
             </Button>
           </DialogFooter>
         </form>

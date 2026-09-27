@@ -140,9 +140,10 @@ export function ProjectDetailView({ slug }: { slug: string }) {
             <h2 className="text-xl font-bold text-foreground tracking-tight">
               Project Architecture & Execution
             </h2>
-            <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line space-y-3 font-sans">
-              {project.caseStudy || project.summary}
-            </div>
+            <div
+              className="prose dark:prose-invert max-w-none text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans"
+              dangerouslySetInnerHTML={{ __html: project.caseStudy || project.summary }}
+            />
           </div>
         </div>
 

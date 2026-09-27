@@ -170,11 +170,12 @@ export function PostDetailView({ slug }: { slug: string }) {
       )}
 
       {/* ─────────────────────────────────────────────────────────────
-          3. ARTICLE MARKDOWN CONTENT
+          3. ARTICLE RICH CONTENT
       ───────────────────────────────────────────────────────────── */}
-      <article className="prose dark:prose-invert max-w-none text-xs sm:text-sm text-foreground/90 leading-relaxed whitespace-pre-line space-y-4 font-sans">
-        {post.content}
-      </article>
+      <article
+        className="prose dark:prose-invert max-w-none text-xs sm:text-sm text-foreground/90 leading-relaxed font-sans"
+        dangerouslySetInnerHTML={{ __html: post.content }}
+      />
 
       {/* ─────────────────────────────────────────────────────────────
           4. TAGS & FOOTER

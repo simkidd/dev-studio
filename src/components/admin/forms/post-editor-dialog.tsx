@@ -18,8 +18,9 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { FileDropzone } from "@/components/ui/file-dropzone";
-import { Loader2, Plus, Trash2, Save, X, FileText, Tag } from "lucide-react";
+import { Loader2, Plus, Trash2, X, FileText, Tag } from "lucide-react";
 import { toast } from "sonner";
+import { RichTextEditor } from "@/components/admin/rich-text-editor";
 
 export interface PostFormData {
   title: string;
@@ -144,7 +145,7 @@ export function PostEditorDialog({
     setValue(
       "tags",
       tags.filter((t) => t !== tagToRemove),
-      { shouldValidate: true }
+      { shouldValidate: true },
     );
   };
 
@@ -201,7 +202,7 @@ export function PostEditorDialog({
             onSaved?.();
             onClose();
           },
-        }
+        },
       );
     } else {
       createPostMutation.mutate(payload, {
@@ -215,22 +216,26 @@ export function PostEditorDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-foreground p-0 overflow-hidden shadow-2xl gap-0">
+      <DialogContent
+        className="sm:max-w-2xl max-h-[90vh] flex flex-col bg-card border-border text-card-foreground p-0 overflow-hidden shadow-2xl gap-0 w-full min-w-0 max-w-full"
+        onInteractOutside={(e) => e.preventDefault()}
+      >
         <DialogHeader className="p-6 pb-3 border-b border-border shrink-0">
-          <DialogTitle className="text-lg font-bold text-foreground">
-            {post ? "Edit Technical Article" : "Write Engineering Article"}
+          <DialogTitle className="text-base font-bold text-foreground">
+            {post ? "Edit Article" : "Write Technical Article"}
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Compose markdown insights to demonstrate architectural depth and technical leadership.
+            Publish formatted breakdowns, tutorials, and architecture case
+            studies.
           </DialogDescription>
         </DialogHeader>
 
         <form
           onSubmit={handleSubmit(onSubmit)}
-          className="flex flex-col min-h-0 flex-1 overflow-hidden"
+          className="flex flex-col min-h-0 flex-1 overflow-hidden w-full min-w-0 max-w-full"
         >
-          <ScrollArea className="flex-1 min-h-0 w-full overflow-y-auto">
-            <div className="p-6 space-y-4">
+          <ScrollArea className="flex-1 min-h-0 w-full min-w-0 max-w-full overflow-y-auto overflow-x-hidden">
+            <div className="p-6 space-y-4 w-full min-w-0 max-w-full overflow-x-hidden">
               {/* Title & Slug */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-1.5">
@@ -416,18 +421,30 @@ export function PostEditorDialog({
                 />
               </div>
 
-              {/* Markdown Content */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">
-                  Article Content (Markdown) *
-                </label>
-                <Textarea
-                  {...register("content", {
+              {/* Rich Text Content */}
+              <div className="space-y-1.5 w-full min-w-0 max-w-full overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-medium text-foreground">
+                    Article Content *
+                  </label>
+                  <span className="text-[11px] font-mono text-muted-foreground">
+                    Rich text formatted with code blocks, headings & links
+                  </span>
+                </div>
+                <Controller
+                  name="content"
+                  control={control}
+                  rules={{
                     required: "Article content is required",
-                  })}
-                  placeholder="## Architecture Overview&#10;&#10;In this article we examine..."
-                  rows={8}
-                  className="text-xs font-mono resize-y min-h-[160px]"
+                  }}
+                  render={({ field }) => (
+                    <RichTextEditor
+                      value={field.value || ""}
+                      onChange={field.onChange}
+                      placeholder="Write your technical article, code breakdowns, and insights..."
+                      height="h-64 sm:h-80"
+                    />
+                  )}
                 />
                 {errors.content && (
                   <p className="text-[11px] text-destructive">
@@ -462,10 +479,10 @@ export function PostEditorDialog({
           <DialogFooter className="p-4 px-6 border-t border-border bg-muted/40 shrink-0">
             <Button
               type="button"
-              variant="outline"
+              variant="ghost"
               size="sm"
               onClick={onClose}
-              className="cursor-pointer text-xs"
+              className="cursor-pointer text-xs px-4"
             >
               Cancel
             </Button>
@@ -473,14 +490,10 @@ export function PostEditorDialog({
               type="submit"
               disabled={isSaving}
               size="sm"
-              className="cursor-pointer text-xs flex items-center gap-1.5"
+              className="cursor-pointer text-xs flex items-center gap-1.5 px-4"
             >
-              {isSaving ? (
-                <Loader2 className="w-3.5 h-3.5 animate-spin" />
-              ) : (
-                <Save className="w-3.5 h-3.5" />
-              )}
-              <span>{post ? "Update Article" : "Publish Article"}</span>
+              {isSaving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>{post ? "Save Changes" : "Create Article"}</span>
             </Button>
           </DialogFooter>
         </form>

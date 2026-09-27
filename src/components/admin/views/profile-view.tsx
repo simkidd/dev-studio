@@ -665,13 +665,10 @@ export function ProfileView() {
                   <Sparkles className="w-4 h-4 text-primary" />
                   <span>Bio & Engineering Story</span>
                 </h2>
-                <span className="text-[11px] text-muted-foreground">
-                  Markdown enabled
-                </span>
               </div>
 
               {/* Elevator Bio */}
-              <div className="space-y-1.5">
+              <div className="space-y-1.5 min-w-0 max-w-full">
                 <label className="text-xs font-medium text-foreground">
                   Short Elevator Bio (Homepage Hero) *
                 </label>
@@ -679,7 +676,7 @@ export function ProfileView() {
                   {...register("bio", { required: "Bio is required" })}
                   placeholder="I design and build resilient cloud systems, high-performance web applications, and intuitive user experiences..."
                   rows={3}
-                  className="rounded-lg resize-y leading-relaxed text-xs"
+                  className="rounded-lg resize-none leading-relaxed text-xs w-full min-w-0 max-w-full min-h-[75px]"
                 />
                 {errors.bio && (
                   <span className="text-[10px] text-destructive">
@@ -689,21 +686,20 @@ export function ProfileView() {
               </div>
 
               {/* Comprehensive About Story */}
-              <div className="space-y-1.5 pt-2">
+              <div className="space-y-1.5 pt-2 min-w-0 max-w-full">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                   <label className="text-xs font-medium text-foreground">
-                    Comprehensive Story / About Me (Markdown)
+                    Comprehensive Story / About Me
                   </label>
                   <span className="text-[11px] font-mono text-muted-foreground">
-                    Supports headers (##), bold (**text**), lists, and code
-                    blocks
+                    Supports multiline paragraphs and formatted text
                   </span>
                 </div>
                 <Textarea
                   {...register("aboutMarkdown")}
-                  placeholder="## My Journey&#10;&#10;I have spent over 6 years building modern web architectures...&#10;&#10;### Tech Stack & Philosophy&#10;&#10;- TypeScript & React&#10;- Microservices with Node.js & Go&#10;- Distributed Databases & Cloud Infrastructure"
-                  rows={10}
-                  className="font-mono text-xs rounded-lg resize-y leading-relaxed"
+                  placeholder="Write your comprehensive background, engineering philosophy, and career achievements..."
+                  rows={5}
+                  className="w-full min-w-0 max-w-full resize-none overflow-y-auto leading-relaxed text-xs font-sans rounded-lg"
                 />
               </div>
 
