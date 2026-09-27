@@ -86,7 +86,7 @@ export function PostDetailView({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-24 space-y-10">
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-10">
       {/* ─────────────────────────────────────────────────────────────
           1. BREADCRUMBS & ARTICLE HEADER
       ───────────────────────────────────────────────────────────── */}

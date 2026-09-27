@@ -142,7 +142,7 @@ export function ServicesView() {
   );
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20 space-y-20 sm:space-y-28">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-20 sm:space-y-28">
       {/* ─────────────────────────────────────────────────────────────
           1. EXPERTISE HERO & HEADER
       ───────────────────────────────────────────────────────────── */}
@@ -327,37 +327,6 @@ export function ServicesView() {
               </div>
             );
           })}
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
-          5. DIRECT COLLABORATION CTA
-      ───────────────────────────────────────────────────────────── */}
-      <section className="p-8 sm:p-14 rounded-3xl bg-card border border-border text-center space-y-6 relative overflow-hidden">
-        <div className="space-y-3 max-w-xl mx-auto">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-            Looking for a skilled engineer for your team or project?
-          </h2>
-          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-            Open for full-time senior engineering roles, technical advisory, and
-            high-impact contracts.
-          </p>
-        </div>
-
-        <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
-          <Link
-            href="/contact"
-            className="px-6 py-3 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs sm:text-sm font-semibold shadow-md shadow-primary/20 flex items-center gap-2 transition-all hover:scale-102 active:scale-98 cursor-pointer"
-          >
-            <span>Start a Conversation</span>
-            <ArrowUpRight className="w-4 h-4" />
-          </Link>
-          <Link
-            href="/projects"
-            className="px-6 py-3 rounded-full bg-muted hover:bg-muted/80 text-foreground text-xs sm:text-sm font-medium border border-border flex items-center gap-2 transition-all cursor-pointer"
-          >
-            <span>View Selected Works</span>
-          </Link>
         </div>
       </section>
     </div>

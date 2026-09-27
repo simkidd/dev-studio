@@ -44,7 +44,7 @@ export function ProjectDetailView({ slug }: { slug: string }) {
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20 space-y-12 sm:space-y-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-12 sm:space-y-16">
       {/* ─────────────────────────────────────────────────────────────
           1. BREADCRUMBS & TOP ACTIONS
       ───────────────────────────────────────────────────────────── */}

@@ -13,7 +13,7 @@ export function ProjectsCatalogView() {
   const projects: IProject[] = projectsRes?.data || [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20 space-y-12">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-12">
       {/* ─────────────────────────────────────────────────────────────
           1. HEADER
       ───────────────────────────────────────────────────────────── */}

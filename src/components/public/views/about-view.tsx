@@ -64,7 +64,7 @@ export function AboutView() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20 space-y-20 sm:space-y-28">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-20 sm:space-y-28">
       {/* ─────────────────────────────────────────────────────────────
           1. ABOUT HERO & MASTER PORTRAIT
       ───────────────────────────────────────────────────────────── */}
@@ -305,26 +305,6 @@ export function AboutView() {
           </div>
         </section>
       )}
-
-      {/* ─────────────────────────────────────────────────────────────
-          6. CLOSING CALL TO ACTION
-      ───────────────────────────────────────────────────────────── */}
-      <section className="p-8 sm:p-14 rounded-3xl bg-primary text-primary-foreground text-center space-y-6 shadow-2xl">
-        <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-          Let&apos;s build something impactful together.
-        </h2>
-        <p className="text-xs sm:text-sm max-w-xl mx-auto opacity-90 leading-relaxed">
-          Whether you need leadership on a full-stack platform, high-throughput
-          backend architecture, or product consultation.
-        </p>
-        <Link
-          href="/contact"
-          className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full bg-background text-foreground hover:bg-background/90 text-xs sm:text-sm font-bold shadow-lg transition-all hover:scale-105 active:scale-98 cursor-pointer"
-        >
-          <span>Get in Touch with Me</span>
-          <ArrowUpRight className="w-4 h-4" />
-        </Link>
-      </section>
     </div>
   );
 }

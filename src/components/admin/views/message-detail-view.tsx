@@ -109,7 +109,7 @@ export function MessageDetailView({ id }: MessageDetailViewProps) {
 
   if (isLoading) {
     return (
-      <div className="space-y-4 pb-16">
+      <div className="space-y-4 pb-6">
         <div className="flex items-center justify-between">
           <div className="space-y-1.5">
             <Skeleton className="h-6 w-56 bg-muted" />
@@ -157,7 +157,7 @@ export function MessageDetailView({ id }: MessageDetailViewProps) {
   }
 
   return (
-    <div className="space-y-4 pb-16">
+    <div className="space-y-4 pb-6">
       {/* Top Header & Action Controls (Matches Project & Post Detail Standard) */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

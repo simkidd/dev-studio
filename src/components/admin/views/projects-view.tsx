@@ -195,7 +195,7 @@ export function ProjectsView() {
   ).length;
 
   return (
-    <div className="space-y-4 pb-12">
+    <div className="space-y-4 pb-6">
       {/* Top Header & Fast Actions */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>

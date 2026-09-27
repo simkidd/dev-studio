@@ -267,7 +267,7 @@ export function ProfileView() {
 
   if (isLoading) {
     return (
-      <div className="space-y-6 max-w-5xl mx-auto animate-pulse pb-16">
+      <div className="space-y-6 max-w-5xl mx-auto animate-pulse pb-6">
         <div className="h-10 bg-muted/60 rounded-xl w-1/3" />
         <div className="h-12 bg-muted/50 rounded-xl w-full" />
         <div className="h-96 bg-card border border-border rounded-2xl p-6 space-y-4">
@@ -280,7 +280,7 @@ export function ProfileView() {
   }
 
   return (
-    <div className="space-y-6 pb-24 max-w-5xl w-full">
+    <div className="space-y-6 pb-6 max-w-5xl w-full">
       {/* Top Header & Floating Save Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div>

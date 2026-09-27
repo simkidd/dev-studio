@@ -99,7 +99,7 @@ export function HomeView() {
   const titleLine2 = headlineWords.slice(midpoint).join(" ");
 
   return (
-    <div className="space-y-28 sm:space-y-36 pb-20">
+    <div className="space-y-28 sm:space-y-36">
       {/* ─────────────────────────────────────────────────────────────
           1. HERO SECTION (Mega Editorial Headline + Portrait Frame)
       ───────────────────────────────────────────────────────────── */}

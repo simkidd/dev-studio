@@ -12,7 +12,7 @@ export function BlogCatalogView() {
   const posts: IPost[] = postsRes?.data || [];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-24 space-y-12">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-12">
       {/* ─────────────────────────────────────────────────────────────
           1. HEADER
       ───────────────────────────────────────────────────────────── */}
