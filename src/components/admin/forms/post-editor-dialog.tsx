@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm, Controller } from "react-hook-form";
 import { IPost } from "@/interfaces";
-import { useCreatePost, useUpdatePost, useUploadFile } from "@/hooks";
+import { useCreatePost, useUpdatePost } from "@/hooks";
 import {
   Dialog,
   DialogContent,
@@ -27,11 +27,9 @@ export interface PostFormData {
   slug: string;
   excerpt: string;
   content: string;
-  coverImageUrl: string;
   tags: string[];
   canonicalUrl?: string;
   isPublished: boolean;
-  readingTimeMinutes: number;
 }
 
 export interface PostEditorDialogProps {
@@ -53,12 +51,9 @@ export function PostEditorDialog({
 
   const createPostMutation = useCreatePost();
   const updatePostMutation = useUpdatePost();
-  const uploadFileMutation = useUploadFile();
 
   const isSaving =
-    createPostMutation.isPending ||
-    updatePostMutation.isPending ||
-    uploadFileMutation.isPending;
+    createPostMutation.isPending || updatePostMutation.isPending;
 
   const {
     register,
@@ -76,11 +71,9 @@ export function PostEditorDialog({
       slug: "",
       excerpt: "",
       content: "",
-      coverImageUrl: "",
       tags: [],
       canonicalUrl: "",
       isPublished: true,
-      readingTimeMinutes: 5,
     },
   });
 
@@ -94,11 +87,9 @@ export function PostEditorDialog({
         slug: post.slug,
         excerpt: post.excerpt || "",
         content: post.content,
-        coverImageUrl: post.coverImageUrl || "",
         tags: post.tags || [],
         canonicalUrl: post.canonicalUrl || "",
         isPublished: post.isPublished,
-        readingTimeMinutes: post.readingTimeMinutes || 5,
       });
       setImagePreview(post.coverImageUrl || "");
       setSelectedImageFile(null);
@@ -108,11 +99,9 @@ export function PostEditorDialog({
         slug: "",
         excerpt: "",
         content: "",
-        coverImageUrl: "",
         tags: ["Architecture", "System Design"],
         canonicalUrl: "",
         isPublished: true,
-        readingTimeMinutes: 5,
       });
       setImagePreview("");
       setSelectedImageFile(null);
@@ -154,7 +143,7 @@ export function PostEditorDialog({
     setImagePreview(URL.createObjectURL(file));
   };
 
-  const onSubmit = async (data: PostFormData) => {
+  const onSubmit = (data: PostFormData) => {
     if (!data.tags || data.tags.length === 0) {
       toast.error("Please add at least one topic tag");
       setError("tags", {
@@ -164,39 +153,26 @@ export function PostEditorDialog({
       return;
     }
 
-    let finalCoverUrl = data.coverImageUrl;
-
-    // If a new local file was selected, upload it first
-    if (selectedImageFile) {
-      try {
-        const uploadRes = await uploadFileMutation.mutateAsync({
-          file: selectedImageFile,
-          folder: "posts",
-        });
-        if (uploadRes?.url) {
-          finalCoverUrl = uploadRes.url;
-        }
-      } catch (err: any) {
-        toast.error(err?.message || "Failed to upload cover image");
-        return;
-      }
+    const formData = new FormData();
+    formData.append("title", data.title);
+    formData.append("slug", data.slug);
+    formData.append("excerpt", data.excerpt);
+    formData.append("content", data.content);
+    formData.append("tags", JSON.stringify(data.tags));
+    if (data.canonicalUrl?.trim()) {
+      formData.append("canonicalUrl", data.canonicalUrl.trim());
     }
+    formData.append("isPublished", String(data.isPublished));
 
-    const payload = {
-      title: data.title,
-      slug: data.slug,
-      excerpt: data.excerpt,
-      content: data.content,
-      coverImageUrl: finalCoverUrl || undefined,
-      tags: data.tags,
-      canonicalUrl: data.canonicalUrl?.trim() || undefined,
-      isPublished: data.isPublished,
-      readingTimeMinutes: Number(data.readingTimeMinutes) || 5,
-    };
+    if (selectedImageFile) {
+      formData.append("image", selectedImageFile);
+    } else if (!imagePreview && post?.coverImageUrl) {
+      formData.append("removeCoverImage", "true");
+    }
 
     if (post) {
       updatePostMutation.mutate(
-        { id: post._id, payload },
+        { id: post._id, payload: formData },
         {
           onSuccess: () => {
             onSaved?.();
@@ -205,7 +181,7 @@ export function PostEditorDialog({
         },
       );
     } else {
-      createPostMutation.mutate(payload, {
+      createPostMutation.mutate(formData, {
         onSuccess: () => {
           onSaved?.();
           onClose();
@@ -272,41 +248,17 @@ export function PostEditorDialog({
                 </div>
               </div>
 
-              {/* Reading Time & Canonical URL */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Read Time (minutes) *
-                  </label>
-                  <Input
-                    type="number"
-                    min={1}
-                    max={120}
-                    {...register("readingTimeMinutes", {
-                      valueAsNumber: true,
-                      required: "Read time is required",
-                    })}
-                    placeholder="5"
-                    className="text-xs h-9 font-mono"
-                  />
-                  {errors.readingTimeMinutes && (
-                    <p className="text-[11px] text-destructive">
-                      {errors.readingTimeMinutes.message}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Canonical URL (optional)
-                  </label>
-                  <Input
-                    type="url"
-                    {...register("canonicalUrl")}
-                    placeholder="https://medium.com/@..."
-                    className="text-xs h-9 font-mono"
-                  />
-                </div>
+              {/* Canonical URL (optional) */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-foreground">
+                  Canonical URL (optional)
+                </label>
+                <Input
+                  type="url"
+                  {...register("canonicalUrl")}
+                  placeholder="https://medium.com/@..."
+                  className="text-xs h-9 font-mono"
+                />
               </div>
 
               {/* Executive Summary / Excerpt */}
@@ -413,9 +365,8 @@ export function PostEditorDialog({
                   onClear={() => {
                     setSelectedImageFile(null);
                     setImagePreview("");
-                    setValue("coverImageUrl", "");
                   }}
-                  isUploading={uploadFileMutation.isPending}
+                  isUploading={isSaving}
                   label="Upload article cover banner"
                   sublabel="High-resolution banner (16:9 recommended)"
                 />

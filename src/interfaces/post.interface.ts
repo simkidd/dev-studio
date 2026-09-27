@@ -5,6 +5,7 @@ export interface IPost {
   excerpt: string;
   content: string;
   coverImageUrl?: string;
+  coverImagePublicId?: string;
   tags: string[];
   canonicalUrl?: string;
   readingTimeMinutes: number;

@@ -7,7 +7,7 @@ export const useCreatePost = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (payload: Partial<IPost>) => {
+    mutationFn: async (payload: FormData | Partial<IPost>) => {
       const res = await postsApi.create(payload);
       return res.data;
     },
@@ -31,7 +31,7 @@ export const useUpdatePost = () => {
       payload,
     }: {
       id: string;
-      payload: Partial<IPost>;
+      payload: FormData | Partial<IPost>;
     }) => {
       const res = await postsApi.update(id, payload);
       return res.data;

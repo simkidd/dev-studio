@@ -27,15 +27,25 @@ export const postsApi = {
     return data;
   },
 
-  create: async (payload: Partial<IPost>): Promise<ApiResponse<IPost>> => {
-    const { data } = await apiClient.post<ApiResponse<IPost>>("/posts", payload);
+  create: async (payload: FormData | Partial<IPost>): Promise<ApiResponse<IPost>> => {
+    const isFormData = payload instanceof FormData;
+    const { data } = await apiClient.post<ApiResponse<IPost>>(
+      "/posts",
+      payload,
+      isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : undefined
+    );
     return data;
   },
 
-  update: async (id: string, payload: Partial<IPost>): Promise<ApiResponse<IPost>> => {
+  update: async (
+    id: string,
+    payload: FormData | Partial<IPost>
+  ): Promise<ApiResponse<IPost>> => {
+    const isFormData = payload instanceof FormData;
     const { data } = await apiClient.put<ApiResponse<IPost>>(
       `/posts/${id}`,
-      payload
+      payload,
+      isFormData ? { headers: { "Content-Type": "multipart/form-data" } } : undefined
     );
     return data;
   },
