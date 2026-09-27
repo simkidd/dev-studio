@@ -39,19 +39,19 @@ const QUICK_TEMPLATES = [
     text: (name: string, subject?: string) =>
       `Hi ${name},\n\nThank you for reaching out regarding "${
         subject || "your project inquiry"
-      }". I've reviewed your specifications and would love to schedule a brief 20-minute discovery call to discuss the technical scope and timeline.\n\nPlease feel free to let me know your preferred availability this week.\n\nBest regards,\nAlex Morgan`,
+      }". I've reviewed your specifications and would love to schedule a brief 20-minute discovery call to discuss the technical scope and timeline.\n\nPlease feel free to let me know your preferred availability this week.\n\nBest regards,`,
   },
   {
     label: "Proposal & Scope",
     text: (name: string, subject?: string) =>
       `Hi ${name},\n\nThanks for contacting me! Based on the details provided in "${
         subject || "your inquiry"
-      }", this aligns closely with previous production architectures I've delivered.\n\nI am currently preparing an estimate and preliminary roadmap for your review. Would you have any additional requirement documents or design mocks to include?\n\nBest regards,\nAlex Morgan`,
+      }", this aligns closely with previous production architectures I've delivered.\n\nI am currently preparing an estimate and preliminary roadmap for your review. Would you have any additional requirement documents or design mocks to include?\n\nBest regards,`,
   },
   {
     label: "Fully Booked / Referral",
     text: (name: string) =>
-      `Hi ${name},\n\nThank you for considering me for your project. I am currently fully committed on active client milestones and unavailable for new contracts at this moment.\n\nI would be happy to reconnect in the upcoming quarter or recommend a trusted senior engineer within my network if needed.\n\nBest regards,\nAlex Morgan`,
+      `Hi ${name},\n\nThank you for considering me for your project. I am currently fully committed on active client milestones and unavailable for new contracts at this moment.\n\nI would be happy to reconnect in the upcoming quarter or recommend a trusted senior engineer within my network if needed.\n\nBest regards,`,
   },
 ];
 

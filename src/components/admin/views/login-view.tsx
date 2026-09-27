@@ -27,14 +27,14 @@ export function LoginView() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col justify-center items-center px-4 relative overflow-hidden">
+    <div className="min-h-dvh bg-background flex flex-col justify-center items-center px-4 relative overflow-hidden">
       {/* Subtle Background Glow */}
       <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[480px] h-[320px] bg-primary/10 blur-[120px] rounded-full pointer-events-none" />
 
       <div className="w-full max-w-md relative z-10">
         {/* Brand Header */}
         <div className="text-center mb-8">
-          <div className="inline-flex w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-violet-600 items-center justify-center text-white shadow-xl shadow-indigo-500/25 mb-4">
+          <div className="inline-flex w-12 h-12 rounded-xl bg-linear-to-br from-indigo-500 to-violet-600 items-center justify-center text-white shadow-xl shadow-indigo-500/25 mb-4">
             <Terminal className="w-6 h-6" />
           </div>
           <h1 className="text-xl font-bold text-foreground tracking-tight">
@@ -76,7 +76,9 @@ export function LoginView() {
                 <Lock className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none z-10" />
                 <Input
                   type="password"
-                  {...register("password", { required: "Password is required" })}
+                  {...register("password", {
+                    required: "Password is required",
+                  })}
                   placeholder="••••••••"
                   className="pl-9 text-xs h-10"
                 />
@@ -110,7 +112,10 @@ export function LoginView() {
           <div className="mt-6 pt-4 border-t border-border text-center">
             <p className="text-[11px] text-muted-foreground">
               Default seeded credentials: <br />
-              <code className="text-foreground font-mono">admin@portfolio.dev</code> / <code className="text-foreground font-mono">Admin@2026!</code>
+              <code className="text-foreground font-mono">
+                admin@portfolio.dev
+              </code>{" "}
+              / <code className="text-foreground font-mono">Admin@2026!</code>
             </p>
           </div>
         </div>

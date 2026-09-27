@@ -140,7 +140,7 @@ export function AdminSidebar() {
       <SidebarHeader className="p-3 border-b border-sidebar-border group-data-[collapsible=icon]:p-2">
         <div className="flex items-center group-data-[collapsible=icon]:justify-center">
           <Link href="/admin" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
+            <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500 to-violet-600 flex items-center justify-center text-white shadow-lg shadow-indigo-500/20 shrink-0">
               <Terminal className="w-4 h-4" />
             </div>
             <div className="group-data-[collapsible=icon]:hidden">

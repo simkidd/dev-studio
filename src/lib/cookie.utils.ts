@@ -20,6 +20,10 @@ export const getUserCookie = (): IUser | null => {
   }
 };
 
+export const setUserCookie = (user: IUser): void => {
+  Cookies.set(COOKIE_KEYS.USER, JSON.stringify(user), COOKIE_CONFIG);
+};
+
 export const setAuthCookies = (tokens: { accessToken: string; refreshToken: string }, user?: IUser): void => {
   Cookies.set(COOKIE_KEYS.ACCESS_TOKEN, tokens.accessToken, {
     ...COOKIE_CONFIG,
@@ -27,7 +31,7 @@ export const setAuthCookies = (tokens: { accessToken: string; refreshToken: stri
   });
   Cookies.set(COOKIE_KEYS.REFRESH_TOKEN, tokens.refreshToken, COOKIE_CONFIG);
   if (user) {
-    Cookies.set(COOKIE_KEYS.USER, JSON.stringify(user), COOKIE_CONFIG);
+    setUserCookie(user);
   }
 };
 

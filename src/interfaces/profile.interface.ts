@@ -17,6 +17,8 @@ export interface IProfileStats {
 
 export interface IProfile {
   _id?: string;
+  brandName?: string;
+  logoUrl?: string;
   firstName: string;
   middleName?: string;
   lastName: string;

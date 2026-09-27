@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   Menu,
@@ -17,7 +18,7 @@ import { cn } from "@/lib/utils";
 const NAV_ITEMS = [
   { label: "Works", href: "/projects" },
   { label: "About", href: "/about" },
-  { label: "Services", href: "/#services" },
+  { label: "Services", href: "/services" },
   { label: "Articles", href: "/blog" },
   { label: "Contact", href: "/contact" },
 ];
@@ -36,29 +37,39 @@ export function PublicNavbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const firstName = profile?.firstName || "Alex";
-  const lastName = profile?.lastName || "Morgan";
-  const isAvailable = profile?.isAvailableForHire ?? true;
+  const brandName =
+    profile?.brandName?.trim() ||
+    (profile?.firstName
+      ? `${profile.firstName} ${profile.lastName || ""}`.trim()
+      : "Developer");
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-3 sm:p-5 pointer-events-none">
       {/* Floating Capsule Bar */}
       <div
         className={cn(
-          "pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-3.5 sm:px-5 py-2 rounded-full border transition-all duration-300 shadow-xl w-full max-w-sm sm:max-w-5xl sm:w-auto min-w-[320px] sm:min-w-[640px] md:min-w-[760px]",
+          "pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-4 sm:px-5 py-2 rounded-full border transition-all duration-300 shadow-xl w-full max-w-sm sm:max-w-2xl md:max-w-4xl min-w-[320px] sm:min-w-[640px] md:min-w-[700px]",
           scrolled
             ? "bg-background/85 dark:bg-background/90 backdrop-blur-md border-border shadow-black/10 dark:shadow-black/40 scale-100"
             : "bg-background/65 dark:bg-background/70 backdrop-blur-sm border-border/70 shadow-xs"
         )}
       >
-        {/* Brand / Name */}
+        {/* Brand / Logo */}
         <Link
           href="/"
           className="flex items-center gap-2 group text-foreground font-bold tracking-tight text-sm hover:opacity-90 transition-opacity"
         >
-          <span className={cn("w-2 h-2 rounded-full animate-pulse", isAvailable ? "bg-emerald-500" : "bg-primary")} />
-          <span className="font-semibold tracking-tight text-sm">
-            {firstName} {lastName}
+          {profile?.logoUrl ? (
+            <Image
+              src={profile.logoUrl}
+              alt={brandName}
+              width={22}
+              height={22}
+              className="w-5.5 h-5.5 rounded-md object-contain"
+            />
+          ) : null}
+          <span className="font-bold tracking-tight text-sm text-foreground">
+            {brandName}
           </span>
         </Link>
 

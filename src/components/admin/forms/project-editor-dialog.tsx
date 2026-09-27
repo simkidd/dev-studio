@@ -460,7 +460,7 @@ export function ProjectEditorDialog({
                   </label>
                   <Input
                     {...register("githubUrl")}
-                    placeholder="https://github.com/alexmorgan/project"
+                    placeholder="https://github.com/username/project"
                     className="font-mono"
                   />
                 </div>

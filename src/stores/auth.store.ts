@@ -6,6 +6,7 @@ import {
   getAccessToken,
   getRefreshToken,
   setAuthCookies,
+  setUserCookie,
   clearAuthCookies,
 } from "@/lib/cookie.utils";
 import { apiClient } from "@/lib/axios";
@@ -26,7 +27,7 @@ export const useAuthStore = create<AuthState>()(
       user: null,
       isAuthenticated: false,
       isLoading: true,
-
+      
       login: (user, tokens) => {
         setAuthCookies(tokens, user);
         set({
@@ -37,6 +38,7 @@ export const useAuthStore = create<AuthState>()(
       },
 
       setUser: (user) => {
+        setUserCookie(user);
         set({ user });
       },
 

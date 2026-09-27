@@ -35,13 +35,13 @@ export function AboutView() {
   const { data: skills = [] } = useSkills();
   const { data: testimonials = [] } = useTestimonials();
 
-  const firstName = profile?.firstName || "Alex";
-  const lastName = profile?.lastName || "Morgan";
-  const fullName = `${firstName} ${lastName}`.trim();
+  const firstName = profile?.firstName || "Developer";
+  const lastName = profile?.lastName || "Portfolio";
+  const fullName = profile ? `${firstName} ${lastName}`.trim() : "Developer Portfolio";
   const bio =
     profile?.bio ||
-    "I engineer high-throughput systems, resilient web architectures, and high-performance digital flagships for venture-backed startups and enterprise platforms.";
-  const location = profile?.location || "London, UK (Remote)";
+    "I engineer high-throughput systems, resilient web architectures, and high-performance digital flagships.";
+  const location = profile?.location || "Remote";
   const avatarUrl = profile?.avatarUrl || "";
   const resumeUrl = profile?.resumeUrl || "";
   const aboutMarkdown = profile?.aboutMarkdown || "";
@@ -64,11 +64,11 @@ export function AboutView() {
   });
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-24 space-y-20 sm:space-y-28">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 pb-20 space-y-20 sm:space-y-28">
       {/* ─────────────────────────────────────────────────────────────
           1. ABOUT HERO & MASTER PORTRAIT
       ───────────────────────────────────────────────────────────── */}
-      <section className="space-y-8">
+      <section className="space-y-6">
         <div className="flex items-center gap-2 text-primary">
           <ChromeSparkleIcon className="w-4 h-4" />
           <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
@@ -77,10 +77,10 @@ export function AboutView() {
         </div>
 
         <div className="flex flex-col md:flex-row items-start justify-between gap-10">
-          <div className="space-y-4 max-w-2xl">
+          <div className="space-y-3 max-w-2xl">
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
               Engineering with <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
+              <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-violet-500">
                 Precision & Clarity.
               </span>
             </h1>
@@ -134,24 +134,36 @@ export function AboutView() {
           <p className="text-3xl sm:text-4xl font-black text-primary font-mono">
             {stats.yearsExperience}+
           </p>
-          <p className="text-xs font-semibold text-foreground">Years Experience</p>
-          <p className="text-[11px] text-muted-foreground font-mono">In full-stack & cloud</p>
+          <p className="text-xs font-semibold text-foreground">
+            Years Experience
+          </p>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            In full-stack & cloud
+          </p>
         </div>
 
         <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-1 text-center">
           <p className="text-3xl sm:text-4xl font-black text-emerald-500 font-mono">
             {stats.completedProjects}+
           </p>
-          <p className="text-xs font-semibold text-foreground">Projects Delivered</p>
-          <p className="text-[11px] text-muted-foreground font-mono">Production flagships</p>
+          <p className="text-xs font-semibold text-foreground">
+            Projects Delivered
+          </p>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            Production flagships
+          </p>
         </div>
 
         <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-1 text-center">
           <p className="text-3xl sm:text-4xl font-black text-indigo-500 font-mono">
             {stats.happyClients}+
           </p>
-          <p className="text-xs font-semibold text-foreground">Satisfied Clients</p>
-          <p className="text-[11px] text-muted-foreground font-mono">Founders & teams</p>
+          <p className="text-xs font-semibold text-foreground">
+            Satisfied Clients
+          </p>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            Founders & teams
+          </p>
         </div>
 
         <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-1 text-center">
@@ -159,7 +171,9 @@ export function AboutView() {
             {stats.codeCommits}+
           </p>
           <p className="text-xs font-semibold text-foreground">Code Commits</p>
-          <p className="text-[11px] text-muted-foreground font-mono">GitHub contributions</p>
+          <p className="text-[11px] text-muted-foreground font-mono">
+            GitHub contributions
+          </p>
         </div>
       </section>
 
@@ -170,7 +184,9 @@ export function AboutView() {
         <section className="p-8 sm:p-12 rounded-3xl bg-card/60 dark:bg-card/40 border border-border space-y-6">
           <div className="flex items-center gap-2 text-primary pb-2 border-b border-border/60">
             <ChromeSparkleIcon className="w-4 h-4" />
-            <h2 className="text-lg font-bold text-foreground">The Background Story</h2>
+            <h2 className="text-lg font-bold text-foreground">
+              The Background Story
+            </h2>
           </div>
 
           <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-line space-y-4 font-sans">
@@ -210,15 +226,18 @@ export function AboutView() {
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                     <div>
                       <h3 className="text-base sm:text-lg font-bold text-foreground">
-                        {exp.role} <span className="text-primary">@ {exp.company}</span>
+                        {exp.role}{" "}
+                        <span className="text-primary">@ {exp.company}</span>
                       </h3>
                       <p className="text-xs text-muted-foreground font-mono">
-                        {exp.location || "Remote"} • {exp.employmentType || "Full-time"}
+                        {exp.location || "Remote"} •{" "}
+                        {exp.employmentType || "Full-time"}
                       </p>
                     </div>
 
                     <span className="text-xs font-mono font-semibold text-primary px-3 py-1 rounded-full bg-primary/10 border border-primary/20 self-start sm:self-auto">
-                      {exp.startDate} — {exp.isCurrent ? "Present" : exp.endDate}
+                      {exp.startDate} —{" "}
+                      {exp.isCurrent ? "Present" : exp.endDate}
                     </span>
                   </div>
 
@@ -295,7 +314,8 @@ export function AboutView() {
           Let&apos;s build something impactful together.
         </h2>
         <p className="text-xs sm:text-sm max-w-xl mx-auto opacity-90 leading-relaxed">
-          Whether you need leadership on a full-stack platform, high-throughput backend architecture, or product consultation.
+          Whether you need leadership on a full-stack platform, high-throughput
+          backend architecture, or product consultation.
         </p>
         <Link
           href="/contact"

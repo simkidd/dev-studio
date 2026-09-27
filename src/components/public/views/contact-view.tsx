@@ -29,11 +29,12 @@ export function ContactView() {
   const [message, setMessage] = useState("");
   const [copied, setCopied] = useState(false);
 
-  const directEmail = profile?.socialLinks?.email || "alex@morgan.dev";
-  const location = profile?.location || "London, UK (Remote)";
+  const directEmail = profile?.socialLinks?.email || "hello@portfolio.dev";
+  const location = profile?.location || "Remote";
   const isAvailable = profile?.isAvailableForHire ?? true;
   const availabilityNote =
-    profile?.availabilityNote || "Open for Staff roles, Advisory & select $10k+ contracts";
+    profile?.availabilityNote ||
+    "Open for full-time senior roles, technical advisory & contract builds";
 
   const github = profile?.socialLinks?.github;
   const linkedin = profile?.socialLinks?.linkedin;
@@ -69,7 +70,7 @@ export function ContactView() {
           setSubject("");
           setMessage("");
         },
-      }
+      },
     );
   };
 
@@ -88,13 +89,14 @@ export function ContactView() {
 
         <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black text-foreground tracking-tight leading-tight">
           Let&apos;s Build Something <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-violet-500">
+          <span className="text-transparent bg-clip-text bg-linear-to-r from-primary to-violet-500">
             Remarkable Together.
           </span>
         </h1>
 
-        <p className="text-xs sm:text-base text-muted-foreground leading-relaxed">
-          Whether you are exploring a new product flagship, modernizing legacy architectures, or seeking technical advisory, I would love to connect.
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+          Whether you are exploring a new product flagship, modernizing legacy
+          architectures, or seeking technical advisory, I would love to connect.
         </p>
       </div>
 
@@ -199,58 +201,69 @@ export function ContactView() {
         {/* Right 3 Cols: Interactive Inquiry Form */}
         <div className="lg:col-span-3 p-6 sm:p-10 rounded-3xl bg-card border border-border shadow-xl space-y-6">
           <div className="space-y-1">
-            <h2 className="text-xl font-bold text-foreground">Send an Inquiry</h2>
+            <h2 className="text-xl font-bold text-foreground">
+              Send a Message
+            </h2>
             <p className="text-xs text-muted-foreground">
-              Please share a few details regarding your timeline, requirements, and budget.
+              Share details about your product goals, team needs, or technical
+              requirements.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Your Name *</label>
+                <label className="text-xs font-medium text-foreground">
+                  Your Name *
+                </label>
                 <input
                   type="text"
                   required
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  placeholder="Alex Morgan"
+                  placeholder="Your Name"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
 
               <div className="space-y-1.5">
-                <label className="text-xs font-medium text-foreground">Your Email Address *</label>
+                <label className="text-xs font-medium text-foreground">
+                  Your Email Address *
+                </label>
                 <input
                   type="email"
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="alex@company.com"
+                  placeholder="your.email@company.com"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Subject / Engagement Type</label>
+              <label className="text-xs font-medium text-foreground">
+                Subject / Opportunity
+              </label>
               <input
                 type="text"
                 value={subject}
                 onChange={(e) => setSubject(e.target.value)}
-                placeholder="e.g. Next.js Enterprise Re-architecture & Staff Advisory"
+                placeholder="e.g. Senior Full-Stack Role / Platform Re-architecture / Contract Build"
                 className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
               />
             </div>
 
             <div className="space-y-1.5">
-              <label className="text-xs font-medium text-foreground">Project Scope & Requirements *</label>
+              <label className="text-xs font-medium text-foreground">
+                Message & Context *
+              </label>
               <textarea
                 required
                 rows={5}
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                placeholder="Describe your current tech stack, product goals, timeline, and key deliverables..."
+                placeholder="Tell me about your tech stack, project goals, timeline, or team role..."
                 className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40 resize-none leading-relaxed"
               />
             </div>

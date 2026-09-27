@@ -81,45 +81,22 @@ export function HomeView() {
     );
   };
 
-  const firstName = profile?.firstName || "Alex";
-  const lastName = profile?.lastName || "Morgan";
-  const fullName = `${firstName} ${lastName}`.trim();
+  const firstName = profile?.firstName || "Developer";
+  const lastName = profile?.lastName || "Portfolio";
+  const fullName = profile ? `${firstName} ${lastName}`.trim() : "Developer Portfolio";
   const headline =
-    profile?.headline || "Senior Full-Stack Architect & Systems Engineer";
+    profile?.headline || "Full-Stack Engineer & Systems Architect";
   const bio =
     profile?.bio ||
-    "I engineer high-throughput systems, resilient web architectures, and high-performance digital flagships for venture-backed startups and enterprise platforms.";
-  const location = profile?.location || "London, UK (Remote)";
+    "I engineer high-throughput systems, resilient web architectures, and high-performance digital experiences.";
+  const location = profile?.location || "Remote";
   const avatarUrl = profile?.avatarUrl || "";
   const isAvailable = profile?.isAvailableForHire ?? true;
 
-  // Services catalog list
-  const SERVICES = [
-    {
-      title: "Full-Stack Architecture & Web Apps",
-      description:
-        "Building scalable Next.js and React enterprise applications with robust state management, sub-second TTFB, and fluid UX.",
-      tags: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
-    },
-    {
-      title: "Distributed Backend & API Systems",
-      description:
-        "Designing high-throughput REST and GraphQL microservices, caching layers, and database architectures.",
-      tags: ["Node.js", "Express", "MongoDB", "PostgreSQL", "Redis"],
-    },
-    {
-      title: "Cloud Infrastructure & DevOps",
-      description:
-        "Automated CI/CD deployment pipelines, containerization with Docker, and cloud orchestrations on AWS & Vercel.",
-      tags: ["AWS", "Docker", "CI/CD", "Vercel", "Monitoring"],
-    },
-    {
-      title: "Technical Advisory & Code Auditing",
-      description:
-        "Guiding engineering teams on architecture decisions, performance optimization, security audits, and code health.",
-      tags: ["System Design", "Auditing", "Refactoring", "Mentorship"],
-    },
-  ];
+  const headlineWords = (headline || "Software Engineer").trim().split(/\s+/);
+  const midpoint = Math.ceil(headlineWords.length / 2);
+  const titleLine1 = headlineWords.slice(0, midpoint).join(" ");
+  const titleLine2 = headlineWords.slice(midpoint).join(" ");
 
   return (
     <div className="space-y-28 sm:space-y-36 pb-20">
@@ -133,14 +110,6 @@ export function HomeView() {
         <div className="max-w-5xl mx-auto space-y-8 relative z-10 w-full flex flex-col items-center">
           {/* Metadata Badges Header */}
           <div className="flex flex-wrap items-center justify-center gap-2.5 sm:gap-4 text-xs font-mono text-muted-foreground">
-            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-muted/80 border border-border/80">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span>
-                {isAvailable
-                  ? "Available for select projects"
-                  : "Engaged in active builds"}
-              </span>
-            </span>
             <span className="hidden sm:inline-flex items-center gap-1 px-3 py-1 rounded-full bg-muted/80 border border-border/80">
               <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
               <span>{location}</span>
@@ -151,23 +120,24 @@ export function HomeView() {
           <div className="space-y-3 relative">
             <div className="flex items-center justify-center gap-3 sm:gap-6">
               <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0" />
-              <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none">
-                Software
+              <h1 className="text-3xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none">
+                {titleLine1}
               </h1>
               <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 hidden xs:block" />
             </div>
-            <div className="flex items-center justify-center gap-3 sm:gap-6">
-              <h1 className="text-4xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/90 to-foreground/60">
-                Engineer
-              </h1>
-              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 block xs:hidden" />
-            </div>
+            {titleLine2 && (
+              <div className="flex items-center justify-center gap-3 sm:gap-6">
+                <h1 className="text-3xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground/90 to-foreground/60">
+                  {titleLine2}
+                </h1>
+                <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 block xs:hidden" />
+              </div>
+            )}
           </div>
 
           {/* Subtitle / Value Proposition */}
           <p className="max-w-2xl mx-auto text-sm sm:text-base text-muted-foreground leading-relaxed px-4 pt-2">
-            {headline}. Specializing in modern web platforms, distributed
-            backends, and elegant user experiences.
+            {profile?.subHeadline || bio}
           </p>
 
           {/* CTA Buttons */}
@@ -225,71 +195,9 @@ export function HomeView() {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. CAPABILITIES & SERVICES (Interactive Horizontal Rows)
-      ───────────────────────────────────────────────────────────── */}
-      <section
-        id="services"
-        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
-      >
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
-          <div>
-            <div className="flex items-center gap-2 text-primary pb-1">
-              <ChromeSparkleIcon className="w-3.5 h-3.5" />
-              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
-                Services & Capabilities
-              </span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-foreground tracking-tight">
-              What I Bring to the Table
-            </h2>
-          </div>
-          <p className="text-xs text-muted-foreground max-w-xs font-mono">
-            High-caliber technical execution across all layers of the stack.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {SERVICES.map((service, index) => (
-            <div
-              key={service.title}
-              className="group p-6 sm:p-8 rounded-2xl bg-card/60 dark:bg-card/40 hover:bg-card border border-border/80 hover:border-primary/40 transition-all duration-300 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-6"
-            >
-              <div className="space-y-2 max-w-xl">
-                <div className="flex items-center gap-3">
-                  <span className="text-xs font-mono text-primary font-bold">
-                    0{index + 1}
-                  </span>
-                  <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                    {service.title}
-                  </h3>
-                </div>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed pl-7">
-                  {service.description}
-                </p>
-              </div>
-
-              <div className="flex flex-wrap items-center gap-1.5 pl-7 md:pl-0">
-                {service.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-1 rounded-lg bg-muted/80 border border-border/80 text-[11px] font-mono text-foreground font-medium"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* ─────────────────────────────────────────────────────────────
           4. SELECTED WORKS / FEATURED PROJECTS (Ambient Glow Cards)
       ───────────────────────────────────────────────────────────── */}
-      <section
-        id="works"
-        className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
-      >
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
           <div>
             <div className="flex items-center gap-2 text-primary pb-1">
@@ -418,10 +326,7 @@ export function HomeView() {
           5. SKILLS & TECHNICAL STACK MATRIX
       ───────────────────────────────────────────────────────────── */}
       {skills.length > 0 && (
-        <section
-          id="skills"
-          className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24"
-        >
+        <section className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8 scroll-mt-24">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/80 pb-4">
             <div>
               <div className="flex items-center gap-2 text-primary pb-1">
@@ -627,7 +532,7 @@ export function HomeView() {
                   required
                   value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Alex Rivers"
+                  placeholder="Your Name"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
@@ -641,7 +546,7 @@ export function HomeView() {
                   required
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="alex@company.com"
+                  placeholder="your.email@company.com"
                   className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>

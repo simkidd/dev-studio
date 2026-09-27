@@ -40,6 +40,8 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export interface ProfileFormData {
+  brandName?: string;
+  logoUrl?: string;
   firstName: string;
   middleName?: string;
   lastName: string;
@@ -84,6 +86,8 @@ export function ProfileView() {
     formState: { errors, isSubmitting, isDirty },
   } = useForm<ProfileFormData>({
     defaultValues: {
+      brandName: "",
+      logoUrl: "",
       firstName: "",
       middleName: "",
       lastName: "",
@@ -114,6 +118,7 @@ export function ProfileView() {
   });
 
   const avatarUrl = watch("avatarUrl");
+  const logoUrl = watch("logoUrl");
   const resumeUrl = watch("resumeUrl");
   const isAvailable = watch("isAvailableForHire");
   const firstName = watch("firstName");
@@ -125,6 +130,8 @@ export function ProfileView() {
   useEffect(() => {
     if (profile) {
       reset({
+        brandName: profile.brandName || "",
+        logoUrl: profile.logoUrl || "",
         firstName: profile.firstName || "",
         middleName: profile.middleName || "",
         lastName: profile.lastName || "",
@@ -174,6 +181,23 @@ export function ProfileView() {
     );
   };
 
+  const handleLogoSelect = (file: File) => {
+    uploadFileMutation.mutate(
+      { file, folder: "logos" },
+      {
+        onSuccess: (data) => {
+          if (data?.url) {
+            setValue("logoUrl", data.url, {
+              shouldValidate: true,
+              shouldDirty: true,
+            });
+            toast.success("Brand logo uploaded successfully");
+          }
+        },
+      },
+    );
+  };
+
   const handleResumeSelect = (file: File) => {
     uploadFileMutation.mutate(
       { file, folder: "documents" },
@@ -200,6 +224,8 @@ export function ProfileView() {
       : [];
 
     const payload: Partial<IProfile> = {
+      brandName: data.brandName?.trim() || undefined,
+      logoUrl: data.logoUrl || undefined,
       firstName: data.firstName.trim(),
       middleName: data.middleName?.trim() || undefined,
       lastName: data.lastName.trim(),
@@ -254,7 +280,7 @@ export function ProfileView() {
   }
 
   return (
-    <div className="space-y-6 pb-24 max-w-5xl mx-auto w-full">
+    <div className="space-y-6 pb-24 max-w-5xl w-full">
       {/* Top Header & Floating Save Action */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-border/60 pb-5">
         <div>
@@ -364,6 +390,40 @@ export function ProfileView() {
 
                 {/* Name Fields Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 flex-1 w-full">
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-medium text-foreground flex items-center justify-between">
+                      <span>Brand / Logo Name</span>
+                      <span className="text-[10px] text-muted-foreground font-normal">
+                        Optional (Defaults to Full Name)
+                      </span>
+                    </label>
+                    <Input
+                      {...register("brandName")}
+                      placeholder="e.g. AcmeDev or Portfolio Name"
+                      className="rounded-lg"
+                    />
+                    <span className="text-[10px] text-muted-foreground block">
+                      Displayed on the floating navbar and footer brand logo.
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-medium text-foreground flex items-center justify-between">
+                      <span>Navbar Brand Logo Icon</span>
+                      <span className="text-[10px] text-muted-foreground font-normal">
+                        Optional (SVG / PNG)
+                      </span>
+                    </label>
+                    <FileDropzone
+                      variant="compact"
+                      label={logoUrl ? "Replace brand logo icon" : "Upload brand logo icon (SVG, PNG)"}
+                      previewUrl={logoUrl}
+                      onFileSelect={handleLogoSelect}
+                      onClear={() => setValue("logoUrl", "", { shouldDirty: true })}
+                      isUploading={uploadFileMutation.isPending}
+                    />
+                  </div>
+
                   <div className="space-y-1.5">
                     <label className="text-xs font-medium text-foreground">
                       First Name *
@@ -372,7 +432,7 @@ export function ProfileView() {
                       {...register("firstName", {
                         required: "First name is required",
                       })}
-                      placeholder="e.g. Alex"
+                      placeholder="First name"
                       className="rounded-lg"
                     />
                     {errors.firstName && (
@@ -383,6 +443,20 @@ export function ProfileView() {
                   </div>
 
                   <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground flex items-center justify-between">
+                      <span>Middle Name</span>
+                      <span className="text-[10px] text-muted-foreground font-normal">
+                        Optional
+                      </span>
+                    </label>
+                    <Input
+                      {...register("middleName")}
+                      placeholder="Middle name"
+                      className="rounded-lg"
+                    />
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
                     <label className="text-xs font-medium text-foreground">
                       Last Name *
                     </label>
@@ -390,7 +464,7 @@ export function ProfileView() {
                       {...register("lastName", {
                         required: "Last name is required",
                       })}
-                      placeholder="e.g. Morgan"
+                      placeholder="Last name"
                       className="rounded-lg"
                     />
                     {errors.lastName && (
@@ -402,13 +476,13 @@ export function ProfileView() {
 
                   <div className="space-y-1.5 sm:col-span-2">
                     <label className="text-xs font-medium text-foreground">
-                      Hero Headline (Primary Specialization) *
+                      Hero Headline (Display Title) *
                     </label>
                     <Input
                       {...register("headline", {
                         required: "Headline is required",
                       })}
-                      placeholder="e.g. Senior Full-Stack Architect & Distributed Systems Engineer"
+                      placeholder="e.g. Software Engineer or Full-Stack Architect"
                       className="rounded-lg"
                     />
                     {errors.headline && (
@@ -416,6 +490,18 @@ export function ProfileView() {
                         {errors.headline.message}
                       </span>
                     )}
+                  </div>
+
+                  <div className="space-y-1.5 sm:col-span-2">
+                    <label className="text-xs font-medium text-foreground">
+                      Hero Subtitle (Value Proposition)
+                    </label>
+                    <Textarea
+                      {...register("subHeadline")}
+                      rows={2}
+                      placeholder="e.g. Specializing in modern web platforms, distributed backends, and elegant user experiences."
+                      className="rounded-lg text-xs leading-relaxed resize-none"
+                    />
                   </div>
 
                   <div className="space-y-1.5 sm:col-span-2">
@@ -525,6 +611,7 @@ export function ProfileView() {
                     type="number"
                     {...register("yearsExperience", { valueAsNumber: true })}
                     className="font-mono text-sm font-semibold rounded-lg bg-background"
+                    min={0}
                   />
                 </div>
 
@@ -537,6 +624,7 @@ export function ProfileView() {
                     type="number"
                     {...register("completedProjects", { valueAsNumber: true })}
                     className="font-mono text-sm font-semibold rounded-lg bg-background"
+                    min={0}
                   />
                 </div>
 
@@ -549,6 +637,7 @@ export function ProfileView() {
                     type="number"
                     {...register("happyClients", { valueAsNumber: true })}
                     className="font-mono text-sm font-semibold rounded-lg bg-background"
+                    min={0}
                   />
                 </div>
 
@@ -561,6 +650,7 @@ export function ProfileView() {
                     type="number"
                     {...register("codeCommits", { valueAsNumber: true })}
                     className="font-mono text-sm font-semibold rounded-lg bg-background"
+                    min={0}
                   />
                 </div>
               </div>
@@ -720,7 +810,7 @@ export function ProfileView() {
                   <Input
                     type="email"
                     {...register("email")}
-                    placeholder="alex@example.com"
+                    placeholder="contact@yourdomain.com"
                     className="rounded-lg text-xs"
                   />
                 </div>
@@ -733,7 +823,7 @@ export function ProfileView() {
                   <Input
                     type="url"
                     {...register("website")}
-                    placeholder="https://alexmorgan.dev"
+                    placeholder="https://yourportfolio.dev"
                     className="rounded-lg text-xs"
                   />
                 </div>
@@ -746,7 +836,7 @@ export function ProfileView() {
                   <Input
                     type="text"
                     {...register("discord")}
-                    placeholder="alex_dev or https://discord.gg/..."
+                    placeholder="username or https://discord.gg/..."
                     className="rounded-lg text-xs"
                   />
                 </div>
@@ -816,7 +906,7 @@ export function ProfileView() {
                   <Input
                     type="text"
                     {...register("seoTitle")}
-                    placeholder="Alex Morgan — Senior Full-Stack Architect & Cloud Specialist"
+                    placeholder="e.g. Senior Full-Stack Architect & Cloud Specialist"
                     className="rounded-lg text-xs"
                   />
                 </div>
@@ -832,7 +922,7 @@ export function ProfileView() {
                   </div>
                   <Textarea
                     {...register("seoDescription")}
-                    placeholder="Explore the portfolio and projects of Alex Morgan, senior engineer specializing in distributed systems, Next.js web applications, and resilient cloud architectures."
+                    placeholder="Explore modern portfolio projects, distributed systems architectures, and full-stack engineering insights."
                     rows={3}
                     className="rounded-lg text-xs resize-none leading-relaxed"
                   />

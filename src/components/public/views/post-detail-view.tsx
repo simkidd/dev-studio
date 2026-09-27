@@ -18,13 +18,39 @@ export function PostDetailView({ slug }: { slug: string }) {
 
   const fullName = profile
     ? `${profile.firstName} ${profile.lastName}`.trim()
-    : "Alex Morgan";
+    : "Developer";
   const avatarUrl = profile?.avatarUrl || "";
 
-  const handleCopyLink = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(window.location.href);
-      toast.success("Article URL copied to clipboard!");
+  const handleShare = async () => {
+    if (typeof window === "undefined") return;
+
+    const shareData = {
+      title: post?.title || "Article",
+      text: post?.excerpt || post?.title || "Check out this article",
+      url: window.location.href,
+    };
+
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+      } catch (err: any) {
+        if (err.name !== "AbortError") {
+          // Fallback to clipboard if share failed
+          try {
+            await navigator.clipboard.writeText(window.location.href);
+            toast.success("Article URL copied to clipboard!");
+          } catch {
+            // Ignore
+          }
+        }
+      }
+    } else {
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        toast.success("Article URL copied to clipboard!");
+      } catch {
+        toast.error("Failed to copy link");
+      }
     }
   };
 
@@ -120,9 +146,10 @@ export function PostDetailView({ slug }: { slug: string }) {
             </div>
 
             <button
-              onClick={handleCopyLink}
-              className="p-2 rounded-full bg-card hover:bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-              title="Copy Article Link"
+              type="button"
+              onClick={handleShare}
+              className="p-2 rounded-full bg-card hover:bg-muted border border-border text-muted-foreground hover:text-foreground transition-colors cursor-pointer active:scale-95"
+              title="Share Article"
             >
               <Share2 className="w-4 h-4" />
             </button>
