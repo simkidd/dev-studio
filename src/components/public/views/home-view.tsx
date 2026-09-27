@@ -1,6 +1,5 @@
 "use client";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChromeSparkleIcon } from "@/components/ui/icons";
 import { TechIcon } from "@/components/ui/tech-icon";
 import { ProjectCard } from "@/components/public/cards/project-card";
@@ -304,21 +303,13 @@ export function HomeView() {
                   &ldquo;{test.quote}&rdquo;
                 </p>
 
-                <div className="flex items-center gap-3 pt-3 border-t border-border/60">
-                  <Avatar className="w-10 h-10 rounded-full border border-border">
-                    <AvatarImage src={test.avatarUrl} alt={test.clientName} />
-                    <AvatarFallback className="font-bold text-xs bg-primary/15 text-primary">
-                      {test.clientName.charAt(0)}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <h4 className="text-xs font-bold text-foreground">
-                      {test.clientName}
-                    </h4>
-                    <p className="text-[11px] text-muted-foreground">
-                      {test.clientRole} {test.company && `@ ${test.company}`}
-                    </p>
-                  </div>
+                <div className="pt-3 border-t border-border/60">
+                  <h4 className="text-xs font-bold text-foreground">
+                    {test.clientName}
+                  </h4>
+                  <p className="text-[11px] text-muted-foreground">
+                    {test.clientRole} {test.company && `@ ${test.company}`}
+                  </p>
                 </div>
               </div>
             ))}

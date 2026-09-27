@@ -219,18 +219,6 @@ export function TestimonialsView() {
               <div>
                 <div className="flex items-start justify-between">
                   <div className="flex items-center gap-3">
-                    <Avatar className="w-10 h-10 border border-border shrink-0">
-                      <AvatarImage
-                        src={t.avatarUrl}
-                        alt={t.clientName}
-                        className="object-cover"
-                      />
-                      <AvatarFallback className="bg-primary/10 text-primary font-bold text-xs">
-                        {t.clientName
-                          ? t.clientName.charAt(0).toUpperCase()
-                          : "C"}
-                      </AvatarFallback>
-                    </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
                         <span className="font-bold text-foreground text-sm">
@@ -355,31 +343,6 @@ export function TestimonialsView() {
                   </div>
                 </div>
 
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-foreground">
-                    Client Avatar
-                  </label>
-                  <FileDropzone
-                    variant="avatar"
-                    previewUrl={watch("avatarUrl")}
-                    onFileSelect={(file: File) => {
-                      uploadFileMutation.mutate(
-                        { file, folder: "testimonials" },
-                        {
-                          onSuccess: (res) => {
-                            if (res?.url) {
-                              setValue("avatarUrl", res.url);
-                              toast.success("Client avatar uploaded");
-                            }
-                          },
-                        },
-                      );
-                    }}
-                    onClear={() => setValue("avatarUrl", "")}
-                    isUploading={uploadFileMutation.isPending}
-                    label="Upload client photo"
-                  />
-                </div>
 
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">
