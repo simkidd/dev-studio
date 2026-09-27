@@ -13,7 +13,7 @@ export function ProjectsCatalogView() {
   const projects: IProject[] = projectsRes?.data || [];
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-12">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 pt-28 sm:pt-36 space-y-12">
       {/* ─────────────────────────────────────────────────────────────
           1. HEADER
       ───────────────────────────────────────────────────────────── */}
@@ -33,7 +33,8 @@ export function ProjectsCatalogView() {
             </span>
           </h1>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            Explore the complete archive of production flagships, scalable systems, and open-source packages.
+            Explore the complete archive of production flagships, scalable
+            systems, and open-source packages.
           </p>
         </div>
       </div>
@@ -42,7 +43,7 @@ export function ProjectsCatalogView() {
           2. PROJECTS GRID
       ───────────────────────────────────────────────────────────── */}
       {isLoading ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2  gap-6">
           {[1, 2, 3, 4, 5, 6].map((i) => (
             <div
               key={i}
@@ -51,7 +52,7 @@ export function ProjectsCatalogView() {
           ))}
         </div>
       ) : projects.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {projects.map((project: IProject) => (
             <div
               key={project._id}
@@ -126,7 +127,8 @@ export function ProjectsCatalogView() {
             No projects published yet
           </p>
           <p className="text-xs text-muted-foreground">
-            Flagship projects and case studies will appear here once published from the CMS.
+            Flagship projects and case studies will appear here once published
+            from the CMS.
           </p>
         </div>
       )}
