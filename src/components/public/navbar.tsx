@@ -141,16 +141,24 @@ export function PublicNavbar() {
           </div>
 
           <div className="flex flex-col space-y-1">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-xl text-xs font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              const isActive = pathname === item.href;
+              return (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={cn(
+                    "px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between",
+                    isActive
+                      ? "bg-primary/10 text-primary font-semibold border border-primary/20"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
+                  )}
+                >
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
           </div>
 
           <div className="pt-2 border-t border-border flex items-center justify-between">
