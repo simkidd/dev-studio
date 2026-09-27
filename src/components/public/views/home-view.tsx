@@ -1,39 +1,27 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import Image from "next/image";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ChromeSparkleIcon } from "@/components/ui/icons";
+import { TechIcon } from "@/components/ui/tech-icon";
+import { ProjectCard } from "@/components/public/cards/project-card";
 import {
+  usePosts,
   useProfile,
   useProjects,
   useSkills,
   useTestimonials,
-  usePosts,
 } from "@/hooks";
-import { IProject, ITestimonial, IPost } from "@/interfaces";
+import { IPost, IProject, ITestimonial } from "@/interfaces";
+import { formatDate } from "@/lib/date.utils";
 import {
   ArrowUpRight,
-  ArrowDown,
-  ExternalLink,
-  Mail,
-  Briefcase,
-  MapPin,
-  CheckCircle2,
-  Layers,
-  Code2,
-  Quote,
   ChevronRight,
+  Layers,
+  MapPin,
+  Quote,
 } from "lucide-react";
-import {
-  GithubIcon,
-  LinkedinIcon,
-  TwitterIcon,
-  ChromeSparkleIcon,
-} from "@/components/ui/icons";
-import { TechIcon } from "@/components/ui/tech-icon";
-import { formatDate } from "@/lib/date.utils";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
 
 export function HomeView() {
   const { data: profile } = useProfile();
@@ -54,7 +42,9 @@ export function HomeView() {
 
   const firstName = profile?.firstName || "Developer";
   const lastName = profile?.lastName || "Portfolio";
-  const fullName = profile ? `${firstName} ${lastName}`.trim() : "Developer Portfolio";
+  const fullName = profile
+    ? `${firstName} ${lastName}`.trim()
+    : "Developer Portfolio";
   const headline =
     profile?.headline || "Full-Stack Engineer & Systems Architect";
   const bio =
@@ -203,82 +193,10 @@ export function HomeView() {
         ) : projects.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {projects.slice(0, 4).map((project: IProject) => (
-              <div
+              <ProjectCard
                 key={project._id}
-                className="group relative rounded-3xl bg-card border border-border/80 hover:border-primary/50 overflow-hidden shadow-xs hover:shadow-2xl transition-all duration-300 flex flex-col"
-              >
-                {/* Thumbnail */}
-                <div className="relative aspect-[16/10] w-full bg-muted/80 overflow-hidden">
-                  {project.thumbnailUrl ? (
-                    <Image
-                      src={project.thumbnailUrl}
-                      alt={project.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono text-xs">
-                      No Preview Available
-                    </div>
-                  )}
-
-                  <div className="absolute top-3 left-3">
-                    <span className="px-3 py-1 rounded-full bg-background/85 border border-border backdrop-blur-md text-[10px] font-mono font-semibold text-foreground">
-                      {project.category || "Full-Stack"}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Content Details */}
-                <div className="p-6 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <h3 className="text-base sm:text-lg font-bold text-foreground group-hover:text-primary transition-colors">
-                        {project.title}
-                      </h3>
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                          title="Live Demo"
-                        >
-                          <ExternalLink className="w-4 h-4" />
-                        </a>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground line-clamp-2 leading-relaxed">
-                      {project.summary}
-                    </p>
-                  </div>
-
-                  {/* Tech Tags & Read More */}
-                  <div className="pt-2 border-t border-border/60 flex items-center justify-between gap-2">
-                    <div className="flex flex-wrap items-center gap-1.5">
-                      {(project.technologies || [])
-                        .slice(0, 3)
-                        .map((tech: string) => (
-                          <span
-                            key={tech}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-muted text-[10px] font-mono text-muted-foreground border border-border/40"
-                          >
-                            <TechIcon name={tech} size={11} />
-                            <span>{tech}</span>
-                          </span>
-                        ))}
-                    </div>
-
-                    <Link
-                      href={`/projects/${project.slug}`}
-                      className="text-xs font-semibold text-primary hover:underline inline-flex items-center gap-1 shrink-0"
-                    >
-                      <span>Details</span>
-                      <ChevronRight className="w-3.5 h-3.5" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
+                project={project}
+              />
             ))}
           </div>
         ) : (

@@ -153,10 +153,9 @@ export function ProjectDetailView({ slug }: { slug: string }) {
             <h2 className="text-xl font-bold text-foreground tracking-tight">
               Project Architecture & Execution
             </h2>
-            <div
-              className="prose dark:prose-invert max-w-none text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans"
-              dangerouslySetInnerHTML={{ __html: project.caseStudy || project.summary }}
-            />
+            <div className="prose dark:prose-invert max-w-none text-xs sm:text-sm text-muted-foreground leading-relaxed font-sans whitespace-pre-line">
+              {project.caseStudy || project.summary}
+            </div>
           </div>
         </div>
 
@@ -201,7 +200,42 @@ export function ProjectDetailView({ slug }: { slug: string }) {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          4. PREVIOUS / NEXT PROJECT NAVIGATION
+          4. VISUAL GALLERY & INTERFACE SHOWCASE
+      ───────────────────────────────────────────────────────────── */}
+      {project.galleryImages && project.galleryImages.length > 0 && (
+        <section className="space-y-6 pt-6 border-t border-border">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-primary">
+              <ChromeSparkleIcon className="w-3.5 h-3.5" />
+              <span className="text-xs font-mono uppercase tracking-widest text-muted-foreground font-semibold">
+                Visual Showcase
+              </span>
+            </div>
+            <h2 className="text-xl sm:text-2xl font-bold text-foreground tracking-tight">
+              Interface Screenshots & Architecture
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {project.galleryImages.map((image, idx) => (
+              <div
+                key={image.url || idx}
+                className="group relative aspect-16/10 rounded-2xl overflow-hidden border border-border/80 bg-muted/50 hover:border-primary/50 transition-all shadow-xs"
+              >
+                <Image
+                  src={image.url}
+                  alt={`${project.title} screenshot ${idx + 1}`}
+                  fill
+                  className="object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* ─────────────────────────────────────────────────────────────
+          5. PREVIOUS / NEXT PROJECT NAVIGATION
       ───────────────────────────────────────────────────────────── */}
       <div className="pt-10 border-t border-border flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
         {prevProject ? (
@@ -211,7 +245,8 @@ export function ProjectDetailView({ slug }: { slug: string }) {
           >
             <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform shrink-0" />
             <span className="truncate">
-              Previous: <span className="text-foreground">{prevProject.title}</span>
+              Previous:{" "}
+              <span className="text-foreground">{prevProject.title}</span>
             </span>
           </Link>
         ) : (
