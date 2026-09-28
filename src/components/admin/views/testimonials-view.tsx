@@ -7,10 +7,9 @@ import {
   useCreateTestimonial,
   useUpdateTestimonial,
   useDeleteTestimonial,
-  useUploadFile,
 } from "@/hooks";
 import { ITestimonial } from "@/interfaces";
-import { Quote, Plus, Trash2, Edit, Star, RefreshCw } from "lucide-react";
+import { Quote, Plus, Trash2, Edit, RefreshCw } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -25,24 +24,12 @@ import { ConfirmationModal } from "@/components/ui/confirmation-modal";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { FileDropzone } from "@/components/ui/file-dropzone";
-import { toast } from "sonner";
 
 export interface TestimonialFormData {
   clientName: string;
   clientRole: string;
   company: string;
-  avatarUrl: string;
   quote: string;
-  rating: number;
   isFeatured: boolean;
 }
 
@@ -55,13 +42,9 @@ export function TestimonialsView() {
     name: string;
   } | null>(null);
 
-  const uploadFileMutation = useUploadFile();
-
   const {
     register,
     handleSubmit,
-    setValue,
-    watch,
     control,
     reset,
     formState: { errors, isSubmitting },
@@ -70,9 +53,7 @@ export function TestimonialsView() {
       clientName: "",
       clientRole: "VP of Engineering",
       company: "Fintech Partner",
-      avatarUrl: "",
       quote: "",
-      rating: 5,
       isFeatured: true,
     },
   });
@@ -94,9 +75,7 @@ export function TestimonialsView() {
       clientName: "",
       clientRole: "VP of Engineering",
       company: "Fintech Partner",
-      avatarUrl: "",
       quote: "",
-      rating: 5,
       isFeatured: true,
     });
     setDialogOpen(true);
@@ -108,9 +87,7 @@ export function TestimonialsView() {
       clientName: t.clientName,
       clientRole: t.clientRole,
       company: t.company,
-      avatarUrl: t.avatarUrl || "",
       quote: t.quote,
-      rating: t.rating || 5,
       isFeatured: t.isFeatured,
     });
     setDialogOpen(true);
@@ -121,12 +98,9 @@ export function TestimonialsView() {
       clientName: data.clientName,
       clientRole: data.clientRole,
       company: data.company,
-      avatarUrl: data.avatarUrl || undefined,
       quote: data.quote,
-      rating: Number(data.rating),
       isFeatured: data.isFeatured,
       isApproved: true,
-      order: 0,
     };
 
     if (editingTestimonial) {
@@ -253,13 +227,6 @@ export function TestimonialsView() {
                   </div>
                 </div>
 
-                {/* Star rating */}
-                <div className="flex items-center gap-1 mt-3 text-amber-400">
-                  {Array.from({ length: t.rating || 5 }).map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
-                  ))}
-                </div>
-
                 {/* Quote */}
                 <p className="mt-3 text-xs text-foreground/85 italic leading-relaxed">
                   "{t.quote}"
@@ -343,7 +310,6 @@ export function TestimonialsView() {
                   </div>
                 </div>
 
-
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground">
                     Endorsement Quote *
@@ -361,7 +327,7 @@ export function TestimonialsView() {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between pt-1">
+                <div className="flex items-center pt-1 border-t border-border/60">
                   <div className="flex items-center gap-2">
                     <Controller
                       name="isFeatured"
@@ -380,31 +346,6 @@ export function TestimonialsView() {
                     >
                       Feature on Homepage
                     </label>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <label className="text-xs text-muted-foreground">
-                      Rating:
-                    </label>
-                    <Controller
-                      name="rating"
-                      control={control}
-                      render={({ field }) => (
-                        <Select
-                          value={String(field.value)}
-                          onValueChange={(val) => field.onChange(Number(val))}
-                        >
-                          <SelectTrigger className="w-28 text-xs h-8">
-                            <SelectValue placeholder="Rating" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="5">5 Stars</SelectItem>
-                            <SelectItem value="4">4 Stars</SelectItem>
-                            <SelectItem value="3">3 Stars</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      )}
-                    />
                   </div>
                 </div>
               </div>
