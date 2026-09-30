@@ -3,7 +3,8 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowRight, Sparkles, Terminal, Flame } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Menu, X, ArrowRight, Terminal } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
@@ -11,7 +12,7 @@ const PLATFORM_NAV_ITEMS = [
   { label: "Templates", href: "/templates" },
   { label: "Features", href: "/#features" },
   { label: "Pricing", href: "/#pricing" },
-  { label: "Live Showcases", href: "/alex-morgan" },
+  { label: "Live Demo", href: "/alex-morgan" },
 ];
 
 export function PublicNavbar() {
@@ -30,30 +31,28 @@ export function PublicNavbar() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-3 sm:p-5 pointer-events-none">
       {/* Floating Capsule Bar */}
-      <div
+      <motion.div
+        initial={{ y: -20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.35, ease: "easeOut" }}
         className={cn(
-          "pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full border transition-all duration-300 shadow-xl w-full max-w-sm sm:max-w-2xl md:max-w-4xl min-w-[320px] sm:min-w-[640px] md:min-w-[700px]",
+          "pointer-events-auto flex items-center justify-between gap-3 sm:gap-6 px-4 sm:px-6 py-2.5 sm:py-3 rounded-full border transition-all duration-300 w-full max-w-4xl",
           scrolled
-            ? "bg-background/85 dark:bg-background/90 backdrop-blur-md border-border shadow-black/10 dark:shadow-black/40 scale-100"
-            : "bg-background/65 dark:bg-background/70 backdrop-blur-sm border-border/70 shadow-xs",
+            ? "bg-background/85 dark:bg-background/90 backdrop-blur-md border-border shadow-lg shadow-black/5 dark:shadow-black/25"
+            : "bg-background/60 dark:bg-background/70 backdrop-blur-sm border-border/60 shadow-xs",
         )}
       >
-        {/* SaaS Platform Brand */}
+        {/* Brand */}
         <Link
           href="/"
-          className="flex items-center gap-2.5 group text-foreground font-bold tracking-tight text-sm hover:opacity-90 transition-opacity shrink-0"
+          className="flex items-center gap-2.5 group text-foreground font-semibold tracking-tight text-sm hover:opacity-90 transition-opacity shrink-0"
         >
-          <div className="w-7 h-7 rounded-lg bg-linear-to-tr from-primary to-indigo-600 flex items-center justify-center text-white font-mono text-xs shadow-md shadow-primary/20">
+          <div className="w-7 h-7 rounded-lg bg-foreground text-background flex items-center justify-center font-mono text-xs">
             <Terminal className="w-3.5 h-3.5" />
           </div>
-          <div className="flex items-center gap-1.5">
-            <span className="font-bold tracking-tight text-sm sm:text-base text-foreground">
-              DevPortfolio
-            </span>
-            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-primary/10 text-primary border border-primary/20">
-              SaaS
-            </span>
-          </div>
+          <span className="font-semibold tracking-tight text-sm sm:text-base text-foreground">
+            DevPortfolio
+          </span>
         </Link>
 
         {/* Desktop Navigation Links */}
@@ -65,10 +64,10 @@ export function PublicNavbar() {
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "text-xs font-medium px-3.5 py-1.5 rounded-full transition-all cursor-pointer",
+                  "text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors cursor-pointer",
                   isActive
                     ? "bg-muted text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                    : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
                 )}
               >
                 {item.label}
@@ -78,19 +77,19 @@ export function PublicNavbar() {
         </nav>
 
         {/* Actions: Theme Toggle, Sign In, Get Started */}
-        <div className="flex items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <ThemeToggle size="sm" className="hidden md:inline-flex" />
 
           <Link
             href="/admin/login"
-            className="hidden sm:inline-flex text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
+            className="hidden sm:inline-flex text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-muted/50"
           >
             Sign In
           </Link>
 
           <Link
             href="/admin/login"
-            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm transition-all"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium shadow-xs transition-all"
           >
             <span>Get Started</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -100,43 +99,52 @@ export function PublicNavbar() {
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             className="md:hidden p-1.5 rounded-full text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
+            aria-label="Toggle Menu"
           >
             {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
-      </div>
+      </motion.div>
 
       {/* Mobile Menu Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden pointer-events-auto absolute top-16 inset-x-4 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-2xl space-y-3 z-50 animate-in fade-in slide-in-from-top-2">
-          <div className="flex flex-col space-y-2">
-            {PLATFORM_NAV_ITEMS.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="pt-3 border-t border-border flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
-              <ThemeToggle size="sm" />
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -8, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden pointer-events-auto absolute top-18 inset-x-4 max-w-md mx-auto bg-popover/95 backdrop-blur-xl border border-border rounded-2xl p-4 shadow-xl space-y-3 z-50"
+          >
+            <div className="flex flex-col space-y-1">
+              {PLATFORM_NAV_ITEMS.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="pt-3 border-t border-border flex items-center justify-between px-3 py-2">
+                <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
+                <ThemeToggle size="sm" />
+              </div>
+              <div className="pt-2">
+                <Link
+                  href="/admin/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <span>Developer Login</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
-            <div className="pt-1">
-              <Link
-                href="/admin/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
-              >
-                <span>Developer Login</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

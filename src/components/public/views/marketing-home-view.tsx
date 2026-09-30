@@ -2,8 +2,8 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import {
-  Sparkles,
   ArrowRight,
   Code2,
   Palette,
@@ -15,385 +15,625 @@ import {
   CheckCircle2,
   ExternalLink,
   ChevronRight,
-  Laptop,
-  Flame,
   Layout,
+  Eye,
+  Activity,
+  ArrowUpRight,
+  FolderGit2,
+  BookOpen,
+  Mail,
+  Check,
+  Database,
+  Inbox,
+  Cpu,
+  Sparkles,
 } from "lucide-react";
-import { TechIcon } from "@/components/ui/tech-icon";
+import { cn } from "@/lib/utils";
+
+type FeatureTabId = "theme-engine" | "cms-workflow" | "crm-inbox";
+
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
 
 export function MarketingHomeView() {
-  const [activePreviewTemplate, setActivePreviewTemplate] = useState<"classic-dev" | "nova-engine" | "apex-studio">("classic-dev");
+  const [activeFeatureTab, setActiveFeatureTab] = useState<FeatureTabId>("theme-engine");
 
   return (
-    <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary">
+    <div className="min-h-screen text-foreground selection:bg-primary/20 selection:text-primary">
       {/* ─────────────────────────────────────────────────────────────
           1. HERO SECTION
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden px-4">
-        {/* Ambient Top Glows */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[400px] bg-primary/15 rounded-full blur-[140px] pointer-events-none" />
-        <div className="absolute top-1/3 right-1/4 w-[400px] h-[300px] bg-amber-500/10 rounded-full blur-[120px] pointer-events-none" />
+      <section className="relative pt-28 pb-20 sm:pt-36 sm:pb-32 overflow-hidden px-4 sm:px-6">
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="max-w-4xl mx-auto text-center space-y-8 relative z-10"
+        >
+          {/* Eyebrow */}
+          <motion.div variants={itemVariants} className="inline-flex">
+            <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono text-primary bg-primary/10 border border-primary/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Developer Portfolio Platform</span>
+            </span>
+          </motion.div>
 
-        <div className="max-w-6xl mx-auto text-center space-y-8 relative z-10">
-          {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full text-xs font-mono text-primary bg-primary/10 border border-primary/20 shadow-xs">
-            <Flame className="w-3.5 h-3.5 text-primary" />
-            <span>Multi-Tenant Developer Portfolio SaaS Platform</span>
-          </div>
-
-          {/* Main Headline */}
-          <div className="space-y-4 max-w-4xl mx-auto">
-            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-black tracking-tight uppercase leading-[0.98] text-foreground">
-              Create a developer portfolio that <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/80 to-amber-400">feels like you</span>.
+          {/* Main Headline & Subtitle */}
+          <motion.div variants={itemVariants} className="space-y-4">
+            <h1 className="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.08] text-foreground">
+              The portfolio platform built for developers.
             </h1>
             <p className="max-w-2xl mx-auto text-base sm:text-lg text-muted-foreground leading-relaxed pt-2">
-              The modern SaaS platform for software engineers, architects, and creative technologists to publish bespoke portfolio sites with zero configuration.
+              Publish production case studies, showcase your tech stack, and receive client inquiries. Decoupled from design—switch themes anytime in one click.
             </p>
-          </div>
+          </motion.div>
 
           {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link
-              href="/admin/login"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2 group"
-            >
-              <span>Build Your Portfolio Free</span>
-              <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-            </Link>
+          <motion.div
+            variants={itemVariants}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-2"
+          >
+            <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/admin/login"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2 group"
+              >
+                <span>Create Your Portfolio</span>
+                <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+              </Link>
+            </motion.div>
 
-            <Link
-              href="/templates"
-              className="w-full sm:w-auto px-8 py-3.5 rounded-xl text-sm font-semibold bg-card border border-border hover:border-primary/40 hover:bg-muted/40 transition-all flex items-center justify-center gap-2"
-            >
-              <span>Explore 3 Templates</span>
-              <Palette className="w-4 h-4 text-muted-foreground" />
-            </Link>
-          </div>
+            <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/alex-morgan"
+                target="_blank"
+                className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-card border border-border hover:border-primary/40 hover:bg-muted/40 transition-all flex items-center justify-center gap-2 shadow-2xs"
+              >
+                <span>View Live Demo</span>
+                <ArrowUpRight className="w-4 h-4 text-muted-foreground" />
+              </Link>
+            </motion.div>
+          </motion.div>
 
-          {/* Social Proof Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground font-mono">
+          {/* Feature Highlights */}
+          <motion.div
+            variants={itemVariants}
+            className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-muted-foreground font-medium"
+          >
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Multi-Tenant Data Isolation</span>
+              <span>Markdown Case Studies</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Zero-Downtime Template Switcher</span>
+              <span>1-Click Theme Switching</span>
             </div>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-              <span>Independent Navbars &amp; Footers</span>
+              <span>Inbound Leads Inbox</span>
             </div>
-          </div>
-        </div>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-500" />
+              <span>Custom Domain Support</span>
+            </div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. LIVE TEMPLATE PREVIEW BENCH (INTERACTIVE SHOWCASE)
+          2. PLATFORM WORKFLOW SHOWCASE
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-16 px-4 max-w-7xl mx-auto border-t border-border/40">
+      <section id="features" className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-t border-border">
         <div className="text-center space-y-4 mb-12">
-          <div className="inline-flex items-center gap-2 text-xs font-mono text-primary uppercase tracking-widest">
-            <Laptop className="w-3.5 h-3.5" />
-            <span>Interactive Studio</span>
-          </div>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Three Bespoke Design Engines</h2>
-          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-            Switch between curated templates anytime. Your content, projects, and articles remain completely intact.
+          <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
+            Features
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            How DevPortfolio Works
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto leading-relaxed">
+            Manage your engineering profile with purpose-built tools designed for modern developers.
           </p>
 
-          {/* Template Switcher Tabs */}
-          <div className="inline-flex flex-wrap items-center justify-center p-1.5 rounded-2xl bg-muted border border-border mt-4 gap-1">
+          {/* Workflow Tabs */}
+          <div className="inline-flex flex-wrap items-center justify-center p-1.5 rounded-full bg-muted/80 border border-border mt-4 gap-1 shadow-2xs">
             <button
-              onClick={() => setActivePreviewTemplate("classic-dev")}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                activePreviewTemplate === "classic-dev"
-                  ? "bg-card text-foreground shadow-sm border border-border"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              onClick={() => setActiveFeatureTab("theme-engine")}
+              className={cn(
+                "relative px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer",
+                activeFeatureTab === "theme-engine"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              <Layout className="w-4 h-4 text-blue-500" />
-              <span>Modern Minimal (Classic Craft)</span>
+              {activeFeatureTab === "theme-engine" && (
+                <motion.div
+                  layoutId="marketing-workflow-pill"
+                  className="absolute inset-0 rounded-full bg-primary shadow-sm -z-10"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <Palette className="w-3.5 h-3.5" />
+              <span>Theme Engine</span>
             </button>
+
             <button
-              onClick={() => setActivePreviewTemplate("nova-engine")}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                activePreviewTemplate === "nova-engine"
-                  ? "bg-card text-foreground shadow-sm border border-border"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              onClick={() => setActiveFeatureTab("cms-workflow")}
+              className={cn(
+                "relative px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer",
+                activeFeatureTab === "cms-workflow"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              <Code2 className="w-4 h-4 text-indigo-500" />
-              <span>Nova Engine (Systems &amp; Telemetry)</span>
+              {activeFeatureTab === "cms-workflow" && (
+                <motion.div
+                  layoutId="marketing-workflow-pill"
+                  className="absolute inset-0 rounded-full bg-primary shadow-sm -z-10"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <FolderGit2 className="w-3.5 h-3.5" />
+              <span>Projects &amp; Case Studies</span>
             </button>
+
             <button
-              onClick={() => setActivePreviewTemplate("apex-studio")}
-              className={`px-4 py-2 rounded-xl text-xs font-semibold flex items-center gap-2 transition-all cursor-pointer ${
-                activePreviewTemplate === "apex-studio"
-                  ? "bg-card text-foreground shadow-sm border border-border"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
+              onClick={() => setActiveFeatureTab("crm-inbox")}
+              className={cn(
+                "relative px-4 py-2 rounded-full text-xs font-semibold flex items-center gap-2 transition-colors cursor-pointer",
+                activeFeatureTab === "crm-inbox"
+                  ? "text-primary-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
             >
-              <Palette className="w-4 h-4 text-rose-500" />
-              <span>Apex Studio (Creative &amp; Editorial)</span>
+              {activeFeatureTab === "crm-inbox" && (
+                <motion.div
+                  layoutId="marketing-workflow-pill"
+                  className="absolute inset-0 rounded-full bg-primary shadow-sm -z-10"
+                  transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                />
+              )}
+              <Inbox className="w-3.5 h-3.5" />
+              <span>Inquiries &amp; Messages</span>
             </button>
           </div>
         </div>
 
-        {/* Live Mockup Window */}
-        <div className="rounded-3xl border border-border/80 bg-card overflow-hidden shadow-2xl">
-          {/* Browser Chrome Header */}
-          <div className="px-4 py-3 bg-muted/70 border-b border-border flex items-center justify-between">
+        {/* Live Feature Preview Console */}
+        <motion.div
+          layout
+          className="rounded-3xl border border-border bg-card overflow-hidden shadow-xl transition-all"
+        >
+          {/* Console Header */}
+          <div className="px-4 sm:px-6 py-3 bg-muted/60 border-b border-border flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rose-500/80" />
-              <div className="w-3 h-3 rounded-full bg-amber-500/80" />
-              <div className="w-3 h-3 rounded-full bg-emerald-500/80" />
+              <div className="w-3 h-3 rounded-full bg-rose-500/70" />
+              <div className="w-3 h-3 rounded-full bg-amber-500/70" />
+              <div className="w-3 h-3 rounded-full bg-emerald-500/70" />
             </div>
 
-            <div className="flex items-center gap-2 px-4 py-1 rounded-lg bg-background border border-border text-xs font-mono text-muted-foreground">
+            <div className="flex items-center gap-2 px-4 py-1 rounded-full bg-background border border-border text-xs font-mono text-muted-foreground shadow-2xs">
               <Globe className="w-3.5 h-3.5 text-primary" />
               <span>
-                devportfolio.com/
-                {activePreviewTemplate === "classic-dev"
-                  ? "alex-morgan"
-                  : activePreviewTemplate === "nova-engine"
-                  ? "alex-morgan"
-                  : "elena-rostova"}
+                {activeFeatureTab === "theme-engine" && "devportfolio.com/templates"}
+                {activeFeatureTab === "cms-workflow" && "devportfolio.com/dashboard/projects"}
+                {activeFeatureTab === "crm-inbox" && "devportfolio.com/dashboard/messages"}
               </span>
             </div>
 
             <Link
-              href={activePreviewTemplate === "apex-studio" ? "/elena-rostova" : "/alex-morgan"}
+              href="/alex-morgan"
+              target="_blank"
               className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
             >
-              <span>View Live</span>
-              <ExternalLink className="w-3.5 h-3.5" />
+              <span>View Demo</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Interactive Preview Content */}
-          <div className="p-8 sm:p-14 min-h-[380px] flex flex-col justify-center">
-            {activePreviewTemplate === "classic-dev" ? (
-              <div className="space-y-6 max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-blue-500/10 text-blue-500 border border-blue-500/20">
-                  <Layout className="w-3.5 h-3.5" />
-                  <span>Modern Minimal Craft &bull; Dedicated Floating Pill Navbar</span>
-                </div>
-                <h3 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-foreground">
-                  Full-Stack Engineer &amp; Systems Architect
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  I engineer high-throughput systems, resilient web architectures, and high-performance digital experiences.
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                  {["React", "Next.js", "TypeScript", "Node.js", "PostgreSQL", "TailwindCSS"].map((tech) => (
-                    <span key={tech} className="px-3 py-1 rounded-lg text-xs font-mono bg-muted border border-border">
-                      {tech}
+          {/* Console Content */}
+          <div className="p-6 sm:p-12 min-h-[400px] bg-background/50 flex flex-col justify-center overflow-hidden">
+            <AnimatePresence mode="wait">
+              {activeFeatureTab === "theme-engine" && (
+                <motion.div
+                  key="theme-engine"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-8 max-w-4xl mx-auto w-full text-center"
+                >
+                  <div className="space-y-3">
+                    <span className="text-xs font-mono text-primary uppercase tracking-wider font-semibold">
+                      Decoupled Content &amp; Layouts
                     </span>
-                  ))}
-                </div>
-              </div>
-            ) : activePreviewTemplate === "nova-engine" ? (
-              <div className="space-y-6 max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-primary/10 text-primary border border-primary/20">
-                  <Terminal className="w-3.5 h-3.5" />
-                  <span>Nova Engine Active &bull; Dedicated Command Header</span>
-                </div>
-                <h3 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-foreground">
-                  Senior Staff Systems &amp; Distributed Architect
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  10+ years architecting web platforms handling $50M+ processed ARR, sub-50ms p99 latencies, and 99.99% uptime SLAs.
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                  {["Go", "TypeScript", "Next.js", "Redis", "Kafka", "Docker"].map((tech) => (
-                    <span key={tech} className="px-3 py-1 rounded-lg text-xs font-mono bg-muted border border-border">
-                      {tech}
+                    <h3 className="text-2xl sm:text-4xl font-extrabold text-foreground">
+                      Switch themes without rewriting your content
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                      Your showcase projects, career milestones, and articles live independently from the UI. Pick any theme from our library and your portfolio adapts instantly.
+                    </p>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-left pt-2">
+                    <div className="p-5 rounded-2xl bg-card border border-border space-y-2 shadow-2xs hover:border-primary/40 transition-colors">
+                      <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-500 flex items-center justify-center font-bold text-xs font-mono">
+                        01
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">Classic Dev</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        Clean typography-led layout with floating capsule navigation.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-card border border-border space-y-2 shadow-2xs hover:border-primary/40 transition-colors">
+                      <div className="w-8 h-8 rounded-xl bg-cyan-500/10 text-cyan-500 flex items-center justify-center font-bold text-xs font-mono">
+                        02
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">Nova Engine</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        High-density console with terminal prompts and telemetry stats.
+                      </p>
+                    </div>
+
+                    <div className="p-5 rounded-2xl bg-card border border-border space-y-2 shadow-2xs hover:border-primary/40 transition-colors">
+                      <div className="w-8 h-8 rounded-xl bg-amber-500/10 text-amber-500 flex items-center justify-center font-bold text-xs font-mono">
+                        03
+                      </div>
+                      <h4 className="font-bold text-sm text-foreground">Apex Studio</h4>
+                      <p className="text-xs text-muted-foreground leading-relaxed">
+                        High-fashion brutalist theme with floating glass dock and editorial cards.
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="pt-2">
+                    <Link
+                      href="/templates"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-primary hover:underline"
+                    >
+                      <span>Explore all available themes in the gallery</span>
+                      <ArrowRight className="w-3.5 h-3.5" />
+                    </Link>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeFeatureTab === "cms-workflow" && (
+                <motion.div
+                  key="cms-workflow"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-8 max-w-4xl mx-auto w-full text-center"
+                >
+                  <div className="space-y-3">
+                    <span className="text-xs font-mono text-primary uppercase tracking-wider font-semibold">
+                      Developer CMS
                     </span>
-                  ))}
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6 max-w-3xl mx-auto text-center">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono bg-amber-400/10 text-amber-400 border border-amber-400/20">
-                  <Palette className="w-3.5 h-3.5" />
-                  <span>Apex Studio Active &bull; Dedicated Floating Glass Dock</span>
-                </div>
-                <h3 className="text-3xl sm:text-5xl font-extrabold uppercase tracking-tighter text-foreground">
-                  Creative Technologist &amp; Interaction Designer
-                </h3>
-                <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-                  Crafting visceral digital experiences, WebGL interactives, and award-winning frontend architectures.
-                </p>
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-2">
-                  {["Three.js", "WebGL", "GLSL Shaders", "React Three Fiber", "GSAP"].map((tech) => (
-                    <span key={tech} className="px-3 py-1 rounded-full text-xs font-mono bg-white/5 border border-white/10 text-amber-300">
-                      {tech}
+                    <h3 className="text-2xl sm:text-4xl font-extrabold text-foreground">
+                      Structured Case Studies &amp; Projects
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                      Publish featured repositories, live URLs, technology tags, and technical case studies through an intuitive management panel.
+                    </p>
+                  </div>
+
+                  <div className="p-6 rounded-2xl bg-card border border-border text-left space-y-4 shadow-sm">
+                    <div className="flex items-center justify-between border-b border-border/60 pb-3">
+                      <div className="flex items-center gap-2">
+                        <Code2 className="w-4 h-4 text-primary" />
+                        <span className="text-xs font-bold text-foreground">Distributed Stream Processor</span>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-emerald-500/10 text-emerald-500 font-semibold">
+                        Published
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+                      <div>
+                        <span className="text-[10px] font-mono text-muted-foreground block">CATEGORY</span>
+                        <span className="font-semibold text-foreground">Backend &amp; Distributed</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono text-muted-foreground block">TECH STACK</span>
+                        <span className="font-semibold text-foreground">Go, Kafka, Redis, Docker</span>
+                      </div>
+                      <div>
+                        <span className="text-[10px] font-mono text-muted-foreground block">LIVE DEMO</span>
+                        <span className="font-semibold text-primary">stream-edge.dev &rarr;</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+
+              {activeFeatureTab === "crm-inbox" && (
+                <motion.div
+                  key="crm-inbox"
+                  initial={{ opacity: 0, y: 16 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -16 }}
+                  transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                  className="space-y-8 max-w-4xl mx-auto w-full text-center"
+                >
+                  <div className="space-y-3">
+                    <span className="text-xs font-mono text-primary uppercase tracking-wider font-semibold">
+                      Inbound Leads Inbox
                     </span>
-                  ))}
-                </div>
-              </div>
-            )}
+                    <h3 className="text-2xl sm:text-4xl font-extrabold text-foreground">
+                      Capture high-value project inquiries
+                    </h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+                      Every contact form inquiry routes directly to your private dashboard inbox with notification alerts, status tracking, and spam protection.
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 text-left">
+                    <div className="p-4 rounded-2xl bg-card border border-border flex items-center justify-between shadow-2xs">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                          <span className="text-xs font-bold text-foreground">Sarah Jenkins &bull; VP Engineering at NextScale</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          &quot;Looking for staff architectural consulting for our Q4 Kubernetes migration sprint...&quot;
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary font-semibold">
+                        New Inquiry
+                      </span>
+                    </div>
+
+                    <div className="p-4 rounded-2xl bg-card border border-border flex items-center justify-between shadow-2xs opacity-80">
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="w-2 h-2 rounded-full bg-muted-foreground" />
+                          <span className="text-xs font-bold text-foreground">David Miller &bull; Founder at Lattice Labs</span>
+                        </div>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          &quot;Interested in full-stack contract lead role for high-throughput streaming platform...&quot;
+                        </p>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-muted text-muted-foreground font-semibold">
+                        Replied
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
-        </div>
+        </motion.div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          3. CORE FEATURES GRID
+          3. CORE ARCHITECTURAL PILLARS
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 max-w-7xl mx-auto border-t border-border/40">
+      <section className="py-20 px-4 sm:px-6 max-w-7xl mx-auto border-t border-border">
         <div className="text-center space-y-4 mb-16">
-          <span className="text-xs font-mono text-primary uppercase tracking-widest">Built For Developers</span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Everything You Need to Stand Out</h2>
+          <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
+            Architecture
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Built for Developers
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+            Everything you need to launch and maintain your public presence with zero operational overhead.
+          </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-              <ShieldCheck className="w-6 h-6" />
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-colors shadow-xs hover:shadow-xl flex flex-col justify-between"
+          >
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Multi-Tenant Isolation</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Every project, post, and inquiry is isolated to your account. Query enforcement guarantees secure data boundaries.
+              </p>
             </div>
-            <h3 className="text-lg font-bold">Strict Tenant Isolation</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Every project, post, and inquiry is cryptographically bounded to your account. Full backend query enforcement guarantees data security.
-            </p>
-          </div>
+            <div className="pt-2 text-xs font-mono text-primary font-semibold">Security Enforced &rarr;</div>
+          </motion.div>
 
-          <div className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-              <Zap className="w-6 h-6" />
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-colors shadow-xs hover:shadow-xl flex flex-col justify-between"
+          >
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <Zap className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Zero-Loss Theme Swaps</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Switch themes as your career evolves. Your Markdown case studies, career milestones, and blog posts format automatically.
+              </p>
             </div>
-            <h3 className="text-lg font-bold">Instant Theme Switching</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Change templates instantly without losing your showcase projects, experience history, skills, or blog articles.
-            </p>
-          </div>
+            <div className="pt-2 text-xs font-mono text-primary font-semibold">Zero Reconfiguration &rarr;</div>
+          </motion.div>
 
-          <div className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-all">
-            <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
-              <Globe className="w-6 h-6" />
+          <motion.div
+            whileHover={{ y: -6 }}
+            className="p-8 rounded-3xl bg-card border border-border space-y-4 hover:border-primary/40 transition-colors shadow-xs hover:shadow-xl flex flex-col justify-between"
+          >
+            <div className="space-y-4">
+              <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary flex items-center justify-center">
+                <Globe className="w-6 h-6" />
+              </div>
+              <h3 className="text-lg font-bold text-foreground">Fast Edge Performance</h3>
+              <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                Built with Next.js App Router streaming, edge caching, automated SEO meta-tags, and lightweight styling.
+              </p>
             </div>
-            <h3 className="text-lg font-bold">Inbound CRM &amp; Telemetry</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Capture inbound client inquiries, consulting leads, and recruiter messages directly into your private dashboard CRM with automated email alerts.
-            </p>
-          </div>
+            <div className="pt-2 text-xs font-mono text-primary font-semibold">Optimized TTFB &rarr;</div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
           4. PRICING TIERS
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 max-w-5xl mx-auto border-t border-border/40">
+      <section id="pricing" className="py-20 px-4 sm:px-6 max-w-5xl mx-auto border-t border-border">
         <div className="text-center space-y-4 mb-16">
-          <span className="text-xs font-mono text-primary uppercase tracking-widest">Simple Transparent Pricing</span>
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">Built for Developers at Every Stage</h2>
+          <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
+            Pricing
+          </span>
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight">
+            Simple, Transparent Plans
+          </h2>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto">
+            Get started for free or upgrade for custom domains and advanced telemetry.
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-stretch">
           {/* Free Tier */}
-          <div className="p-8 rounded-3xl bg-card border border-border space-y-6 flex flex-col justify-between">
-            <div className="space-y-4">
-              <span className="text-xs font-mono text-muted-foreground uppercase">Hobby / Starter</span>
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="p-8 rounded-3xl bg-card border border-border space-y-6 flex flex-col justify-between shadow-xs hover:shadow-md transition-all"
+          >
+            <div className="space-y-5">
+              <span className="text-xs font-mono text-muted-foreground uppercase font-semibold">Starter / Hobby</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-foreground">$0</span>
+                <span className="text-5xl font-black text-foreground">$0</span>
                 <span className="text-xs text-muted-foreground font-mono">/ forever</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Everything you need to launch a beautiful public developer portfolio today.
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                Everything you need to launch a high-performance public developer portfolio today.
               </p>
-              <ul className="space-y-2.5 text-xs text-muted-foreground pt-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Subdomain / slug routing (e.g. <code>/your-handle</code>)</span>
+              <ul className="space-y-3 text-xs text-muted-foreground pt-3 border-t border-border">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Public handle routing (<code>/{'{your-slug}'}</code>)</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Access to all 3 signature templates</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Full access to all current and future templates</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Unlimited projects &amp; case studies</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Unlimited projects, case studies &amp; articles</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-500" />
-                  <span>Inbound contact inquiry CRM</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-emerald-500 shrink-0" />
+                  <span>Integrated contact inquiry management</span>
                 </li>
               </ul>
             </div>
-            <Link
-              href="/admin/login"
-              className="w-full py-3 rounded-xl text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground text-center block transition-colors"
-            >
-              Get Started Free
-            </Link>
-          </div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/admin/login"
+                className="w-full py-3.5 rounded-full text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground text-center block transition-colors border border-border shadow-2xs"
+              >
+                Get Started Free
+              </Link>
+            </motion.div>
+          </motion.div>
 
           {/* Pro Tier */}
-          <div className="p-8 rounded-3xl bg-card border-2 border-primary space-y-6 flex flex-col justify-between relative shadow-xl shadow-primary/5">
+          <motion.div
+            whileHover={{ y: -4 }}
+            className="p-8 rounded-3xl bg-card border-2 border-primary space-y-6 flex flex-col justify-between relative shadow-lg shadow-primary/10 transition-all"
+          >
             <div className="absolute top-4 right-4">
-              <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-primary-foreground">
+              <span className="px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-primary text-primary-foreground shadow-xs">
                 Popular
               </span>
             </div>
-            <div className="space-y-4">
-              <span className="text-xs font-mono text-primary uppercase">Pro Engineer</span>
+            <div className="space-y-5">
+              <span className="text-xs font-mono text-primary uppercase font-semibold">Pro Engineer</span>
               <div className="flex items-baseline gap-1">
-                <span className="text-4xl font-black text-foreground">$12</span>
+                <span className="text-5xl font-black text-foreground">$12</span>
                 <span className="text-xs text-muted-foreground font-mono">/ month</span>
               </div>
-              <p className="text-xs text-muted-foreground">
-                For senior engineers, contractors, and agency founders wanting custom domains and telemetry.
+              <p className="text-xs sm:text-sm text-muted-foreground">
+                For senior engineers, contractors, and consultants wanting custom domains and telemetry.
               </p>
-              <ul className="space-y-2.5 text-xs text-muted-foreground pt-2">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Custom domain routing (e.g. <code>alex.dev</code>)</span>
+              <ul className="space-y-3 text-xs text-muted-foreground pt-3 border-t border-border">
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>Custom domain routing (<code>alex.dev</code>)</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Advanced visitor telemetry &amp; analytics</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>Visitor analytics &amp; lead tracking telemetry</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Priority Cloudinary media transformation</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>Priority media transformation &amp; CDN caching</span>
                 </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-primary" />
-                  <span>Custom theme CSS &amp; brand token overrides</span>
+                <li className="flex items-center gap-2.5">
+                  <Check className="w-4 h-4 text-primary shrink-0" />
+                  <span>Custom CSS token overrides &amp; styling</span>
                 </li>
               </ul>
             </div>
-            <Link
-              href="/admin/login"
-              className="w-full py-3 rounded-xl text-xs font-semibold bg-primary text-primary-foreground hover:opacity-90 text-center block transition-opacity shadow-md"
-            >
-              Upgrade to Pro
-            </Link>
-          </div>
+            <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href="/admin/login"
+                className="w-full py-3.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:opacity-95 text-center block transition-opacity shadow-md shadow-primary/20"
+              >
+                Upgrade to Pro
+              </Link>
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
           5. BOTTOM CTA
       ───────────────────────────────────────────────────────────── */}
-      <section className="py-20 px-4 max-w-5xl mx-auto border-t border-border/40">
-        <div className="p-10 sm:p-16 rounded-3xl bg-linear-to-tr from-primary/15 via-card to-card border border-primary/20 text-center space-y-6">
-          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight uppercase">
+      <section className="py-20 px-4 sm:px-6 max-w-5xl mx-auto border-t border-border">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.98 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="p-10 sm:p-16 rounded-3xl bg-card border border-border text-center space-y-6 shadow-xs"
+        >
+          <h2 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
             Deploy your portfolio today.
           </h2>
-          <p className="text-sm text-muted-foreground max-w-xl mx-auto">
-            Join developers managing their online presence with DevPortfolio SaaS.
+          <p className="text-sm sm:text-base text-muted-foreground max-w-lg mx-auto leading-relaxed">
+            Join software engineers managing their online presence with DevPortfolio.
           </p>
-          <div className="pt-2">
-            <Link
-              href="/admin/login"
-              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl text-sm font-bold bg-primary text-primary-foreground hover:opacity-90 shadow-lg transition-all"
-            >
-              <span>Create Your Portfolio</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+          <div className="pt-2 flex items-center justify-center">
+            <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
+              <Link
+                href="/admin/login"
+                className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-95 shadow-md shadow-primary/20 transition-all"
+              >
+                <span>Create Your Portfolio</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );
