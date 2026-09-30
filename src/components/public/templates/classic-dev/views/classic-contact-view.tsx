@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { apiClient } from "@/lib/axios";
 import { toast } from "sonner";
@@ -12,6 +13,7 @@ import {
   MapPin,
   MessageSquare,
   Sparkles,
+  ArrowRight,
 } from "lucide-react";
 import {
   GithubIcon,
@@ -41,7 +43,7 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
 
   const [inquiryName, setInquiryName] = useState("");
   const [inquiryEmail, setInquiryEmail] = useState("");
-  const [inquirySubject, setInquirySubject] = useState("");
+  const [inquirySubject, setInquirySubject] = useState("Full-Stack Web Application");
   const [inquiryMessage, setInquiryMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -59,7 +61,7 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
         senderName: inquiryName || "Prospective Client / Partner",
         senderEmail: inquiryEmail,
         message: inquiryMessage,
-        subject: inquirySubject || `Portfolio Inquiry for ${fullName}`,
+        subject: inquirySubject ? `[${inquirySubject}] for ${fullName}` : `Portfolio Inquiry for ${fullName}`,
         portfolioSlug: portfolio.slug,
       });
       setSubmitted(true);
@@ -79,25 +81,43 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
     { name: "YouTube", url: profile?.socialLinks?.youtube, icon: YoutubeIcon },
   ].filter((s) => Boolean(s.url));
 
+  const subjectOptions = [
+    "Full-Stack Web Application",
+    "Technical Architecture Advisory",
+    "Design Engineering Retainer",
+    "Senior Full-Time Opportunity",
+  ];
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-10">
       {/* Header */}
-      <div className="space-y-4 max-w-3xl">
-        <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
-          Contact
+      <motion.div
+        initial={{ opacity: 0, y: 16 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-4 max-w-3xl"
+      >
+        <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold flex items-center gap-1.5">
+          <MessageSquare className="w-3.5 h-3.5" />
+          Direct Inquiries
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
           Get in Touch
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Have a project in mind, an opportunity, or want to say hello? Send a message below or reach out directly.
+          Have a project in mind, an opportunity, or want to discuss technical collaboration? Send a message below or connect directly.
         </p>
-      </div>
+      </motion.div>
 
       {/* Grid Layout: Contact Info & Form */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
         {/* Left Column: Unified Contact Card & Status (5 cols) */}
-        <div className="lg:col-span-5 space-y-4">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.1 }}
+          className="lg:col-span-5 space-y-4"
+        >
           {/* Single Unified Contact Details Card */}
           <div className="p-6 rounded-3xl bg-card border border-border shadow-xs space-y-5">
             {/* Availability */}
@@ -123,37 +143,41 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
               </span>
 
               {/* Email */}
-              <a
+              <motion.a
+                whileHover={{ x: 4, scale: 1.01 }}
+                whileTap={{ scale: 0.98 }}
                 href={`mailto:${email}`}
                 className="flex items-center gap-3 p-3 rounded-2xl bg-background hover:bg-muted/70 border border-border text-foreground hover:text-primary transition-colors group"
               >
-                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                   <Mail className="w-4 h-4" />
                 </div>
                 <div className="min-w-0 flex-1">
                   <p className="text-[11px] font-mono text-muted-foreground">Email</p>
                   <p className="text-xs font-semibold truncate group-hover:underline">{email}</p>
                 </div>
-              </a>
+              </motion.a>
 
               {/* Phone (if available) */}
               {phone && (
-                <a
+                <motion.a
+                  whileHover={{ x: 4, scale: 1.01 }}
+                  whileTap={{ scale: 0.98 }}
                   href={`tel:${phone.replace(/\s+/g, "")}`}
                   className="flex items-center gap-3 p-3 rounded-2xl bg-background hover:bg-muted/70 border border-border text-foreground hover:text-primary transition-colors group"
                 >
-                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <div className="w-9 h-9 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
                     <Phone className="w-4 h-4" />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-[11px] font-mono text-muted-foreground">Phone / WhatsApp</p>
-                    <p className="text-xs font-semibold font-mono truncate group-hover:underline">{phone}</p>
+                    <p className="text-[11px] font-mono text-muted-foreground">Phone</p>
+                    <p className="text-xs font-semibold truncate group-hover:underline">{phone}</p>
                   </div>
-                </a>
+                </motion.a>
               )}
 
               {/* Location */}
-              <div className="flex items-center gap-3 p-3 rounded-2xl bg-background border border-border text-foreground">
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/40 border border-border/50 text-foreground">
                 <div className="w-9 h-9 rounded-xl bg-muted text-muted-foreground flex items-center justify-center shrink-0">
                   <MapPin className="w-4 h-4" />
                 </div>
@@ -164,134 +188,181 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
               </div>
             </div>
 
-            {/* Social Links */}
+            {/* Social Network Links */}
             {socialLinks.length > 0 && (
-              <div className="pt-4 border-t border-border/60 space-y-2.5">
+              <div className="space-y-2 pt-3 border-t border-border/60">
                 <span className="text-xs font-mono font-bold uppercase tracking-wider text-muted-foreground block">
-                  Social Presence
+                  Find Me Online
                 </span>
                 <div className="flex flex-wrap gap-2">
-                  {socialLinks.map((social) => {
-                    const Icon = social.icon;
+                  {socialLinks.map((s) => {
+                    const Icon = s.icon;
                     return (
-                      <a
-                        key={social.name}
-                        href={social.url}
+                      <motion.a
+                        key={s.name}
+                        whileHover={{ scale: 1.05, y: -2 }}
+                        whileTap={{ scale: 0.95 }}
+                        href={s.url}
                         target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-3 py-1.5 rounded-xl bg-background hover:bg-muted border border-border text-xs text-foreground font-medium flex items-center gap-1.5 transition-colors"
+                        rel="noreferrer"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-background hover:bg-muted border border-border text-xs font-medium text-foreground hover:text-primary transition-colors shadow-xs"
                       >
-                        <Icon className="w-3.5 h-3.5 text-muted-foreground" />
-                        <span>{social.name}</span>
-                      </a>
+                        <Icon className="w-3.5 h-3.5" />
+                        <span>{s.name}</span>
+                      </motion.a>
                     );
                   })}
                 </div>
               </div>
             )}
           </div>
-        </div>
+        </motion.div>
 
-        {/* Right Column: Message Transmission Form (7 cols) */}
-        <div className="lg:col-span-7">
-          {submitted ? (
-            <div className="p-10 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-600 dark:text-emerald-400 text-center space-y-3 shadow-xl">
-              <CheckCircle2 className="w-10 h-10 mx-auto" />
-              <h3 className="text-lg font-bold">Message Transmitted</h3>
-              <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
-                Thank you for reaching out. Your inquiry has been routed to {firstName}&apos;s message desk and will be addressed shortly.
-              </p>
-              <button
-                type="button"
-                onClick={() => {
-                  setSubmitted(false);
-                  setInquiryName("");
-                  setInquiryEmail("");
-                  setInquirySubject("");
-                  setInquiryMessage("");
-                }}
-                className="mt-4 px-4 py-2 rounded-xl bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-700 dark:text-emerald-300 text-xs font-semibold transition-colors cursor-pointer"
-              >
-                Send Another Inquiry
-              </button>
-            </div>
-          ) : (
-            <form
-              onSubmit={handleSendMessage}
-              className="bg-card border border-border rounded-3xl p-6 sm:p-8 space-y-4 shadow-xl"
-            >
-              <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-primary" />
-                  <h2 className="text-sm font-bold text-foreground">Send an Inquiry</h2>
-                </div>
-                <span className="text-[11px] font-mono text-muted-foreground">Direct CRM Routing</span>
-              </div>
+        {/* Right Column: Interactive Contact Form (7 cols) */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, delay: 0.15 }}
+          className="lg:col-span-7"
+        >
+          <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border shadow-xs relative overflow-hidden">
+            <AnimatePresence mode="wait">
+              {submitted ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="py-12 text-center space-y-4"
+                >
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="w-14 h-14 rounded-full bg-emerald-500/10 text-emerald-500 flex items-center justify-center mx-auto"
+                  >
+                    <CheckCircle2 className="w-8 h-8" />
+                  </motion.div>
+                  <div className="space-y-1">
+                    <h3 className="text-xl font-bold text-foreground">Message Dispatched!</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground max-w-sm mx-auto">
+                      Thank you for reaching out. I&apos;ve received your note and will get back to you shortly.
+                    </p>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.97 }}
+                    type="button"
+                    onClick={() => {
+                      setSubmitted(false);
+                      setInquiryMessage("");
+                    }}
+                    className="inline-flex items-center gap-1.5 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md hover:opacity-95 transition-opacity cursor-pointer"
+                  >
+                    <span>Send Another Note</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </motion.button>
+                </motion.div>
+              ) : (
+                <motion.form
+                  key="form"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  onSubmit={handleSendMessage}
+                  className="space-y-5"
+                >
+                  <div className="space-y-2">
+                    <label className="text-xs font-mono font-semibold uppercase text-muted-foreground block">
+                      Inquiry Category
+                    </label>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                      {subjectOptions.map((opt) => {
+                        const isSelected = inquirySubject === opt;
+                        return (
+                          <button
+                            key={opt}
+                            type="button"
+                            onClick={() => setInquirySubject(opt)}
+                            className={`p-2.5 rounded-xl text-left text-xs font-medium transition-all border cursor-pointer ${
+                              isSelected
+                                ? "bg-primary/10 border-primary text-primary font-bold shadow-xs"
+                                : "bg-background border-border text-foreground hover:border-primary/40"
+                            }`}
+                          >
+                            <span className="block truncate">{opt}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-foreground mb-1 block">Your Name</label>
-                  <input
-                    type="text"
-                    placeholder="Jane Doe"
-                    value={inquiryName}
-                    onChange={(e) => setInquiryName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-hidden focus:border-primary transition-colors"
-                  />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-foreground mb-1 block">Your Email *</label>
-                  <input
-                    type="email"
-                    required
-                    placeholder="jane@company.com"
-                    value={inquiryEmail}
-                    onChange={(e) => setInquiryEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-hidden focus:border-primary transition-colors"
-                  />
-                </div>
-              </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground block">
+                        Your Name
+                      </label>
+                      <input
+                        type="text"
+                        value={inquiryName}
+                        onChange={(e) => setInquiryName(e.target.value)}
+                        placeholder="Sarah Jenkins"
+                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-medium text-foreground block">
+                        Email Address <span className="text-destructive">*</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={inquiryEmail}
+                        onChange={(e) => setInquiryEmail(e.target.value)}
+                        placeholder="sarah@example.com"
+                        className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                      />
+                    </div>
+                  </div>
 
-              <div>
-                <label className="text-xs font-medium text-foreground mb-1 block">Subject</label>
-                <input
-                  type="text"
-                  placeholder="e.g. Architecture Sprint / Advisory Role / Project Build"
-                  value={inquirySubject}
-                  onChange={(e) => setInquirySubject(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-hidden focus:border-primary transition-colors"
-                />
-              </div>
+                  <div className="space-y-1.5">
+                    <label className="text-xs font-medium text-foreground block">
+                      Message <span className="text-destructive">*</span>
+                    </label>
+                    <textarea
+                      required
+                      rows={5}
+                      value={inquiryMessage}
+                      onChange={(e) => setInquiryMessage(e.target.value)}
+                      placeholder="Tell me about your project, timeline, or engineering needs..."
+                      className="w-full px-4 py-2.5 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all resize-none"
+                    />
+                  </div>
 
-              <div>
-                <label className="text-xs font-medium text-foreground mb-1 block">Message *</label>
-                <textarea
-                  required
-                  rows={5}
-                  placeholder="Describe your project, objectives, tech stack, and timeline..."
-                  value={inquiryMessage}
-                  onChange={(e) => setInquiryMessage(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs text-foreground focus:outline-hidden focus:border-primary transition-colors resize-none leading-relaxed"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full py-3.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 hover:opacity-95 transition-opacity cursor-pointer flex items-center justify-center gap-2"
-              >
-                {isSubmitting ? (
-                  <span>Transmitting Dispatch...</span>
-                ) : (
-                  <>
-                    <span>Send Message</span>
-                    <Send className="w-3.5 h-3.5" />
-                  </>
-                )}
-              </button>
-            </form>
-          )}
-        </div>
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    type="submit"
+                    disabled={isSubmitting}
+                    className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-xs uppercase tracking-wider shadow-lg shadow-primary/25 hover:opacity-95 transition-opacity flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                  >
+                    {isSubmitting ? (
+                      <span className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 animate-spin" />
+                        <span>Sending Message...</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-2">
+                        <Send className="w-4 h-4" />
+                        <span>Send Direct Inquiry</span>
+                      </span>
+                    )}
+                  </motion.button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

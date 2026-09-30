@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
-import { ArrowLeft, Clock, Calendar, Share2 } from "lucide-react";
+import { ArrowLeft, Clock, Calendar, Share2, Terminal } from "lucide-react";
 import { toast } from "sonner";
 
 interface NovaBlogDetailViewProps {
@@ -25,6 +26,17 @@ export function NovaBlogDetailView({
     ? posts.find((p) => p.slug === subSlug || p._id === subSlug) || posts[0]
     : posts[0];
 
+  const { scrollYProgress: pageScrollProgress } = useScroll();
+  const smoothReadingProgress = useSpring(pageScrollProgress, { stiffness: 200, damping: 30 });
+
+  const coverRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: coverProgress } = useScroll({
+    target: coverRef,
+    offset: ["start end", "end start"],
+  });
+  const smoothCoverProgress = useSpring(coverProgress, { stiffness: 120, damping: 24, mass: 0.2 });
+  const coverY = useTransform(smoothCoverProgress, [0, 1], [-18, 18]);
+
   if (!selectedPost) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center font-mono space-y-4">
@@ -36,10 +48,24 @@ export function NovaBlogDetailView({
     );
   }
 
+  const currentIndex = posts.findIndex((p) => p._id === selectedPost._id);
+  const nextPost = currentIndex >= 0 && currentIndex < posts.length - 1 ? posts[currentIndex + 1] : posts[0];
+
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8 font-mono">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 py-12 space-y-8 font-mono relative">
+      {/* Top Cyan Reading Progress Bar */}
+      <motion.div
+        style={{ scaleX: smoothReadingProgress, transformOrigin: "0%" }}
+        className="fixed top-0 left-0 right-0 h-1 bg-cyan-400 shadow-sm shadow-cyan-400/50 z-50 pointer-events-none"
+      />
+
       {/* Top Navigation & Share */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-wrap items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4"
+      >
         <Link
           href={`/${portfolio.slug}/blog`}
           className="inline-flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
@@ -50,7 +76,9 @@ export function NovaBlogDetailView({
           <span className="text-cyan-700 dark:text-cyan-300">{selectedPost.slug || selectedPost._id}</span>
         </Link>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="button"
           onClick={() => {
             if (typeof window !== "undefined") {
@@ -62,11 +90,16 @@ export function NovaBlogDetailView({
         >
           <Share2 className="w-3.5 h-3.5" />
           <span>share_doc()</span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Document Frame */}
-      <div className="rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+        className="rounded-2xl bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 overflow-hidden shadow-2xl backdrop-blur-md"
+      >
         {/* Header Telemetry */}
         <div className="p-6 sm:p-8 space-y-4 border-b border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/40">
           <div className="flex flex-wrap items-center gap-3 text-xs">
@@ -111,14 +144,15 @@ export function NovaBlogDetailView({
           </div>
         </div>
 
-        {/* Cover Image Frame */}
+        {/* Cover Image Frame with Parallax */}
         {selectedPost.coverImageUrl && (
-          <div className="p-6 bg-slate-100 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800">
+          <div ref={coverRef} className="p-6 bg-slate-100 dark:bg-slate-950/70 border-b border-slate-200 dark:border-slate-800 overflow-hidden">
             <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
-              <img
+              <motion.img
+                style={{ y: coverY, scale: 1.05 }}
                 src={selectedPost.coverImageUrl}
                 alt={selectedPost.title}
-                className="w-full h-auto object-cover max-h-[450px]"
+                className="w-full h-auto object-cover max-h-[450px] transform-gpu will-change-transform"
               />
             </div>
           </div>
@@ -139,45 +173,41 @@ export function NovaBlogDetailView({
               {selectedPost.tags.map((tag) => (
                 <span
                   key={tag}
-                  className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-cyan-700 dark:text-cyan-400 text-xs font-mono font-semibold"
+                  className="px-2.5 py-1 rounded bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs text-cyan-700 dark:text-cyan-400 font-semibold"
                 >
-                  &quot;{tag}&quot;
+                  #{tag}
                 </span>
               ))}
             </div>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Related Whitepapers */}
-      {posts.filter((p) => p._id !== selectedPost._id).length > 0 && (
-        <div className="space-y-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-          <div className="flex justify-between items-center text-xs">
-            <span className="text-slate-500">$ cat /usr/share/related_docs.txt</span>
-            <Link href={`/${portfolio.slug}/blog`} className="text-cyan-600 dark:text-cyan-400 hover:underline">
-              all_whitepapers() &rarr;
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {posts
-              .filter((p) => p._id !== selectedPost._id)
-              .slice(0, 2)
-              .map((p) => (
-                <Link
-                  key={p._id}
-                  href={`/${portfolio.slug}/blog/${p.slug || p._id}`}
-                  className="p-4 rounded-xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/50 transition-colors block space-y-1 shadow-xs"
-                >
-                  <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-semibold">[{p.tags?.[0] || "SYS"}]</span>
-                  <h4 className="text-sm font-bold text-slate-900 dark:text-white hover:text-cyan-600 dark:hover:text-cyan-300">{p.title}</h4>
-                  <p className="text-xs text-slate-600 dark:text-slate-400 font-sans line-clamp-1">
-                    {p.excerpt || p.content.slice(0, 80)}
-                  </p>
-                </Link>
-              ))}
-          </div>
-        </div>
+      {/* Next Document Link */}
+      {nextPost && nextPost._id !== selectedPost._id && (
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="pt-2"
+        >
+          <Link
+            href={`/${portfolio.slug}/blog/${nextPost.slug || nextPost._id}`}
+            className="block p-5 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 hover:border-cyan-500/40 transition-colors group"
+          >
+            <span className="text-[10px] text-cyan-600 dark:text-cyan-400 font-bold block">
+              $ cat ../next_whitepaper &rarr;
+            </span>
+            <h4 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-cyan-600 dark:group-hover:text-cyan-400 transition-colors mt-1">
+              {nextPost.title}
+            </h4>
+            {nextPost.excerpt && (
+              <p className="text-xs text-slate-600 dark:text-slate-400 font-sans mt-1">
+                {nextPost.excerpt}
+              </p>
+            )}
+          </Link>
+        </motion.div>
       )}
     </div>
   );

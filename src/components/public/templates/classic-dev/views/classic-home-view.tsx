@@ -1,8 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
+import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { TechIcon } from "@/components/ui/tech-icon";
 import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/ui/icons";
@@ -42,6 +42,118 @@ const itemVariants: Variants = {
   },
 };
 
+function ClassicParallaxProjectCard({
+  project,
+  portfolioSlug,
+  index,
+}: {
+  project: any;
+  portfolioSlug: string;
+  index: number;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  const imgY = useTransform(smoothProgress, [0, 1], [-15, 15]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-40px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{ y: -6 }}
+      className="group relative rounded-3xl bg-card border border-border overflow-hidden hover:border-primary/40 transition-colors duration-300 shadow-sm hover:shadow-2xl flex flex-col justify-between"
+    >
+      <Link
+        href={`/${portfolioSlug}/projects/${project.slug || project._id}`}
+        className="aspect-16/10 w-full overflow-hidden bg-muted relative block group/img"
+      >
+        {project.thumbnailUrl ? (
+          <motion.img
+            style={{ y: imgY, scale: 1.08 }}
+            src={project.thumbnailUrl}
+            alt={project.title}
+            className="w-full h-full object-cover transition-transform duration-500 will-change-transform"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-muted to-primary/10 text-muted-foreground gap-2 p-4 text-center">
+            <div className="w-10 h-10 rounded-2xl bg-background/80 border border-border flex items-center justify-center shadow-xs">
+              <ArrowUpRight className="w-5 h-5 text-primary" />
+            </div>
+            <span className="text-[11px] font-mono opacity-70 font-medium">Case Study Preview</span>
+          </div>
+        )}
+        <div className="absolute top-3 right-3 z-10">
+          <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-medium bg-background/90 text-foreground backdrop-blur-md border border-border/80 shadow-xs">
+            {project.category || "Full-Stack"}
+          </span>
+        </div>
+      </Link>
+
+      <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col justify-between">
+        <div className="space-y-2">
+          <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+            <Link href={`/${portfolioSlug}/projects/${project.slug || project._id}`}>
+              {project.title}
+            </Link>
+          </h3>
+          <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
+            {project.summary}
+          </p>
+        </div>
+
+        <div className="space-y-4 pt-2">
+          <div className="flex flex-wrap gap-1.5">
+            {project.technologies.slice(0, 4).map((tech: string) => (
+              <motion.span
+                key={tech}
+                whileHover={{ scale: 1.05 }}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-muted text-muted-foreground"
+              >
+                <TechIcon name={tech} className="w-3 h-3 text-primary" />
+                <span>{tech}</span>
+              </motion.span>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
+            <Link
+              href={`/${portfolioSlug}/projects/${project.slug || project._id}`}
+              className="font-semibold text-primary hover:underline flex items-center gap-1"
+            >
+              <span>Inspect Case Study</span>
+              <ArrowUpRight className="w-3.5 h-3.5" />
+            </Link>
+
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+              >
+                <span>Live</span>
+                <ExternalLink className="w-3.5 h-3.5" />
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
   const { portfolio, profile, projects, experiences, skills, testimonials } = bundle;
 
@@ -55,14 +167,34 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
   const featuredProjects = projects.filter((p) => p.isFeatured).slice(0, 4);
   const displayProjects = featuredProjects.length > 0 ? featuredProjects : projects.slice(0, 4);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroY = useTransform(heroProgress, [0, 1], [0, 40]);
+  const heroOpacity = useTransform(heroProgress, [0, 0.8], [1, 0.2]);
+
+  const timelineRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: timelineProgress } = useScroll({
+    target: timelineRef,
+    offset: ["start 80%", "end 50%"],
+  });
+  const timelineScaleY = useSpring(timelineProgress, {
+    stiffness: 100,
+    damping: 30,
+    restDelta: 0.001,
+  });
+
   return (
     <div className="space-y-24 sm:space-y-32">
       {/* ─────────────────────────────────────────────────────────────
-          1. CLEAN CLASSIC CENTERED HERO
+          1. CLEAN CLASSIC CENTERED HERO WITH SCROLL PARALLAX
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-20 sm:pt-28 pb-8">
+      <section ref={heroRef} className="relative pt-20 sm:pt-28 pb-8">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <motion.div
+            style={{ y: heroY, opacity: heroOpacity }}
             variants={containerVariants}
             initial="hidden"
             animate="visible"
@@ -131,7 +263,7 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
       </section>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. FEATURED CASE STUDIES
+          2. FEATURED CASE STUDIES WITH INNER SCROLL PARALLAX
       ───────────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-8">
@@ -161,90 +293,12 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {displayProjects.map((project, idx) => (
-              <motion.div
+              <ClassicParallaxProjectCard
                 key={project._id}
-                initial={{ opacity: 0, y: 24 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                whileHover={{ y: -6 }}
-                className="group relative rounded-3xl bg-card border border-border overflow-hidden hover:border-primary/40 transition-colors duration-300 shadow-sm hover:shadow-2xl flex flex-col justify-between"
-              >
-                <Link
-                  href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
-                  className="aspect-16/10 w-full overflow-hidden bg-muted relative block group/img"
-                >
-                  {project.thumbnailUrl ? (
-                    <img
-                      src={project.thumbnailUrl}
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover/img:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-muted to-primary/10 text-muted-foreground gap-2 p-4 text-center">
-                      <div className="w-10 h-10 rounded-2xl bg-background/80 border border-border flex items-center justify-center shadow-xs">
-                        <ArrowUpRight className="w-5 h-5 text-primary" />
-                      </div>
-                      <span className="text-[11px] font-mono opacity-70 font-medium">Case Study Preview</span>
-                    </div>
-                  )}
-                  <div className="absolute top-3 right-3">
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-mono font-medium bg-background/90 text-foreground backdrop-blur-md border border-border/80 shadow-xs">
-                      {project.category || "Full-Stack"}
-                    </span>
-                  </div>
-                </Link>
-
-                <div className="p-6 sm:p-8 space-y-4 flex-1 flex flex-col justify-between">
-                  <div className="space-y-2">
-                    <h3 className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
-                      <Link href={`/${portfolio.slug}/projects/${project.slug || project._id}`}>
-                        {project.title}
-                      </Link>
-                    </h3>
-                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed line-clamp-2">
-                      {project.summary}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4 pt-2">
-                    <div className="flex flex-wrap gap-1.5">
-                      {project.technologies.slice(0, 4).map((tech) => (
-                        <motion.span
-                          key={tech}
-                          whileHover={{ scale: 1.05 }}
-                          className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-muted text-muted-foreground"
-                        >
-                          <TechIcon name={tech} className="w-3 h-3 text-primary" />
-                          <span>{tech}</span>
-                        </motion.span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-2 border-t border-border/50 text-xs">
-                      <Link
-                        href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
-                        className="font-semibold text-primary hover:underline flex items-center gap-1"
-                      >
-                        <span>Inspect Case Study</span>
-                        <ArrowUpRight className="w-3.5 h-3.5" />
-                      </Link>
-
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
-                        >
-                          <span>Live</span>
-                          <ExternalLink className="w-3.5 h-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                project={project}
+                portfolioSlug={portfolio.slug}
+                index={idx}
+              />
             ))}
           </div>
         </div>
@@ -255,8 +309,8 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
       ───────────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-          {/* Career Milestones */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Career Milestones with Scroll Progress Line */}
+          <div ref={timelineRef} className="lg:col-span-7 space-y-6">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -281,7 +335,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
               </Link>
             </motion.div>
 
-            <div className="relative pl-6 sm:pl-7 border-l-2 border-primary/20 space-y-8 ml-2 sm:ml-3">
+            <div className="relative pl-6 sm:pl-7 border-l-2 border-border/40 space-y-8 ml-2 sm:ml-3">
+              {/* Dynamic Animated Scroll Progress Line */}
+              <motion.div
+                style={{ scaleY: timelineScaleY, originY: 0 }}
+                className="absolute left-[-2px] top-0 bottom-0 w-0.5 bg-primary"
+              />
+
               {experiences.map((exp, idx) => {
                 const startFormatted = formatMonthYear(exp.startDate) || exp.startDate;
                 const endFormatted = exp.isCurrent ? "Present" : formatMonthYear(exp.endDate) || exp.endDate;
@@ -297,12 +357,12 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                   >
                     {/* Node Dot */}
                     {exp.isCurrent ? (
-                      <span className="absolute -left-[31px] sm:-left-[35px] top-1.5 flex h-3.5 w-3.5">
+                      <span className="absolute -left-[31px] sm:-left-[35px] top-1.5 flex h-3.5 w-3.5 z-10">
                         <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75" />
                         <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-primary border-2 border-background shadow-xs" />
                       </span>
                     ) : (
-                      <span className="absolute -left-[29px] sm:-left-[33px] top-2 w-2.5 h-2.5 rounded-full bg-muted-foreground/40 border-2 border-background ring-1 ring-border group-hover:bg-primary transition-colors" />
+                      <span className="absolute -left-[29px] sm:-left-[33px] top-2 w-2.5 h-2.5 rounded-full bg-muted-foreground/40 border-2 border-background ring-1 ring-border group-hover:bg-primary transition-colors z-10" />
                     )}
 
                     <motion.div

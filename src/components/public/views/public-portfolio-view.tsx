@@ -3,7 +3,8 @@
 import React from "react";
 import { usePublicPortfolio } from "@/hooks";
 import { TemplateDispatcher } from "@/components/public/templates/template-dispatcher";
-import { Lock, AlertCircle, ArrowLeft, Terminal } from "lucide-react";
+import { getStaticDemoBundle } from "@/lib/demo-data";
+import { Lock, ArrowLeft, Terminal } from "lucide-react";
 import Link from "next/link";
 
 export type PortfolioPageView =
@@ -20,16 +21,21 @@ interface PublicPortfolioViewProps {
   slug: string;
   view?: PortfolioPageView;
   subSlug?: string;
+  templateOverride?: string;
 }
 
 export function PublicPortfolioView({
   slug,
   view = "home",
   subSlug,
+  templateOverride,
 }: PublicPortfolioViewProps) {
-  const { data: bundle, isLoading, isError, error } = usePublicPortfolio(slug);
+  const { data: serverBundle, isLoading, isError, error } = usePublicPortfolio(slug, templateOverride);
 
-  if (isLoading) {
+  // Hybrid fallback: Check server data first, then static fallback
+  const bundle = serverBundle || getStaticDemoBundle(slug, templateOverride);
+
+  if (isLoading && !bundle) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4">
         <div className="max-w-md w-full text-center space-y-6">
@@ -52,7 +58,7 @@ export function PublicPortfolioView({
     );
   }
 
-  if (isError || !bundle) {
+  if (!bundle) {
     const errorMsg =
       (error as any)?.response?.data?.message ||
       "This developer portfolio could not be found or is currently private.";
@@ -82,7 +88,7 @@ export function PublicPortfolioView({
               <span>DevPortfolio SaaS</span>
             </Link>
             <Link
-              href="/admin/login"
+              href="/login"
               className="w-full sm:w-auto px-4 py-2.5 rounded-xl text-xs font-semibold bg-muted text-muted-foreground hover:text-foreground transition-colors"
             >
               Owner Login

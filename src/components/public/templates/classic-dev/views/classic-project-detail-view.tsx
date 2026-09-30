@@ -1,7 +1,8 @@
 "use client";
 
-import React from "react";
+import React, { useRef } from "react";
 import Link from "next/link";
+import { motion, useScroll, useTransform, useSpring } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { TechIcon } from "@/components/ui/tech-icon";
 import { ChromeSparkleIcon, GithubIcon } from "@/components/ui/icons";
@@ -11,7 +12,7 @@ import {
   ExternalLink,
   Share2,
   Sparkles,
-  Briefcase,
+  CheckCircle2,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -30,6 +31,14 @@ export function ClassicProjectDetailView({
     ? projects.find((p) => p.slug === subSlug || p._id === subSlug) || projects[0]
     : projects[0];
 
+  const heroImageRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: imageProgress } = useScroll({
+    target: heroImageRef,
+    offset: ["start end", "end start"],
+  });
+  const smoothImageProgress = useSpring(imageProgress, { stiffness: 120, damping: 24, mass: 0.2 });
+  const imageY = useTransform(smoothImageProgress, [0, 1], [-20, 20]);
+
   if (!selectedProject) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-4">
@@ -41,10 +50,18 @@ export function ClassicProjectDetailView({
     );
   }
 
+  const currentIndex = projects.findIndex((p) => p._id === selectedProject._id);
+  const nextProject = currentIndex >= 0 && currentIndex < projects.length - 1 ? projects[currentIndex + 1] : projects[0];
+
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-12">
       {/* Top Breadcrumb & Share */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-border/50 pb-4">
+      <motion.div
+        initial={{ opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="flex flex-wrap items-center justify-between gap-4 border-b border-border/50 pb-4"
+      >
         <Link
           href={`/${portfolio.slug}/projects`}
           className="inline-flex items-center gap-2 text-xs font-mono text-muted-foreground hover:text-primary transition-colors"
@@ -55,7 +72,9 @@ export function ClassicProjectDetailView({
           <span className="text-foreground">{selectedProject.title}</span>
         </Link>
 
-        <button
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
           type="button"
           onClick={() => {
             if (typeof window !== "undefined") {
@@ -67,11 +86,16 @@ export function ClassicProjectDetailView({
         >
           <Share2 className="w-3.5 h-3.5" />
           <span>Share Case Study</span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
 
       {/* Header Hero Banner */}
-      <div className="space-y-6">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.55 }}
+        className="space-y-6"
+      >
         <div className="flex flex-wrap items-center gap-2.5">
           <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-primary/10 text-primary border border-primary/20">
             {selectedProject.category}
@@ -97,7 +121,9 @@ export function ClassicProjectDetailView({
         {/* Action Buttons */}
         <div className="flex flex-wrap items-center gap-3 pt-2">
           {selectedProject.liveUrl && (
-            <a
+            <motion.a
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
               href={selectedProject.liveUrl}
               target="_blank"
               rel="noreferrer"
@@ -105,10 +131,12 @@ export function ClassicProjectDetailView({
             >
               <span>Launch Live Application</span>
               <ExternalLink className="w-3.5 h-3.5" />
-            </a>
+            </motion.a>
           )}
           {selectedProject.githubUrl && (
-            <a
+            <motion.a
+              whileHover={{ scale: 1.04, y: -2 }}
+              whileTap={{ scale: 0.97 }}
               href={selectedProject.githubUrl}
               target="_blank"
               rel="noreferrer"
@@ -116,192 +144,113 @@ export function ClassicProjectDetailView({
             >
               <GithubIcon className="w-4 h-4" />
               <span>View Source Code</span>
-            </a>
+            </motion.a>
           )}
         </div>
-      </div>
+      </motion.div>
 
-      {/* Featured Image */}
+      {/* Featured Image with Parallax */}
       {selectedProject.thumbnailUrl && (
-        <div className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-card">
+        <motion.div
+          ref={heroImageRef}
+          initial={{ opacity: 0, scale: 0.97 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6 }}
+          className="relative rounded-3xl overflow-hidden border border-border shadow-2xl bg-card"
+        >
           <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent z-10 pointer-events-none" />
-          <img
+          <motion.img
+            style={{ y: imageY, scale: 1.06 }}
             src={selectedProject.thumbnailUrl}
             alt={selectedProject.title}
-            className="w-full h-auto object-cover max-h-[550px]"
+            className="w-full h-auto object-cover max-h-[550px] transform-gpu will-change-transform"
           />
-        </div>
+        </motion.div>
       )}
 
       {/* Metrics Grid (if any) */}
       {selectedProject.metrics && selectedProject.metrics.length > 0 && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
           {selectedProject.metrics.map((m, idx) => (
-            <div key={idx} className="p-5 rounded-2xl bg-card border border-border space-y-1">
-              <span className="text-2xl sm:text-3xl font-black text-primary font-mono">{m.value}</span>
-              <p className="text-xs text-muted-foreground font-medium">{m.label}</p>
-            </div>
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 12 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.4, delay: idx * 0.05 }}
+              whileHover={{ y: -3 }}
+              className="p-5 rounded-2xl bg-card border border-border space-y-1 shadow-xs"
+            >
+              <span className="text-[11px] font-mono text-muted-foreground uppercase">{m.label}</span>
+              <span className="text-xl sm:text-2xl font-black text-primary block">{m.value}</span>
+            </motion.div>
           ))}
         </div>
       )}
 
-      {/* Main Content & Specs Grid */}
+      {/* Case Study Details Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left Column: Case Study Narrative */}
-        <div className="lg:col-span-8 space-y-8">
-          <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-6">
-            <h2 className="text-xl font-bold text-foreground flex items-center gap-2">
-              <Briefcase className="w-5 h-5 text-primary" />
-              <span>Architecture &amp; System Overview</span>
-            </h2>
-            <div className="prose dark:prose-invert max-w-none text-sm leading-relaxed space-y-4 text-muted-foreground">
-              <p className="whitespace-pre-line">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="lg:col-span-8 space-y-8"
+        >
+          <div className="space-y-4">
+            <h2 className="text-xl font-bold text-foreground">Project Overview</h2>
+            <div className="prose dark:prose-invert max-w-none text-sm sm:text-base leading-relaxed space-y-4 text-foreground/90">
+              <p className="whitespace-pre-line leading-relaxed">
                 {selectedProject.caseStudy || selectedProject.summary}
               </p>
             </div>
           </div>
+        </motion.div>
 
-          {/* Engineering Highlights */}
-          <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-4">
-            <h3 className="text-base font-bold text-foreground">Key Technical Highlights</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="p-4 rounded-2xl bg-background border border-border space-y-1.5">
-                <span className="text-xs font-bold text-foreground">High Availability</span>
-                <p className="text-xs text-muted-foreground">
-                  Engineered for zero-downtime deployments with automated health checks and failover redundancy.
-                </p>
-              </div>
-              <div className="p-4 rounded-2xl bg-background border border-border space-y-1.5">
-                <span className="text-xs font-bold text-foreground">Optimized Performance</span>
-                <p className="text-xs text-muted-foreground">
-                  Sub-100ms API response latency and 95+ Google Lighthouse scores across all critical paths.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {/* Gallery Showcase */}
-          {selectedProject.galleryImages && selectedProject.galleryImages.length > 0 && (
-            <div className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-6">
-              <div className="space-y-1">
-                <span className="text-xs font-mono text-primary uppercase tracking-wider font-semibold">
-                  Visual Showcase
-                </span>
-                <h3 className="text-lg font-bold text-foreground">Interface &amp; System Gallery</h3>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {selectedProject.galleryImages.map((img, idx) => (
-                  <div
-                    key={idx}
-                    className="group relative rounded-2xl overflow-hidden border border-border bg-muted/40 aspect-16/10 shadow-xs hover:border-primary/40 transition-colors"
-                  >
-                    <img
-                      src={img.url}
-                      alt={`${selectedProject.title} preview ${idx + 1}`}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Right Column: Metadata Sidebar */}
-        <div className="lg:col-span-4 space-y-6">
-          <div className="p-6 rounded-3xl bg-card border border-border space-y-6 sticky top-24">
-            <h3 className="text-xs font-mono uppercase text-muted-foreground tracking-widest">
-              Project Specifications
-            </h3>
-
-            <div className="space-y-4 text-xs divide-y divide-border/60">
-              <div className="pt-2">
-                <span className="text-muted-foreground block text-[11px] mb-1">Stack &amp; Technologies</span>
-                <div className="flex flex-wrap gap-1.5">
-                  {selectedProject.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-muted text-foreground border border-border/50"
-                    >
-                      <TechIcon name={tech} className="w-3 h-3 text-primary" />
-                      <span>{tech}</span>
-                    </span>
-                  ))}
-                </div>
-              </div>
-
-              <div className="pt-3">
-                <span className="text-muted-foreground block text-[11px] mb-0.5">Category</span>
-                <span className="font-semibold text-foreground">{selectedProject.category}</span>
-              </div>
-
-              <div className="pt-3">
-                <span className="text-muted-foreground block text-[11px] mb-0.5">Deployment Target</span>
-                <span className="font-semibold text-foreground">Production Cloud</span>
-              </div>
-
-              <div className="pt-3">
-                <span className="text-muted-foreground block text-[11px] mb-0.5">Status</span>
-                <span className="inline-flex items-center gap-1.5 text-emerald-600 dark:text-emerald-400 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                  Active &amp; Deployed
-                </span>
-              </div>
-            </div>
-
-            {/* Consultation CTA */}
-            <div className="p-4 rounded-2xl bg-primary/5 border border-primary/20 space-y-3">
-              <span className="text-xs font-bold text-foreground block">
-                Want to build something like this?
-              </span>
-              <p className="text-[11px] text-muted-foreground">
-                Let&apos;s collaborate on your next mission-critical architecture.
-              </p>
-              <Link
-                href={`/${portfolio.slug}/contact`}
-                className="block text-center py-2 px-3 rounded-xl bg-primary text-primary-foreground font-semibold text-xs shadow-sm hover:opacity-95 transition-opacity"
-              >
-                Inquire Directly
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Related Projects Section */}
-      {projects.filter((p) => p._id !== selectedProject._id).length > 0 && (
-        <div className="space-y-6 pt-12 border-t border-border/50">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-foreground">Explore Other Works</h3>
-            <Link
-              href={`/${portfolio.slug}/projects`}
-              className="text-xs font-mono text-primary hover:underline"
-            >
-              View All &rarr;
-            </Link>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            {projects
-              .filter((p) => p._id !== selectedProject._id)
-              .slice(0, 2)
-              .map((p) => (
-                <Link
-                  key={p._id}
-                  href={`/${portfolio.slug}/projects/${p.slug || p._id}`}
-                  className="group block p-6 rounded-3xl bg-card border border-border hover:border-primary/40 transition-all shadow-sm hover:shadow-md"
+        {/* Right Rail: Technologies & Details */}
+        <motion.div
+          initial={{ opacity: 0, x: 20 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="lg:col-span-4 space-y-6"
+        >
+          <div className="p-6 rounded-3xl bg-card border border-border space-y-4">
+            <span className="text-xs font-mono font-semibold uppercase tracking-wider text-muted-foreground block">
+              Core Technologies
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {selectedProject.technologies.map((tech) => (
+                <motion.span
+                  key={tech}
+                  whileHover={{ scale: 1.05 }}
+                  className="px-3 py-1.5 rounded-xl bg-background border border-border text-xs font-medium text-foreground shadow-xs cursor-default"
                 >
-                  <span className="text-[10px] font-mono text-primary uppercase">{p.category}</span>
-                  <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-1">
-                    {p.title}
-                  </h4>
-                  <p className="text-xs text-muted-foreground line-clamp-2 mt-1.5">{p.summary}</p>
-                </Link>
+                  {tech}
+                </motion.span>
               ))}
+            </div>
           </div>
-        </div>
-      )}
+
+          {/* Next Project Bridge */}
+          {nextProject && nextProject._id !== selectedProject._id && (
+            <Link
+              href={`/${portfolio.slug}/projects/${nextProject.slug || nextProject._id}`}
+              className="block p-5 rounded-3xl bg-primary/5 border border-primary/20 hover:border-primary/40 transition-colors group"
+            >
+              <span className="text-[10px] font-mono font-bold uppercase text-primary tracking-wider block">
+                Next Case Study &rarr;
+              </span>
+              <h4 className="text-base font-bold text-foreground group-hover:text-primary transition-colors mt-1">
+                {nextProject.title}
+              </h4>
+              <p className="text-xs text-muted-foreground line-clamp-2 mt-1">
+                {nextProject.summary}
+              </p>
+            </Link>
+          )}
+        </motion.div>
+      </div>
     </div>
   );
 }

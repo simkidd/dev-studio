@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useState, useRef } from "react";
 import Link from "next/link";
-import { motion, type Variants } from "framer-motion";
-import { IPublicPortfolioBundle } from "@/interfaces";
+import { motion, useScroll, useTransform, useSpring, type Variants } from "framer-motion";
+import { IPublicPortfolioBundle, IProject } from "@/interfaces";
 import {
   ArrowRight,
   ChevronRight,
@@ -12,6 +12,10 @@ import {
   ShieldCheck,
   CornerDownRight,
   ArrowUpRight,
+  Terminal,
+  Cpu,
+  Activity,
+  Zap,
 } from "lucide-react";
 
 interface NovaHomeViewProps {
@@ -41,8 +45,121 @@ const cyberItem: Variants = {
   },
 };
 
+function NovaParallaxProjectCard({
+  project,
+  portfolioSlug,
+  index,
+}: {
+  project: IProject;
+  portfolioSlug: string;
+  index: number;
+}) {
+  const cardRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: cardRef,
+    offset: ["start end", "end start"],
+  });
+
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 120,
+    damping: 24,
+    restDelta: 0.001,
+  });
+
+  const imgY = useTransform(smoothProgress, [0, 1], [-14, 14]);
+
+  return (
+    <motion.div
+      ref={cardRef}
+      initial={{ opacity: 0, y: 24 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-30px" }}
+      transition={{ duration: 0.5, delay: index * 0.1 }}
+      whileHover={{ y: -6 }}
+      className="group rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-500/40 transition-all flex flex-col justify-between shadow-xs hover:shadow-xl hover:shadow-cyan-500/5"
+    >
+      <Link
+        href={`/${portfolioSlug}/projects/${project.slug || project._id}`}
+        className="aspect-16/10 w-full overflow-hidden bg-slate-950 relative border-b border-slate-200 dark:border-slate-800 block"
+      >
+        {project.thumbnailUrl ? (
+          <motion.img
+            style={{ y: imgY, scale: 1.08 }}
+            src={project.thumbnailUrl}
+            alt={project.title}
+            className="w-full h-full object-cover transition-transform duration-500 will-change-transform"
+          />
+        ) : (
+          <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 dark:text-slate-500 font-mono text-xs gap-2">
+            <Code2 className="w-6 h-6 opacity-40" />
+            <span>[NO_TELEMETRY_PREVIEW]</span>
+          </div>
+        )}
+        <span className="absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-950/80 text-cyan-400 border border-cyan-500/30 backdrop-blur-md z-10">
+          {project.category || "Full-Stack"}
+        </span>
+      </Link>
+
+      <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
+        <div className="space-y-2 font-mono">
+          <div className="flex items-center justify-between text-[11px] text-cyan-600 dark:text-cyan-400">
+            <span>[{project.category || "ENGINEERING"}]</span>
+            <span>v1.0</span>
+          </div>
+          <h3 className="text-base font-bold text-slate-900 dark:text-white font-mono">
+            <Link
+              href={`/${portfolioSlug}/projects/${project.slug || project._id}`}
+              className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
+            >
+              {project.title}
+            </Link>
+          </h3>
+          <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed line-clamp-2">
+            {project.summary}
+          </p>
+        </div>
+
+        <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800 font-mono text-xs">
+          <div className="flex flex-wrap gap-1">
+            {project.technologies.slice(0, 3).map((t) => (
+              <span
+                key={t}
+                className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 text-[10px] border border-slate-200 dark:border-slate-800"
+              >
+                {t}
+              </span>
+            ))}
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
+            <Link
+              href={`/${portfolioSlug}/projects/${project.slug || project._id}`}
+              className="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-semibold text-xs"
+            >
+              <span>inspect()</span>
+              <ChevronRight className="w-3.5 h-3.5" />
+            </Link>
+            {project.liveUrl && (
+              <a
+                href={project.liveUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 text-xs"
+              >
+                <ExternalLink className="w-3.5 h-3.5" />
+                <span>live</span>
+              </a>
+            )}
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 export function NovaHomeView({ bundle }: NovaHomeViewProps) {
   const { portfolio, profile, projects, testimonials } = bundle;
+  const [terminalLog, setTerminalLog] = useState<string | null>(null);
 
   const firstName = profile?.firstName || "Operator";
   const lastName = profile?.lastName || "";
@@ -53,27 +170,60 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
   const isAvailable = profile?.isAvailableForHire ?? true;
   const featuredProjects = projects.slice(0, 3);
 
+  const heroRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: heroProgress } = useScroll({
+    target: heroRef,
+    offset: ["start start", "end start"],
+  });
+  const heroX = useTransform(heroProgress, [0, 1], [0, -20]);
+  const heroOpacity = useTransform(heroProgress, [0, 0.85], [1, 0.2]);
+
+  const handleRunDiagnostics = () => {
+    setTerminalLog("Running node telemetry check... [CPU: OK] [MEM: 24%] [SERVICES: 100% HEALTHY]");
+    setTimeout(() => {
+      setTerminalLog(null);
+    }, 4000);
+  };
+
   return (
     <div className="space-y-24 py-12 sm:py-16">
       {/* ─────────────────────────────────────────────────────────────
           1. UNBOXED HERO: CYBERNETIC COMMAND STATION
       ───────────────────────────────────────────────────────────── */}
-      <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10 font-mono">
+      <section ref={heroRef} className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10 font-mono">
         <motion.div
+          style={{ x: heroX, opacity: heroOpacity }}
           variants={cyberContainer}
           initial="hidden"
           animate="visible"
           className="space-y-8"
         >
           {/* Terminal Header Prompt */}
-          <motion.div variants={cyberItem} className="flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 font-semibold font-mono">
+          <motion.div variants={cyberItem} className="flex flex-wrap items-center gap-2 text-xs text-cyan-600 dark:text-cyan-400 font-semibold font-mono">
             <span>$ init --operator=&quot;{brandName}&quot; --status={isAvailable ? "ready" : "busy"}</span>
             <motion.span
               animate={{ opacity: [1, 0, 1] }}
               transition={{ repeat: Infinity, duration: 0.8 }}
               className="inline-block w-2 h-3.5 bg-cyan-500 ml-0.5 translate-y-0.5"
             />
+            <button
+              onClick={handleRunDiagnostics}
+              className="ml-auto text-[10px] px-2.5 py-0.5 rounded bg-cyan-500/10 border border-cyan-500/30 text-cyan-500 hover:bg-cyan-500/20 transition-colors cursor-pointer"
+            >
+              run_diag()
+            </button>
           </motion.div>
+
+          {terminalLog && (
+            <motion.div
+              initial={{ opacity: 0, y: -6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0 }}
+              className="p-3 rounded-lg bg-cyan-950/30 border border-cyan-500/40 text-cyan-300 text-xs font-mono"
+            >
+              {terminalLog}
+            </motion.div>
+          )}
 
           {/* Expansive Display Typography */}
           <div className="space-y-6 max-w-5xl">
@@ -124,10 +274,33 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
               </Link>
             </motion.div>
           </motion.div>
+
+          {/* Real-Time Telemetry HUD Bar */}
+          <motion.div
+            variants={cyberItem}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 border-t border-slate-200 dark:border-slate-800/80 text-xs"
+          >
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] text-slate-500 block">SYSTEM_STATUS</span>
+              <span className="font-bold text-emerald-500">OPERATIONAL</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] text-slate-500 block">PUBLIC_BUILDS</span>
+              <span className="font-bold text-foreground">{projects.length} Repositories</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] text-slate-500 block">AVAILABILITY</span>
+              <span className="font-bold text-cyan-500">{isAvailable ? "Open for Comm" : "Engaged"}</span>
+            </div>
+            <div className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800">
+              <span className="text-[10px] text-slate-500 block">CORE_PROTOCOL</span>
+              <span className="font-bold text-foreground">HTTPS / Edge</span>
+            </div>
+          </motion.div>
         </motion.div>
       </section>
 
-      {/* FEATURED REPOSITORIES / SHOWCASE */}
+      {/* FEATURED REPOSITORIES / SHOWCASE WITH SCROLL PARALLAX */}
       {featuredProjects.length > 0 && (
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 font-mono">
           <motion.div
@@ -154,90 +327,12 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
             {featuredProjects.map((project, idx) => (
-              <motion.div
+              <NovaParallaxProjectCard
                 key={project._id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-30px" }}
-                transition={{ duration: 0.5, delay: idx * 0.1 }}
-                whileHover={{ y: -6 }}
-                className="group rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-500/40 transition-all flex flex-col justify-between shadow-xs hover:shadow-xl hover:shadow-cyan-500/5"
-              >
-                <Link
-                  href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
-                  className="aspect-16/10 w-full overflow-hidden bg-slate-950 relative border-b border-slate-200 dark:border-slate-800 block"
-                >
-                  {project.thumbnailUrl ? (
-                    <img
-                      src={project.thumbnailUrl}
-                      alt={project.title}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex flex-col items-center justify-center text-slate-600 dark:text-slate-500 font-mono text-xs gap-2">
-                      <Code2 className="w-6 h-6 opacity-40" />
-                      <span>[NO_TELEMETRY_PREVIEW]</span>
-                    </div>
-                  )}
-                  <span className="absolute top-3 right-3 px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-slate-950/80 text-cyan-400 border border-cyan-500/30 backdrop-blur-md">
-                    {project.category || "Full-Stack"}
-                  </span>
-                </Link>
-
-                <div className="p-6 space-y-4 flex-1 flex flex-col justify-between">
-                  <div className="space-y-2 font-mono">
-                    <div className="flex items-center justify-between text-[11px] text-cyan-600 dark:text-cyan-400">
-                      <span>[{project.category || "ENGINEERING"}]</span>
-                      <span>v1.0</span>
-                    </div>
-                    <h3 className="text-base font-bold text-slate-900 dark:text-white font-mono">
-                      <Link
-                        href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
-                        className="hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors"
-                      >
-                        {project.title}
-                      </Link>
-                    </h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 font-sans leading-relaxed line-clamp-2">
-                      {project.summary}
-                    </p>
-                  </div>
-
-                  <div className="space-y-3 pt-2 border-t border-slate-100 dark:border-slate-800 font-mono text-xs">
-                    <div className="flex flex-wrap gap-1">
-                      {project.technologies.slice(0, 3).map((t) => (
-                        <span
-                          key={t}
-                          className="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-950 text-slate-700 dark:text-slate-300 text-[10px] border border-slate-200 dark:border-slate-800"
-                        >
-                          {t}
-                        </span>
-                      ))}
-                    </div>
-
-                    <div className="flex items-center justify-between pt-1">
-                      <Link
-                        href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
-                        className="text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1 font-semibold text-xs"
-                      >
-                        <span>inspect()</span>
-                        <ChevronRight className="w-3.5 h-3.5" />
-                      </Link>
-                      {project.liveUrl && (
-                        <a
-                          href={project.liveUrl}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white flex items-center gap-1 text-xs"
-                        >
-                          <ExternalLink className="w-3.5 h-3.5" />
-                          <span>live</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
+                project={project}
+                portfolioSlug={portfolio.slug}
+                index={idx}
+              />
             ))}
           </div>
         </section>
