@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { TechIcon } from "@/components/ui/tech-icon";
 import { ArrowUpRight, FileText } from "lucide-react";
@@ -11,7 +12,7 @@ interface ApexAboutViewProps {
 }
 
 export function ApexAboutView({ bundle }: ApexAboutViewProps) {
-  const { profile, testimonials, experiences, skills } = bundle;
+  const { profile, experiences, skills } = bundle;
 
   const firstName = profile?.firstName || "Developer";
   const lastName = profile?.lastName || "";
@@ -175,33 +176,6 @@ export function ApexAboutView({ bundle }: ApexAboutViewProps) {
                 </div>
               );
             })}
-          </div>
-        </div>
-      )}
-
-      {/* Endorsements */}
-      {testimonials && testimonials.length > 0 && (
-        <div className="space-y-8 border-t border-stone-200 dark:border-white/10 pt-16">
-          <div className="space-y-1">
-            <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
-              Endorsements
-            </span>
-            <h2 className="text-3xl font-extrabold uppercase tracking-tight text-stone-900 dark:text-white">
-              Client Testimonials
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {testimonials.map((t) => (
-              <div
-                key={t._id}
-                className="p-8 rounded-3xl bg-white dark:bg-white/5 border border-stone-200 dark:border-white/10 space-y-4 shadow-xs"
-              >
-                <p className="text-sm italic text-stone-700 dark:text-white/80">&ldquo;{t.quote}&rdquo;</p>
-                <div className="text-xs font-bold text-amber-600 dark:text-amber-400">
-                  {t.clientName} &bull; {t.company}
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       )}

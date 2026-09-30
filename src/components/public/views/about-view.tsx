@@ -7,7 +7,6 @@ import {
   useProfile,
   useExperiences,
   useSkills,
-  useTestimonials,
 } from "@/hooks";
 import { IExperience } from "@/interfaces";
 import {
@@ -35,7 +34,6 @@ export function AboutView() {
   const { data: profile } = useProfile();
   const { data: experiences = [] } = useExperiences();
   const { data: skills = [] } = useSkills();
-  const { data: testimonials = [] } = useTestimonials();
 
   const firstName = profile?.firstName || "Developer";
   const lastName = profile?.lastName || "Portfolio";

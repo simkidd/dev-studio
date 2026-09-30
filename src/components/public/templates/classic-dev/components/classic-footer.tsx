@@ -10,7 +10,7 @@ import {
   YoutubeIcon,
   DiscordIcon,
 } from "@/components/ui/icons";
-import { MapPin, Mail, ArrowUp } from "lucide-react";
+import { MapPin, Mail, Phone, ArrowUp } from "lucide-react";
 
 interface ClassicFooterProps {
   bundle: IPublicPortfolioBundle;
@@ -26,7 +26,8 @@ export function ClassicFooter({ bundle }: ClassicFooterProps) {
   const headline = profile?.headline || "Full-Stack Engineer & Systems Architect";
   const location = profile?.location || "Remote";
   const isAvailable = profile?.isAvailableForHire ?? true;
-  const email = profile?.socialLinks?.email || "contact@portfolio.dev";
+  const email = profile?.contactEmail || profile?.socialLinks?.email || "contact@portfolio.dev";
+  const phone = profile?.contactPhone || profile?.socialLinks?.phone;
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -119,13 +120,25 @@ export function ClassicFooter({ bundle }: ClassicFooterProps) {
             <h4 className="text-xs font-semibold uppercase tracking-wider text-foreground">
               Direct Contact
             </h4>
-            <a
-              href={`mailto:${email}`}
-              className="inline-flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-            >
-              <Mail className="w-3.5 h-3.5 text-primary" />
-              <span>{email}</span>
-            </a>
+            <div className="space-y-2">
+              <a
+                href={`mailto:${email}`}
+                className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                <Mail className="w-3.5 h-3.5 text-primary shrink-0" />
+                <span className="truncate">{email}</span>
+              </a>
+
+              {phone && (
+                <a
+                  href={`tel:${phone}`}
+                  className="flex items-center gap-2 text-xs text-muted-foreground hover:text-primary transition-colors"
+                >
+                  <Phone className="w-3.5 h-3.5 text-primary shrink-0" />
+                  <span>{phone}</span>
+                </a>
+              )}
+            </div>
 
             <div className="flex items-center gap-2 pt-2">
               {profile?.socialLinks?.github && (

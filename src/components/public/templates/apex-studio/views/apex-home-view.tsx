@@ -3,13 +3,14 @@
 import React from "react";
 import Link from "next/link";
 import { IPublicPortfolioBundle } from "@/interfaces";
+import { ArrowUpRight } from "lucide-react";
 
 interface ApexHomeViewProps {
   bundle: IPublicPortfolioBundle;
 }
 
 export function ApexHomeView({ bundle }: ApexHomeViewProps) {
-  const { portfolio, profile, projects } = bundle;
+  const { portfolio, profile, projects, testimonials } = bundle;
 
   const headline = profile?.headline || "Creative Technologist & Interface Architect";
   const bio = profile?.bio || "Crafting tactile digital experiences, bespoke interactive systems, and spatial interfaces.";
@@ -115,6 +116,88 @@ export function ApexHomeView({ bundle }: ApexHomeViewProps) {
           ))}
         </div>
       </section>
+
+      {/* TESTIMONIALS & ENDORSEMENTS */}
+      {testimonials && testimonials.length > 0 && (
+        <section className="px-6 lg:px-12 max-w-7xl mx-auto space-y-12">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-stone-200 dark:border-white/10 pb-6">
+            <div className="space-y-2">
+              <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
+                Critical Endorsements
+              </span>
+              <h2 className="text-3xl sm:text-5xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
+                Client &amp; Peer Perspectives
+              </h2>
+            </div>
+            <Link
+              href={`/${portfolio.slug}/about`}
+              className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase hover:underline font-semibold"
+            >
+              All Feedback &rarr;
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {testimonials.map((t, idx) => {
+              const projRef = typeof t.projectRef === "object" && t.projectRef ? t.projectRef : null;
+              const indexFormatted = String(idx + 1).padStart(2, "0");
+
+              return (
+                <div
+                  key={t._id}
+                  className="p-8 sm:p-10 rounded-3xl bg-stone-50 dark:bg-white/5 border border-stone-200 dark:border-white/10 space-y-6 flex flex-col justify-between relative group hover:border-amber-500/40 transition-all shadow-xs"
+                >
+                  <div className="space-y-4 relative">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-mono text-amber-600 dark:text-amber-400 font-bold tracking-widest">
+                        {indexFormatted} // VERIFIED AUDIT
+                      </span>
+                      {t.linkedInUrl && (
+                        <a
+                          href={t.linkedInUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-stone-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+                          aria-label="LinkedIn"
+                        >
+                          <ArrowUpRight className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+
+                    <p className="text-base sm:text-lg font-light leading-relaxed text-stone-800 dark:text-stone-200 font-serif italic">
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-6 border-t border-stone-200 dark:border-white/10">
+                    <div>
+                      <h4 className="text-sm font-black uppercase tracking-wider text-stone-900 dark:text-white">
+                        {t.clientName}
+                      </h4>
+                      <p className="text-xs font-mono uppercase text-amber-600 dark:text-amber-400 font-semibold pt-0.5">
+                        {t.clientRole} {t.company ? `— ${t.company}` : ""}
+                      </p>
+                    </div>
+
+                    {projRef && (
+                      <div className="pt-1">
+                        <Link
+                          href={`/${portfolio.slug}/projects/${projRef.slug || projRef._id}`}
+                          className="inline-flex items-center gap-1.5 text-xs font-mono uppercase font-semibold text-stone-600 dark:text-stone-400 hover:text-amber-600 dark:hover:text-amber-400 transition-colors"
+                        >
+                          <span>Commissioned for: {projRef.title}</span>
+                          <ArrowUpRight className="w-3.5 h-3.5 text-amber-600 dark:text-amber-400" />
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
     </div>
   );
 }

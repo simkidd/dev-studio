@@ -299,37 +299,106 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
           4. TESTIMONIALS (IF ANY)
       ───────────────────────────────────────────────────────────── */}
       {testimonials.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            <div className="space-y-1 text-center max-w-2xl mx-auto">
-              <span className="text-xs font-mono text-primary font-semibold uppercase tracking-wider">
-                Endorsements
-              </span>
-              <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground">
-                Client &amp; Colleague Feedback
-              </h2>
-            </div>
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="space-y-2 text-center max-w-2xl mx-auto">
+            <span className="text-xs font-mono text-primary font-semibold uppercase tracking-widest">
+              Social Proof &amp; Endorsements
+            </span>
+            <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight text-foreground">
+              Peer &amp; Leadership Endorsements
+            </h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">
+              Direct recommendations and verified feedback from engineering leaders, product managers, and clients.
+            </p>
+          </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {testimonials.map((t) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {testimonials.map((t) => {
+              const projRef = typeof t.projectRef === "object" && t.projectRef ? t.projectRef : null;
+              const initials = t.clientName
+                .split(" ")
+                .map((n) => n[0])
+                .join("")
+                .substring(0, 2)
+                .toUpperCase();
+
+              return (
                 <div
                   key={t._id}
-                  className="p-6 sm:p-8 rounded-3xl bg-card border border-border space-y-4 flex flex-col justify-between shadow-xs"
+                  className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 hover:border-primary/40 transition-all shadow-xs hover:shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden group"
                 >
-                  <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed italic">
-                    &ldquo;{t.quote}&rdquo;
-                  </p>
-                  <div className="flex items-center gap-3 pt-2 border-t border-border/50">
-                    <div>
-                      <h4 className="text-xs font-bold text-foreground">{t.clientName}</h4>
-                      <p className="text-[11px] text-muted-foreground">
-                        {t.clientRole} {t.company ? `@ ${t.company}` : ""}
-                      </p>
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between text-muted-foreground">
+                      <div className="w-9 h-9 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shadow-xs">
+                        <Quote className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-muted border border-border/60 text-muted-foreground">
+                        Verified Review
+                      </span>
                     </div>
+
+                    <p className="text-xs sm:text-sm text-foreground/90 leading-relaxed italic">
+                      &ldquo;{t.quote}&rdquo;
+                    </p>
+                  </div>
+
+                  <div className="space-y-3 pt-4 border-t border-border/60">
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-linear-to-tr from-primary to-indigo-600 flex items-center justify-center text-white font-mono text-xs font-bold shadow-xs">
+                          {initials}
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="text-xs sm:text-sm font-bold text-foreground">
+                              {t.clientName}
+                            </h4>
+                            {t.linkedInUrl && (
+                              <a
+                                href={t.linkedInUrl}
+                                target="_blank"
+                                rel="noreferrer"
+                                className="text-muted-foreground hover:text-primary transition-colors"
+                                aria-label="LinkedIn"
+                              >
+                                <ExternalLink className="w-3 h-3" />
+                              </a>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-muted-foreground">
+                            {t.clientRole} {t.company ? `@ ${t.company}` : ""}
+                          </p>
+                        </div>
+                      </div>
+
+                      {t.companyUrl && (
+                        <a
+                          href={t.companyUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-[11px] font-mono text-primary hover:underline flex items-center gap-1 hidden sm:flex"
+                        >
+                          <span>{t.company}</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    {projRef && (
+                      <div className="pt-1">
+                        <Link
+                          href={`/${portfolio.slug}/projects/${projRef.slug || projRef._id}`}
+                          className="inline-flex items-center gap-1.5 text-[11px] font-mono text-primary bg-primary/5 hover:bg-primary/10 border border-primary/20 px-2.5 py-1 rounded-lg transition-colors"
+                        >
+                          <span>Case study: {projRef.title}</span>
+                          <ArrowUpRight className="w-3 h-3" />
+                        </Link>
+                      </div>
+                    )}
                   </div>
                 </div>
-              ))}
-            </div>
+              );
+            })}
           </div>
         </section>
       )}
