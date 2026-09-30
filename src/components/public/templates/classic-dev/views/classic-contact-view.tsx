@@ -84,13 +84,13 @@ export function ClassicContactView({ bundle }: ClassicContactViewProps) {
       {/* Header */}
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
-          Inquire &amp; Collaborate
+          Contact
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          Direct Consultation Gateway
+          Get in Touch
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Have a project, advisory inquiry, or technical challenge in mind? Send a direct message or reach out through my direct contact channels.
+          Have a project in mind, an opportunity, or want to say hello? Send a message below or reach out directly.
         </p>
       </div>
 

@@ -22,13 +22,13 @@ export function NovaAboutView({ bundle }: NovaAboutViewProps) {
       {/* Top Standalone Page Header */}
       <div className="space-y-2 max-w-3xl">
         <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">
-          $ cat /etc/profile.nfo
+          $ whoami --verbose
         </span>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-          Operator Dossier
+          About Me
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-          Deep background, system specifications, career milestones, and core competencies for {fullName}.
+          Background, experience, and core technical stack for {fullName}.
         </p>
       </div>
 

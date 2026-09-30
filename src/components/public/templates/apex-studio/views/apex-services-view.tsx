@@ -15,13 +15,13 @@ export function ApexServicesView({ bundle }: ApexServicesViewProps) {
     <div className="max-w-5xl mx-auto px-6 lg:px-12 py-16 space-y-12">
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
-          Studio Capabilities
+          Services
         </span>
         <h1 className="text-4xl sm:text-7xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
-          Bespoke Offerings
+          Capabilities
         </h1>
         <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 font-light leading-relaxed">
-          Comprehensive creative direction, bespoke interactive engineering, and high-performance frontend systems.
+          Full-stack web engineering, design systems, and frontend architecture.
         </p>
       </div>
 

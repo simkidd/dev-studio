@@ -13,16 +13,16 @@ export function ClassicBlogView({ bundle }: ClassicBlogViewProps) {
   const { portfolio, posts } = bundle;
 
   return (
-    <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-10">
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
-          Writing &amp; Perspectives
+          Writing
         </span>
         <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-          Technical Articles &amp; Insights
+          Articles &amp; Thoughts
         </h1>
         <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-          Deep-dives into systems engineering, frontend architecture, and developer productivity.
+          Thoughts on software engineering, web performance, and modern technology.
         </p>
       </div>
 

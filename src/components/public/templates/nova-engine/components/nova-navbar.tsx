@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { Terminal, Menu, X, ArrowRight } from "lucide-react";
@@ -35,9 +36,12 @@ export function NovaNavbar({ bundle, view = "home" }: NovaNavbarProps) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-14 flex items-center justify-between font-mono text-xs">
         {/* Brand / Daemon ID */}
         <Link href={`/${portfolio.slug}`} className="flex items-center gap-2.5 group shrink-0">
-          <div className="w-6 h-6 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:bg-cyan-500/20 transition-colors">
+          <motion.div
+            whileHover={{ scale: 1.1, rotate: 5 }}
+            className="w-6 h-6 rounded bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-600 dark:text-cyan-400 group-hover:bg-cyan-500/20 transition-colors"
+          >
             <Terminal className="w-3.5 h-3.5" />
-          </div>
+          </motion.div>
           <div className="flex items-center gap-2">
             <span className="font-bold text-cyan-600 dark:text-cyan-400 tracking-wider">NOVA-OS</span>
             <span className="text-slate-400 dark:text-slate-500">::</span>
@@ -48,7 +52,7 @@ export function NovaNavbar({ bundle, view = "home" }: NovaNavbarProps) {
         </Link>
 
         {/* Desktop Telemetry Nav */}
-        <nav className="hidden md:flex items-center gap-5 text-[11px] font-mono tracking-wider">
+        <nav className="hidden md:flex items-center gap-2 text-[11px] font-mono tracking-wider relative">
           {navLinks.map((link) => {
             const isActive =
               link.href === `/${portfolio.slug}`
@@ -62,13 +66,20 @@ export function NovaNavbar({ bundle, view = "home" }: NovaNavbarProps) {
                 key={link.label}
                 href={link.href}
                 className={cn(
-                  "transition-colors",
+                  "relative px-3 py-1.5 rounded-lg transition-colors",
                   isActive
-                    ? "text-cyan-600 dark:text-cyan-400 font-bold underline underline-offset-4"
+                    ? "text-cyan-600 dark:text-cyan-400 font-bold"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-200",
                 )}
               >
-                {link.label}
+                {isActive && (
+                  <motion.div
+                    layoutId="nova-nav-active-pill"
+                    className="absolute inset-0 rounded-lg bg-cyan-500/10 border border-cyan-500/30 -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
+                <span>&gt; {link.label}</span>
               </Link>
             );
           })}
@@ -76,7 +87,7 @@ export function NovaNavbar({ bundle, view = "home" }: NovaNavbarProps) {
 
         {/* Status Badge, Theme Switcher, & Mobile Trigger */}
         <div className="flex items-center gap-2.5">
-          <span className="hidden sm:inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+          <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
             <span>DAEMON_RUNNING</span>
           </span>
@@ -94,53 +105,61 @@ export function NovaNavbar({ bundle, view = "home" }: NovaNavbarProps) {
       </div>
 
       {/* Mobile Terminal Dropdown */}
-      {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 dark:border-cyan-500/30 bg-white/95 dark:bg-[#07090e]/95 backdrop-blur-2xl px-4 py-4 space-y-3 font-mono text-xs animate-in fade-in slide-in-from-top-1 duration-200">
-          <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono pb-1 border-b border-slate-100 dark:border-slate-800">
-            <span>$ sys.routing --active-tree</span>
-          </div>
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.2 }}
+            className="md:hidden border-b border-slate-200 dark:border-cyan-500/30 bg-white/95 dark:bg-[#07090e]/95 backdrop-blur-2xl px-4 py-4 space-y-3 font-mono text-xs"
+          >
+            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-mono pb-1 border-b border-slate-100 dark:border-slate-800">
+              <span>$ sys.routing --active-tree</span>
+            </div>
 
-          <nav className="flex flex-col space-y-1">
-            {navLinks.map((link) => {
-              const isActive =
-                link.href === `/${portfolio.slug}`
-                  ? view === "home"
-                  : link.href.endsWith(`/${view}`) ||
-                    (view.startsWith("project") && link.label === "Projects") ||
-                    (view.startsWith("blog") && link.label === "Blog");
+            <nav className="flex flex-col space-y-1">
+              {navLinks.map((link) => {
+                const isActive =
+                  link.href === `/${portfolio.slug}`
+                    ? view === "home"
+                    : link.href.endsWith(`/${view}`) ||
+                      (view.startsWith("project") && link.label === "Projects") ||
+                      (view.startsWith("blog") && link.label === "Blog");
 
-              return (
-                <Link
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "px-3 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-between",
-                    isActive
-                      ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold border border-cyan-500/20"
-                      : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900",
-                  )}
-                >
-                  <span className="flex items-center gap-2">
-                    <span className="text-cyan-500/60">&gt;</span>
-                    <span>{link.label}</span>
-                  </span>
-                  {isActive ? (
-                    <span className="text-[10px] text-cyan-600 dark:text-cyan-400">[ACTIVE]</span>
-                  ) : (
-                    <ArrowRight className="w-3 h-3 opacity-40" />
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
+                return (
+                  <Link
+                    key={link.label}
+                    href={link.href}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className={cn(
+                      "px-3 py-2 rounded-lg text-xs font-mono transition-colors flex items-center justify-between",
+                      isActive
+                        ? "bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 font-bold border border-cyan-500/20"
+                        : "text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-900",
+                    )}
+                  >
+                    <span className="flex items-center gap-2">
+                      <span className="text-cyan-500/60">&gt;</span>
+                      <span>{link.label}</span>
+                    </span>
+                    {isActive ? (
+                      <span className="text-[10px] text-cyan-600 dark:text-cyan-400">[ACTIVE]</span>
+                    ) : (
+                      <ArrowRight className="w-3 h-3 opacity-40" />
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
 
-          <div className="pt-3 border-t border-slate-200 dark:border-cyan-500/20 flex items-center justify-between">
-            <span className="text-slate-500 dark:text-slate-400 text-[11px]">$ sys.theme_mode</span>
-            <ThemeToggle size="sm" />
-          </div>
-        </div>
-      )}
+            <div className="pt-3 border-t border-slate-200 dark:border-cyan-500/20 flex items-center justify-between">
+              <span className="text-slate-500 dark:text-slate-400 text-[11px]">$ sys.theme_mode</span>
+              <ThemeToggle size="sm" />
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

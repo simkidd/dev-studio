@@ -2,6 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion, type Variants } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import {
   ArrowRight,
@@ -9,9 +10,6 @@ import {
   ExternalLink,
   Code2,
   ShieldCheck,
-  Terminal,
-  Activity,
-  Cpu,
   CornerDownRight,
   ArrowUpRight,
 } from "lucide-react";
@@ -19,6 +17,29 @@ import {
 interface NovaHomeViewProps {
   bundle: IPublicPortfolioBundle;
 }
+
+const cyberContainer: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
+    },
+  },
+};
+
+const cyberItem: Variants = {
+  hidden: { opacity: 0, x: -16 },
+  visible: {
+    opacity: 1,
+    x: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
 
 export function NovaHomeView({ bundle }: NovaHomeViewProps) {
   const { portfolio, profile, projects, testimonials } = bundle;
@@ -29,7 +50,6 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
   const brandName = profile?.brandName?.trim() || fullName;
   const headline = profile?.headline || "Systems Engineering & High-Throughput Cloud Architecture";
   const bio = profile?.bio || "Architecting distributed backends, real-time telemetry pipelines, and fault-tolerant cloud platforms.";
-  const location = profile?.location || "0.0.0.0/0 (Remote)";
   const isAvailable = profile?.isAvailableForHire ?? true;
   const featuredProjects = projects.slice(0, 3);
 
@@ -39,56 +59,84 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
           1. UNBOXED HERO: CYBERNETIC COMMAND STATION
       ───────────────────────────────────────────────────────────── */}
       <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10 font-mono">
-        {/* Terminal Header Prompt */}
-        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold font-mono block">
-          $ init --operator=&quot;{brandName}&quot; --status={isAvailable ? "ready" : "busy"}
-        </span>
+        <motion.div
+          variants={cyberContainer}
+          initial="hidden"
+          animate="visible"
+          className="space-y-8"
+        >
+          {/* Terminal Header Prompt */}
+          <motion.div variants={cyberItem} className="flex items-center gap-1.5 text-xs text-cyan-600 dark:text-cyan-400 font-semibold font-mono">
+            <span>$ init --operator=&quot;{brandName}&quot; --status={isAvailable ? "ready" : "busy"}</span>
+            <motion.span
+              animate={{ opacity: [1, 0, 1] }}
+              transition={{ repeat: Infinity, duration: 0.8 }}
+              className="inline-block w-2 h-3.5 bg-cyan-500 ml-0.5 translate-y-0.5"
+            />
+          </motion.div>
 
-        {/* Expansive Display Typography */}
-        <div className="space-y-6 max-w-5xl">
-          <h1 className="text-4xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight text-slate-900 dark:text-white leading-[1.04]">
-            {headline}
-          </h1>
+          {/* Expansive Display Typography */}
+          <div className="space-y-6 max-w-5xl">
+            <motion.h1
+              variants={cyberItem}
+              className="text-4xl sm:text-7xl lg:text-8xl font-black uppercase tracking-tight text-slate-900 dark:text-white leading-[1.04]"
+            >
+              {headline}
+            </motion.h1>
 
-          <p className="text-base sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-sans max-w-3xl">
-            {bio}
-          </p>
-        </div>
+            <motion.p
+              variants={cyberItem}
+              className="text-base sm:text-xl text-slate-600 dark:text-slate-300 leading-relaxed font-sans max-w-3xl"
+            >
+              {bio}
+            </motion.p>
+          </div>
 
+          {/* Action Commands */}
+          <motion.div variants={cyberItem} className="flex flex-wrap items-center gap-4 pt-2">
+            <motion.div whileHover={{ x: 3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href={`/${portfolio.slug}/projects`}
+                className="px-6 py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-lg shadow-cyan-500/20"
+              >
+                <span>$ exec ./inspect_builds</span>
+                <ArrowRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
 
+            <motion.div whileHover={{ x: 3, scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href={`/${portfolio.slug}/contact`}
+                className="px-6 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs border border-slate-300 dark:border-slate-700 transition-colors flex items-center gap-2"
+              >
+                <span>$ socket.open_comm()</span>
+                <CornerDownRight className="w-3.5 h-3.5 text-cyan-500" />
+              </Link>
+            </motion.div>
 
-        {/* Action Commands */}
-        <div className="flex flex-wrap items-center gap-4 pt-2">
-          <Link
-            href={`/${portfolio.slug}/projects`}
-            className="px-6 py-3.5 rounded-xl bg-cyan-600 hover:bg-cyan-500 dark:bg-cyan-500 dark:hover:bg-cyan-400 text-white dark:text-slate-950 font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-lg shadow-cyan-500/20 hover:scale-102 active:scale-98"
-          >
-            <span>$ exec ./inspect_builds</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-
-          <Link
-            href={`/${portfolio.slug}/contact`}
-            className="px-6 py-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 text-xs border border-slate-300 dark:border-slate-700 transition-colors flex items-center gap-2"
-          >
-            <span>$ socket.open_comm()</span>
-            <CornerDownRight className="w-3.5 h-3.5 text-cyan-500" />
-          </Link>
-
-          <Link
-            href={`/${portfolio.slug}/about`}
-            className="px-5 py-3.5 text-xs text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center gap-1.5"
-          >
-            <span>$ cat /operator_dossier</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </Link>
-        </div>
+            <motion.div whileHover={{ x: 3 }} whileTap={{ scale: 0.98 }}>
+              <Link
+                href={`/${portfolio.slug}/about`}
+                className="px-5 py-3.5 text-xs text-slate-500 hover:text-cyan-600 dark:hover:text-cyan-400 transition-colors flex items-center gap-1.5"
+              >
+                <span>$ cat /operator_dossier</span>
+                <ArrowUpRight className="w-3.5 h-3.5" />
+              </Link>
+            </motion.div>
+          </motion.div>
+        </motion.div>
       </section>
 
       {/* FEATURED REPOSITORIES / SHOWCASE */}
       {featuredProjects.length > 0 && (
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 font-mono">
-          <div className="flex items-end justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="flex items-end justify-between border-b border-slate-200 dark:border-slate-800 pb-4"
+          >
             <div className="space-y-1">
               <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ ls -la ./featured</span>
               <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
@@ -102,13 +150,18 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
               <span>View all ({projects.length})</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 font-sans">
-            {featuredProjects.map((project) => (
-              <div
+            {featuredProjects.map((project, idx) => (
+              <motion.div
                 key={project._id}
-                className="group rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-500/40 transition-all flex flex-col justify-between shadow-xs hover:shadow-xl"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -6 }}
+                className="group rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 overflow-hidden hover:border-cyan-500/40 transition-all flex flex-col justify-between shadow-xs hover:shadow-xl hover:shadow-cyan-500/5"
               >
                 <Link
                   href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
@@ -184,7 +237,7 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </section>
@@ -193,7 +246,13 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
       {/* TESTIMONIALS & TELEMETRY SIGNALS */}
       {testimonials && testimonials.length > 0 && (
         <section className="px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8 font-mono">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4"
+          >
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-cyan-600 dark:text-cyan-400 text-xs font-semibold">
                 <ShieldCheck className="w-4 h-4" />
@@ -210,7 +269,7 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
               <span>$ cat /all_reviews</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {testimonials.map((t, idx) => {
@@ -218,8 +277,13 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
               const indexFormatted = String(idx + 1).padStart(2, "0");
 
               return (
-                <div
+                <motion.div
                   key={t._id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  whileHover={{ y: -4 }}
                   className="p-6 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 space-y-4 hover:border-cyan-500/40 transition-all flex flex-col justify-between shadow-xs"
                 >
                   <div className="space-y-3">
@@ -279,12 +343,12 @@ export function NovaHomeView({ bundle }: NovaHomeViewProps) {
                           className="text-[10px] font-mono text-cyan-600 dark:text-cyan-400 hover:underline flex items-center gap-1"
                         >
                           <span>$ inspect_ref({projRef.title})</span>
-                          <ChevronRight className="w-3 h-3" />
+                          <ChevronRight className="w-3.5 h-3.5" />
                         </Link>
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>

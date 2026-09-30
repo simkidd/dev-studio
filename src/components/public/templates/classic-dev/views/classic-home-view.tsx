@@ -2,18 +2,16 @@
 
 import React from "react";
 import Link from "next/link";
+import { motion, type Variants } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { TechIcon } from "@/components/ui/tech-icon";
-import { ChromeSparkleIcon, GithubIcon } from "@/components/ui/icons";
+import { GithubIcon, LinkedinIcon, TwitterIcon } from "@/components/ui/icons";
 import {
   ArrowUpRight,
-  Sparkles,
   ExternalLink,
   ChevronRight,
-  Briefcase,
-  Layers,
   Quote,
-  Send,
+  FileText,
 } from "lucide-react";
 import { formatMonthYear } from "@/lib/date.utils";
 
@@ -21,14 +19,37 @@ interface ClassicHomeViewProps {
   bundle: IPublicPortfolioBundle;
 }
 
+const containerVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 0.04,
+    },
+  },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: 0.5,
+      ease: [0.16, 1, 0.3, 1],
+    },
+  },
+};
+
 export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
   const { portfolio, profile, projects, experiences, skills, testimonials } = bundle;
 
   const firstName = profile?.firstName || "Developer";
   const lastName = profile?.lastName || "";
-  const fullName = `${firstName} ${lastName}`.trim();
-  const headline = profile?.headline || "Full-Stack Engineer & Systems Architect";
-  const bio = profile?.bio || "I build high-throughput applications and modern digital experiences.";
+  const fullName = `${firstName} ${lastName}`.trim() || "Developer";
+  const headline = profile?.headline || "Software Engineer & Interface Architect";
+  const bio = profile?.bio || "I build high-throughput applications, distributed backends, and modern digital experiences.";
   const location = profile?.location || "Remote";
 
   const featuredProjects = projects.filter((p) => p.isFeatured).slice(0, 4);
@@ -37,53 +58,75 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
   return (
     <div className="space-y-24 sm:space-y-32">
       {/* ─────────────────────────────────────────────────────────────
-          1. MEGA HEADLINE HERO
+          1. CLEAN CLASSIC CENTERED HERO
       ───────────────────────────────────────────────────────────── */}
-      <section className="relative pt-24 sm:pt-32 pb-12 overflow-hidden">
-        {/* Subtle Ambient Glow */}
-        <div className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[300px] bg-primary/10 blur-[120px] rounded-full pointer-events-none -z-10" />
+      <section className="relative pt-20 sm:pt-28 pb-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="visible"
+            className="flex flex-col items-center space-y-6"
+          >
+            {/* Intro / Location (Clean typography, unboxed) */}
+            <motion.div
+              variants={itemVariants}
+              className="flex items-center justify-center gap-2 text-xs sm:text-sm text-muted-foreground font-medium"
+            >
+              <span className="text-foreground font-semibold">{fullName}</span>
+              <span className="text-muted-foreground/60">•</span>
+              <span>Based in {location}</span>
+            </motion.div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col items-center text-center space-y-6 max-w-4xl mx-auto">
-            {/* Location Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-muted/80 border border-border/80 text-xs font-medium text-muted-foreground backdrop-blur-xs">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <span>Based in {location} &bull; Open for worldwide contracts</span>
-            </div>
-
-            {/* Mega Headline with Chrome Sparkles */}
-            <div className="space-y-1">
-              <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-[1.05]">
-                <span className="inline-flex items-center gap-2 sm:gap-4 flex-wrap justify-center">
-                  <span>{headline}</span>
-                  <ChromeSparkleIcon className="w-8 h-8 sm:w-12 sm:h-12 md:w-14 md:h-14 text-primary animate-pulse inline-block" />
-                </span>
+            {/* Headline & Bio */}
+            <motion.div variants={itemVariants} className="space-y-4">
+              <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-foreground leading-[1.12]">
+                {headline}
               </h1>
-            </div>
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-2xl mx-auto font-normal">
+                {bio}
+              </p>
+            </motion.div>
 
-            {/* Bio Subtitle */}
-            <p className="text-base sm:text-lg md:text-xl text-muted-foreground leading-relaxed max-w-2xl font-normal">
-              {bio}
-            </p>
+            {/* Actions */}
+            <motion.div
+              variants={itemVariants}
+              className="flex flex-wrap items-center justify-center gap-3 pt-2"
+            >
+              <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href={`/${portfolio.slug}/projects`}
+                  className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-xs sm:text-sm font-semibold shadow-md shadow-primary/20 hover:opacity-95 transition-all flex items-center gap-2"
+                >
+                  <span>Explore Projects</span>
+                  <ArrowUpRight className="w-4 h-4" />
+                </Link>
+              </motion.div>
 
-            {/* CTAs */}
-            <div className="flex flex-wrap items-center justify-center gap-3.5 pt-4">
-              <Link
-                href={`/${portfolio.slug}/projects`}
-                className="px-6 py-3 rounded-full bg-primary text-primary-foreground text-xs sm:text-sm font-semibold shadow-lg shadow-primary/20 hover:opacity-95 transition-all flex items-center gap-2"
-              >
-                <span>Explore Showcase</span>
-                <ArrowUpRight className="w-4 h-4" />
-              </Link>
+              <motion.div whileHover={{ scale: 1.03, y: -1 }} whileTap={{ scale: 0.97 }}>
+                <Link
+                  href={`/${portfolio.slug}/contact`}
+                  className="px-6 py-3 rounded-full bg-card hover:bg-muted text-foreground text-xs sm:text-sm font-semibold border border-border transition-colors flex items-center gap-2 shadow-2xs"
+                >
+                  <span>Get in Touch</span>
+                </Link>
+              </motion.div>
 
-              <Link
-                href={`/${portfolio.slug}/contact`}
-                className="px-6 py-3 rounded-full bg-card hover:bg-muted text-foreground text-xs sm:text-sm font-semibold border border-border transition-all flex items-center gap-2 shadow-xs"
-              >
-                <span>Direct Inquiries</span>
-              </Link>
-            </div>
-          </div>
+              {profile?.resumeUrl && (
+                <motion.a
+                  whileHover={{ scale: 1.03, y: -1 }}
+                  whileTap={{ scale: 0.97 }}
+                  href={profile.resumeUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="px-5 py-3 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground text-xs sm:text-sm font-semibold border border-border/60 transition-colors flex items-center gap-1.5"
+                >
+                  <FileText className="w-4 h-4" />
+                  <span>Resume</span>
+                </motion.a>
+              )}
+            </motion.div>
+          </motion.div>
         </div>
       </section>
 
@@ -92,7 +135,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
       ───────────────────────────────────────────────────────────── */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/60 pb-6">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border/60 pb-6"
+          >
             <div className="space-y-1">
               <span className="text-xs font-mono text-primary font-semibold uppercase tracking-wider">
                 Curated Works
@@ -103,18 +152,23 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
             </div>
             <Link
               href={`/${portfolio.slug}/projects`}
-              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 group"
             >
               <span>View all projects ({projects.length})</span>
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
             </Link>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {displayProjects.map((project) => (
-              <div
+            {displayProjects.map((project, idx) => (
+              <motion.div
                 key={project._id}
-                className="group relative rounded-3xl bg-card border border-border overflow-hidden hover:border-primary/40 transition-all duration-300 shadow-sm hover:shadow-xl flex flex-col justify-between"
+                initial={{ opacity: 0, y: 24 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-40px" }}
+                transition={{ duration: 0.5, delay: idx * 0.1 }}
+                whileHover={{ y: -6 }}
+                className="group relative rounded-3xl bg-card border border-border overflow-hidden hover:border-primary/40 transition-colors duration-300 shadow-sm hover:shadow-2xl flex flex-col justify-between"
               >
                 <Link
                   href={`/${portfolio.slug}/projects/${project.slug || project._id}`}
@@ -156,13 +210,14 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                   <div className="space-y-4 pt-2">
                     <div className="flex flex-wrap gap-1.5">
                       {project.technologies.slice(0, 4).map((tech) => (
-                        <span
+                        <motion.span
                           key={tech}
+                          whileHover={{ scale: 1.05 }}
                           className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-mono bg-muted text-muted-foreground"
                         >
                           <TechIcon name={tech} className="w-3 h-3 text-primary" />
                           <span>{tech}</span>
-                        </span>
+                        </motion.span>
                       ))}
                     </div>
 
@@ -180,7 +235,7 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                           href={project.liveUrl}
                           target="_blank"
                           rel="noreferrer"
-                          className="text-muted-foreground hover:text-foreground flex items-center gap-1"
+                          className="text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
                         >
                           <span>Live</span>
                           <ExternalLink className="w-3.5 h-3.5" />
@@ -189,7 +244,7 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                     </div>
                   </div>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -202,7 +257,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
           {/* Career Milestones */}
           <div className="lg:col-span-7 space-y-6">
-            <div className="flex items-end justify-between">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5 }}
+              className="flex items-end justify-between"
+            >
               <div className="space-y-1">
                 <span className="text-xs font-mono text-primary font-semibold uppercase tracking-wider">
                   Track Record
@@ -213,20 +274,27 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
               </div>
               <Link
                 href={`/${portfolio.slug}/about`}
-                className="text-xs font-mono text-primary hover:underline flex items-center gap-1 font-semibold"
+                className="text-xs font-mono text-primary hover:underline flex items-center gap-1 font-semibold group"
               >
                 <span>Full Profile</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
               </Link>
-            </div>
+            </motion.div>
 
             <div className="relative pl-6 sm:pl-7 border-l-2 border-primary/20 space-y-8 ml-2 sm:ml-3">
-              {experiences.map((exp) => {
+              {experiences.map((exp, idx) => {
                 const startFormatted = formatMonthYear(exp.startDate) || exp.startDate;
                 const endFormatted = exp.isCurrent ? "Present" : formatMonthYear(exp.endDate) || exp.endDate;
 
                 return (
-                  <div key={exp._id} className="relative group">
+                  <motion.div
+                    key={exp._id}
+                    initial={{ opacity: 0, x: -16 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    viewport={{ once: true, margin: "-30px" }}
+                    transition={{ duration: 0.45, delay: idx * 0.08 }}
+                    className="relative group"
+                  >
                     {/* Node Dot */}
                     {exp.isCurrent ? (
                       <span className="absolute -left-[31px] sm:-left-[35px] top-1.5 flex h-3.5 w-3.5">
@@ -237,7 +305,10 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                       <span className="absolute -left-[29px] sm:-left-[33px] top-2 w-2.5 h-2.5 rounded-full bg-muted-foreground/40 border-2 border-background ring-1 ring-border group-hover:bg-primary transition-colors" />
                     )}
 
-                    <div className="p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-all space-y-2 shadow-xs">
+                    <motion.div
+                      whileHover={{ y: -2 }}
+                      className="p-5 sm:p-6 rounded-2xl bg-card border border-border hover:border-primary/30 transition-colors space-y-2 shadow-xs"
+                    >
                       <div className="flex flex-wrap items-baseline justify-between gap-2">
                         <h3 className="text-sm sm:text-base font-bold text-foreground">
                           {exp.role} &bull; <span className="text-primary">{exp.company}</span>
@@ -252,16 +323,16 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
 
                       {exp.achievements && exp.achievements.length > 0 && (
                         <ul className="space-y-1 pt-1">
-                          {exp.achievements.slice(0, 2).map((ach, idx) => (
-                            <li key={idx} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                          {exp.achievements.slice(0, 2).map((ach, i) => (
+                            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
                               <span className="text-primary font-bold mt-0.5">&bull;</span>
                               <span className="leading-relaxed line-clamp-2">{ach}</span>
                             </li>
                           ))}
                         </ul>
                       )}
-                    </div>
-                  </div>
+                    </motion.div>
+                  </motion.div>
                 );
               })}
             </div>
@@ -269,28 +340,42 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
 
           {/* Core Technologies */}
           <div className="lg:col-span-5 space-y-6">
-            <div className="space-y-1">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5 }}
+              className="space-y-1"
+            >
               <span className="text-xs font-mono text-primary font-semibold uppercase tracking-wider">
                 Proficiencies
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-foreground">
                 Technical Stack
               </h2>
-            </div>
+            </motion.div>
 
-            <div className="p-6 rounded-3xl bg-card border border-border space-y-4 shadow-xs">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="p-6 rounded-3xl bg-card border border-border space-y-4 shadow-xs"
+            >
               <div className="flex flex-wrap gap-2">
                 {skills.map((skill) => (
-                  <span
+                  <motion.span
                     key={skill._id}
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-muted text-foreground border border-border/40"
+                    whileHover={{ scale: 1.06, y: -2 }}
+                    whileTap={{ scale: 0.97 }}
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium bg-muted text-foreground border border-border/40 cursor-default shadow-2xs hover:border-primary/40 hover:bg-muted/80 transition-colors"
                   >
                     <TechIcon name={skill.name} className="w-3.5 h-3.5 text-primary" />
                     <span>{skill.name}</span>
-                  </span>
+                  </motion.span>
                 ))}
               </div>
-            </div>
+            </motion.div>
           </div>
         </div>
       </section>
@@ -300,7 +385,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
       ───────────────────────────────────────────────────────────── */}
       {testimonials.length > 0 && (
         <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="space-y-2 text-center max-w-2xl mx-auto">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="space-y-2 text-center max-w-2xl mx-auto"
+          >
             <span className="text-xs font-mono text-primary font-semibold uppercase tracking-widest">
               Social Proof &amp; Endorsements
             </span>
@@ -310,10 +401,10 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
             <p className="text-xs sm:text-sm text-muted-foreground">
               Direct recommendations and verified feedback from engineering leaders, product managers, and clients.
             </p>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {testimonials.map((t) => {
+            {testimonials.map((t, idx) => {
               const projRef = typeof t.projectRef === "object" && t.projectRef ? t.projectRef : null;
               const initials = t.clientName
                 .split(" ")
@@ -323,8 +414,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                 .toUpperCase();
 
               return (
-                <div
+                <motion.div
                   key={t._id}
+                  initial={{ opacity: 0, y: 24 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.5, delay: idx * 0.1 }}
+                  whileHover={{ y: -4 }}
                   className="p-6 sm:p-8 rounded-3xl bg-card border border-border/80 hover:border-primary/40 transition-all shadow-xs hover:shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden group"
                 >
                   <div className="space-y-4">
@@ -396,7 +492,7 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
                       </div>
                     )}
                   </div>
-                </div>
+                </motion.div>
               );
             })}
           </div>
@@ -407,7 +503,13 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
           5. BOTTOM INQUIRY TEASER
       ───────────────────────────────────────────────────────────── */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 sm:p-12 rounded-3xl bg-gradient-to-tr from-primary/10 via-card to-card border border-primary/20 text-center space-y-6 shadow-xl">
+        <motion.div
+          initial={{ opacity: 0, scale: 0.96 }}
+          whileInView={{ opacity: 1, scale: 1 }}
+          viewport={{ once: true, margin: "-40px" }}
+          transition={{ duration: 0.6 }}
+          className="p-8 sm:p-12 rounded-3xl bg-linear-to-tr from-primary/10 via-card to-card border border-primary/20 text-center space-y-6 shadow-xl"
+        >
           <span className="px-3 py-1 rounded-full text-xs font-mono font-medium bg-primary/10 text-primary border border-primary/20">
             Open For Collaborations
           </span>
@@ -418,15 +520,17 @@ export function ClassicHomeView({ bundle }: ClassicHomeViewProps) {
             Reach out directly for architecture sprints, full-stack builds, and advisory contracts.
           </p>
           <div className="pt-2">
-            <Link
-              href={`/${portfolio.slug}/contact`}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm shadow-md shadow-primary/25 hover:opacity-95 transition-opacity"
-            >
-              <span>Initiate Consultation</span>
-              <ArrowUpRight className="w-4 h-4" />
-            </Link>
+            <motion.div whileHover={{ scale: 1.04, y: -2 }} whileTap={{ scale: 0.97 }} className="inline-block">
+              <Link
+                href={`/${portfolio.slug}/contact`}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-primary text-primary-foreground font-semibold text-xs sm:text-sm shadow-md shadow-primary/25 hover:opacity-95 transition-opacity"
+              >
+                <span>Initiate Consultation</span>
+                <ArrowUpRight className="w-4 h-4" />
+              </Link>
+            </motion.div>
           </div>
-        </div>
+        </motion.div>
       </section>
     </div>
   );

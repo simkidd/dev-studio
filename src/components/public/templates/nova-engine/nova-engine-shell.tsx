@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { PortfolioPageView } from "../../views/public-portfolio-view";
 import { NovaNavbar } from "./components/nova-navbar";
@@ -50,8 +51,21 @@ export function NovaEngineShell({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-[#07090e] text-slate-800 dark:text-slate-100 font-sans selection:bg-cyan-500/30 selection:text-cyan-800 dark:selection:text-cyan-300 flex flex-col justify-between transition-colors duration-200">
       <NovaNavbar bundle={bundle} view={view} />
-      <main className="flex-1">{renderCurrentView()}</main>
+      <main className="flex-1">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={view + (subSlug || "")}
+            initial={{ opacity: 0, filter: "blur(4px)", y: 8 }}
+            animate={{ opacity: 1, filter: "blur(0px)", y: 0 }}
+            exit={{ opacity: 0, filter: "blur(4px)", y: -6 }}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+          >
+            {renderCurrentView()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       <NovaFooter bundle={bundle} />
     </div>
   );
 }
+

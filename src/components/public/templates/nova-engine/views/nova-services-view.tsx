@@ -12,12 +12,12 @@ export function NovaServicesView({ bundle }: NovaServicesViewProps) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-8 font-mono">
       <div className="space-y-2 max-w-3xl">
-        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ systemctl list-services</span>
+        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ service --list</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-          Active Capabilities
+          Capabilities
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-          Engineering specializations in distributed systems, telemetry pipelines, and resilient full-stack platforms.
+          Specializations in full-stack architecture, distributed systems, and performance engineering.
         </p>
       </div>
 

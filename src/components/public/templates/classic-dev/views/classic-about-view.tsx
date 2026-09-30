@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { TechIcon } from "@/components/ui/tech-icon";
 import { FileText } from "lucide-react";
@@ -21,67 +22,90 @@ export function ClassicAboutView({ bundle }: ClassicAboutViewProps) {
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-16">
       <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-center">
-        <div className="md:col-span-7 space-y-6">
+        <motion.div
+          initial={{ opacity: 0, x: -20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          className="md:col-span-7 space-y-6"
+        >
           <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
-            Biography &amp; Leadership
+            About
           </span>
           <h1 className="text-3xl sm:text-5xl font-extrabold tracking-tight text-foreground">
-            About {fullName}
+            About Me
           </h1>
           <p className="text-base text-muted-foreground leading-relaxed">
             {profile?.aboutMarkdown || bio}
           </p>
           {profile?.resumeUrl && (
             <div className="pt-2">
-              <a
+              <motion.a
+                whileHover={{ scale: 1.04, y: -2 }}
+                whileTap={{ scale: 0.97 }}
                 href={profile.resumeUrl}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-primary text-primary-foreground text-xs font-semibold shadow-md shadow-primary/20 hover:opacity-95 transition-opacity"
               >
                 <FileText className="w-4 h-4" />
                 <span>Download Resume / CV</span>
-              </a>
+              </motion.a>
             </div>
           )}
-        </div>
+        </motion.div>
 
         {profile?.avatarUrl && (
-          <div className="md:col-span-5 flex justify-center">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.92 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.6, delay: 0.15 }}
+            className="md:col-span-5 flex justify-center"
+          >
             <div className="relative">
-              <div className="absolute -inset-2 rounded-3xl bg-gradient-to-tr from-primary/30 to-indigo-500/30 blur-xl" />
+              <div className="absolute -inset-2 rounded-3xl bg-linear-to-tr from-primary/30 to-indigo-500/30 blur-xl animate-pulse" />
               <img
                 src={profile.avatarUrl}
                 alt={fullName}
                 className="relative w-64 h-64 sm:w-72 sm:h-72 rounded-3xl object-cover border-2 border-border shadow-2xl"
               />
             </div>
-          </div>
+          </motion.div>
         )}
       </div>
 
       {/* Technical Proficiencies */}
       {skills && skills.length > 0 && (
         <div className="space-y-8 border-t border-border/40 pt-12">
-          <div className="space-y-1">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="space-y-1"
+          >
             <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
               Proficiencies &amp; Stack
             </span>
             <h2 className="text-2xl font-bold text-foreground">Technical Capabilities</h2>
-          </div>
+          </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {skills.map((skill) => (
-              <div
+            {skills.map((skill, idx) => (
+              <motion.div
                 key={skill._id}
-                className="p-4 rounded-2xl bg-card border border-border flex items-center gap-3 shadow-xs hover:border-primary/40 transition-colors"
+                initial={{ opacity: 0, y: 16 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: "-30px" }}
+                transition={{ duration: 0.4, delay: idx * 0.04 }}
+                whileHover={{ y: -3 }}
+                className="p-4 rounded-2xl bg-card border border-border flex items-center gap-3 shadow-xs hover:border-primary/40 transition-colors cursor-default"
               >
                 <TechIcon name={skill.name} icon={skill.icon} className="w-5 h-5 text-primary" />
                 <div className="min-w-0">
                   <span className="text-sm font-semibold text-foreground block truncate">{skill.name}</span>
                   <span className="text-[11px] text-muted-foreground font-mono block truncate">{skill.category}</span>
                 </div>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>
@@ -90,20 +114,33 @@ export function ClassicAboutView({ bundle }: ClassicAboutViewProps) {
       {/* Career Timeline */}
       {experiences.length > 0 && (
         <div className="space-y-10 border-t border-border/40 pt-12">
-          <div className="space-y-1">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, margin: "-40px" }}
+            transition={{ duration: 0.5 }}
+            className="space-y-1"
+          >
             <span className="text-xs font-mono text-primary uppercase tracking-widest font-semibold">
               History
             </span>
             <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Career Milestones</h2>
-          </div>
+          </motion.div>
 
           <div className="relative pl-6 sm:pl-8 border-l-2 border-primary/20 space-y-10 ml-3 sm:ml-4">
-            {experiences.map((exp) => {
+            {experiences.map((exp, idx) => {
               const startFormatted = formatMonthYear(exp.startDate) || exp.startDate;
               const endFormatted = exp.isCurrent ? "Present" : formatMonthYear(exp.endDate) || exp.endDate;
 
               return (
-                <div key={exp._id} className="relative group">
+                <motion.div
+                  key={exp._id}
+                  initial={{ opacity: 0, x: -16 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-30px" }}
+                  transition={{ duration: 0.45, delay: idx * 0.08 }}
+                  className="relative group"
+                >
                   {/* Timeline Node Marker */}
                   {exp.isCurrent ? (
                     <span className="absolute -left-[31px] sm:-left-[39px] top-1.5 flex h-4 w-4">
@@ -114,7 +151,10 @@ export function ClassicAboutView({ bundle }: ClassicAboutViewProps) {
                     <span className="absolute -left-[29px] sm:-left-[37px] top-2 w-3 h-3 rounded-full bg-muted-foreground/40 border-2 border-background ring-1 ring-border group-hover:bg-primary transition-colors" />
                   )}
 
-                  <div className="p-6 rounded-2xl bg-card border border-border group-hover:border-primary/30 transition-all space-y-3 shadow-xs">
+                  <motion.div
+                    whileHover={{ y: -2 }}
+                    className="p-6 rounded-2xl bg-card border border-border group-hover:border-primary/30 transition-colors space-y-3 shadow-xs"
+                  >
                     <div className="flex flex-wrap items-baseline justify-between gap-2">
                       <div className="space-y-0.5">
                         <div className="flex items-center gap-2 flex-wrap">
@@ -154,8 +194,8 @@ export function ClassicAboutView({ bundle }: ClassicAboutViewProps) {
                     {/* Key Achievements */}
                     {exp.achievements && exp.achievements.length > 0 && (
                       <ul className="space-y-1.5 pt-1">
-                        {exp.achievements.map((ach, idx) => (
-                          <li key={idx} className="text-xs text-muted-foreground flex items-start gap-2">
+                        {exp.achievements.map((ach, i) => (
+                          <li key={i} className="text-xs text-muted-foreground flex items-start gap-2">
                             <span className="text-primary mt-1">&bull;</span>
                             <span className="leading-relaxed">{ach}</span>
                           </li>
@@ -177,8 +217,8 @@ export function ClassicAboutView({ bundle }: ClassicAboutViewProps) {
                         ))}
                       </div>
                     )}
-                  </div>
-                </div>
+                  </motion.div>
+                </motion.div>
               );
             })}
           </div>

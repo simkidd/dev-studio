@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { ArrowUpRight, Menu, X } from "lucide-react";
@@ -68,7 +69,7 @@ export function ClassicNavbar({ bundle, view = "home" }: ClassicNavbarProps) {
         </Link>
 
         {/* Desktop Nav */}
-        <nav className="hidden md:flex items-center gap-1">
+        <nav className="hidden md:flex items-center gap-1 relative">
           {navItems.map((item) => {
             const isItemActive =
               item.href === `/${portfolio.slug}`
@@ -82,12 +83,19 @@ export function ClassicNavbar({ bundle, view = "home" }: ClassicNavbarProps) {
                 key={item.label}
                 href={item.href}
                 className={cn(
-                  "text-xs font-medium px-3.5 py-1.5 rounded-full transition-all cursor-pointer",
+                  "relative text-xs font-medium px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10",
                   isItemActive
-                    ? "bg-muted text-foreground font-semibold"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted/60",
+                    ? "text-foreground font-semibold"
+                    : "text-muted-foreground hover:text-foreground",
                 )}
               >
+                {isItemActive && (
+                  <motion.div
+                    layoutId="classic-nav-active-pill"
+                    className="absolute inset-0 rounded-full bg-muted border border-border/60 shadow-xs -z-10"
+                    transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                  />
+                )}
                 {item.label}
               </Link>
             );
@@ -118,36 +126,44 @@ export function ClassicNavbar({ bundle, view = "home" }: ClassicNavbarProps) {
       </div>
 
       {/* Mobile Nav Overlay */}
-      {mobileMenuOpen && (
-        <div className="md:hidden pointer-events-auto absolute top-16 inset-x-4 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-2xl space-y-3 z-50 animate-in fade-in slide-in-from-top-2">
-          <div className="flex flex-col space-y-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.label}
-                href={item.href}
-                onClick={() => setMobileMenuOpen(false)}
-                className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
-            <div className="pt-3 border-t border-border flex items-center justify-between">
-              <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
-              <ThemeToggle size="sm" />
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -10, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: "easeOut" }}
+            className="md:hidden pointer-events-auto absolute top-16 inset-x-4 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-2xl space-y-3 z-50"
+          >
+            <div className="flex flex-col space-y-2">
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 transition-colors"
+                >
+                  {item.label}
+                </Link>
+              ))}
+              <div className="pt-3 border-t border-border flex items-center justify-between">
+                <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
+                <ThemeToggle size="sm" />
+              </div>
+              <div className="pt-1">
+                <Link
+                  href={`/${portfolio.slug}/contact`}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
+                >
+                  <span>Get in Touch</span>
+                  <ArrowUpRight className="w-3.5 h-3.5" />
+                </Link>
+              </div>
             </div>
-            <div className="pt-1">
-              <Link
-                href={`/${portfolio.slug}/contact`}
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
-              >
-                <span>Get in Touch</span>
-                <ArrowUpRight className="w-3.5 h-3.5" />
-              </Link>
-            </div>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }

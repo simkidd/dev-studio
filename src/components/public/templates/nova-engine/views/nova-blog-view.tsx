@@ -12,18 +12,18 @@ export function NovaBlogView({ bundle }: NovaBlogViewProps) {
   const { portfolio, posts } = bundle;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-12 space-y-8 font-mono">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 space-y-8 font-mono">
       <div className="space-y-2 max-w-3xl">
-        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ cat /var/log/whitepapers.log</span>
+        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ cat /var/log/articles.md</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-          Technical Articles
+          Articles &amp; Notes
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-          In-depth architectural analysis, systems benchmarks, and engineering documentation.
+          Technical writeups, architecture breakdowns, and systems benchmarks.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 font-sans">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 font-sans">
         {posts.map((post) => (
           <div
             key={post._id}

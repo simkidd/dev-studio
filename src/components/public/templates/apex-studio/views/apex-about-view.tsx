@@ -24,10 +24,10 @@ export function ApexAboutView({ bundle }: ApexAboutViewProps) {
       {/* BIO HEADER */}
       <div className="space-y-6 max-w-3xl">
         <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
-          Philosophy &amp; Practice
+          About
         </span>
         <h1 className="text-4xl sm:text-7xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
-          About {fullName}
+          About Me
         </h1>
         <p className="text-lg text-stone-600 dark:text-white/70 font-light leading-relaxed">
           {profile?.aboutMarkdown || bio}

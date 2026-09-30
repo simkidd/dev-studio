@@ -15,13 +15,13 @@ export function ApexProjectsView({ bundle }: ApexProjectsViewProps) {
     <div className="max-w-7xl mx-auto px-6 lg:px-12 py-16 space-y-16">
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
-          Folio Index
+          Portfolio
         </span>
         <h1 className="text-4xl sm:text-7xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
-          Selected Works &amp; Art
+          Selected Works
         </h1>
         <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 font-light leading-relaxed">
-          Curated index of bespoke web architectures, interactive 3D spatial design, and brand flagships.
+          A curated collection of web applications, interactive interfaces, and digital products.
         </p>
       </div>
 

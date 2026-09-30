@@ -90,13 +90,13 @@ export function ApexContactView({ bundle }: ApexContactViewProps) {
       {/* Header */}
       <div className="space-y-4 max-w-3xl">
         <span className="text-xs font-mono text-amber-600 dark:text-amber-400 uppercase tracking-widest font-semibold">
-          Commission Studio
+          Contact
         </span>
         <h1 className="text-4xl sm:text-7xl font-black uppercase tracking-tight text-stone-900 dark:text-white">
-          Initiate Inquiries
+          Get in Touch
         </h1>
         <p className="text-sm sm:text-base text-stone-600 dark:text-stone-300 font-light leading-relaxed">
-          Available for bespoke web architectures, interactive 3D digital experiences, and creative engineering leadership.
+          Available for web development projects, technical consulting, and collaborative engineering.
         </p>
       </div>
 

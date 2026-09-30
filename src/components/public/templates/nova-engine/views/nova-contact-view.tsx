@@ -82,12 +82,12 @@ export function NovaContactView({ bundle }: NovaContactViewProps) {
     <div className="max-w-6xl mx-auto px-4 sm:px-6 py-14 space-y-10 font-mono">
       {/* Terminal Title Header */}
       <div className="space-y-2 max-w-3xl">
-        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ socket.open_stream(&quot;inquiries.crm&quot;)</span>
+        <span className="text-xs text-cyan-600 dark:text-cyan-400 font-semibold">$ connect --direct</span>
         <h1 className="text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white uppercase tracking-tight">
-          Transmit Payload
+          Get in Touch
         </h1>
         <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 font-sans leading-relaxed">
-          Direct uplink to {fullName}&apos;s dashboard telemetry and message queue.
+          Send a message below or connect with {fullName} through direct channels.
         </p>
       </div>
 

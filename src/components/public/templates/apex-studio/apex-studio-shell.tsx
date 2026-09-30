@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { PortfolioPageView } from "../../views/public-portfolio-view";
 import { ApexNavbar } from "./components/apex-navbar";
@@ -50,8 +51,21 @@ export function ApexStudioShell({
   return (
     <div className="min-h-screen bg-[#fafaf9] dark:bg-[#09090b] text-stone-900 dark:text-white selection:bg-amber-400 selection:text-black font-sans flex flex-col justify-between transition-colors duration-200">
       <ApexNavbar bundle={bundle} view={view} />
-      <main className="flex-1 pt-28">{renderCurrentView()}</main>
+      <main className="flex-1 pt-28">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={view + (subSlug || "")}
+            initial={{ opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {renderCurrentView()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       <ApexFooter bundle={bundle} />
     </div>
   );
 }
+

@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { IPublicPortfolioBundle } from "@/interfaces";
 import { PortfolioPageView } from "../../views/public-portfolio-view";
 import { ClassicNavbar } from "./components/classic-navbar";
@@ -50,8 +51,21 @@ export function ClassicDevShell({
   return (
     <div className="min-h-screen bg-background text-foreground selection:bg-primary/20 selection:text-primary transition-colors flex flex-col justify-between">
       <ClassicNavbar bundle={bundle} view={view} />
-      <main className="flex-1 pt-24 sm:pt-28">{renderCurrentView()}</main>
+      <main className="flex-1 pt-24 sm:pt-28">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={view + (subSlug || "")}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {renderCurrentView()}
+          </motion.div>
+        </AnimatePresence>
+      </main>
       <ClassicFooter bundle={bundle} />
     </div>
   );
 }
+
