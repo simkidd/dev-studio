@@ -6,6 +6,9 @@ import { useRouter } from "next/navigation";
 import {
   useDashboardStats,
   useUpdateMessageStatus,
+  usePortfolioSettings,
+  useUpdatePortfolioSettings,
+  useProfile,
 } from "@/hooks";
 import { IMessage, IProject } from "@/interfaces";
 import {
@@ -18,6 +21,17 @@ import {
   Send,
   Building,
   Activity,
+  Globe,
+  ExternalLink,
+  Copy,
+  Check,
+  Palette,
+  Sparkles,
+  CheckCircle2,
+  Circle,
+  Eye,
+  Sliders,
+  User,
 } from "lucide-react";
 import { Sparkline } from "@/components/ui/sparkline";
 import { SegmentedMeter } from "@/components/ui/segmented-meter";
@@ -25,16 +39,60 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { ProjectEditorDialog } from "@/components/admin";
 import { formatDateTime } from "@/lib/date.utils";
+import { toast } from "sonner";
+import { cn } from "@/lib/utils";
 
 export function DashboardView() {
   const router = useRouter();
   const { data: stats, isLoading: isStatsLoading, refetch } = useDashboardStats();
+  const { data: portfolioSettings, isLoading: isPortfolioLoading } = usePortfolioSettings();
+  const { data: profile } = useProfile();
+  const updatePortfolioMutation = useUpdatePortfolioSettings();
 
   const updateMessageStatus = useUpdateMessageStatus();
   const [isProjectSheetOpen, setIsProjectSheetOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   const projects: IProject[] = stats?.recent?.projects ?? [];
   const messages: IMessage[] = stats?.recent?.messages ?? [];
+
+  const portfolioSlug = portfolioSettings?.slug || stats?.portfolio?.slug || "my-portfolio";
+  const isPublished = portfolioSettings?.isPublished ?? stats?.portfolio?.isPublished ?? false;
+  const currentTemplate = portfolioSettings?.templateId || stats?.portfolio?.templateId || "nova-engine";
+  const completionPercentage = stats?.completion?.percentage ?? 85;
+  const completionSteps = stats?.completion?.steps ?? [
+    { id: "profile", label: "Profile Bio & Headline", done: true },
+    { id: "projects", label: "Showcase Projects (1+)", done: true },
+    { id: "skills", label: "Tech Stack & Skills (3+)", done: true },
+    { id: "avatar", label: "Profile Avatar Image", done: true },
+    { id: "socials", label: "GitHub & LinkedIn Links", done: false },
+  ];
+
+  const handleCopyLink = () => {
+    if (typeof window !== "undefined") {
+      const url = `${window.location.origin}/${portfolioSlug}`;
+      navigator.clipboard.writeText(url);
+      setCopied(true);
+      toast.success("Portfolio URL copied to clipboard!");
+      setTimeout(() => setCopied(false), 2500);
+    }
+  };
+
+  const handleTogglePublish = async () => {
+    try {
+      await updatePortfolioMutation.mutateAsync({
+        isPublished: !isPublished,
+      });
+      toast.success(
+        !isPublished
+          ? "Portfolio published live to the web!"
+          : "Portfolio unpublished. Set to private draft.",
+      );
+      refetch();
+    } catch (err: any) {
+      toast.error("Failed to update publication status");
+    }
+  };
 
   return (
     <div className="space-y-6 pb-6">
@@ -45,12 +103,11 @@ export function DashboardView() {
             <span>Portfolio Command Hub</span>
             <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-500 dark:text-emerald-400 border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse" />
-              Live Server v2.4
+              SaaS Multi-Tenant v3.0
             </span>
           </h1>
           <p className="text-xs text-muted-foreground mt-1">
-            Real-time pipeline metrics, project showcases, and client inquiry
-            telemetry.
+            Real-time portfolio management, template selector, pipeline telemetry, and inbound inquiries.
           </p>
         </div>
 
@@ -63,12 +120,152 @@ export function DashboardView() {
             <span>New Project</span>
           </button>
           <Link
-            href="/admin/messages"
+            href="/admin/templates"
             className="px-3.5 py-2 rounded-lg bg-card hover:bg-accent border border-border text-foreground text-xs font-medium transition-colors flex items-center gap-1.5"
           >
-            <Mail className="w-3.5 h-3.5 text-primary" />
-            <span>View Inbound Leads</span>
+            <Palette className="w-3.5 h-3.5 text-primary" />
+            <span>Switch Theme</span>
           </Link>
+        </div>
+      </div>
+
+      {/* SaaS Portfolio Live Status & Completion Hub */}
+      <div className="bg-linear-to-br from-card to-card/60 border border-border rounded-2xl p-5 md:p-6 shadow-sm relative overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          {/* Left Column: Public URL & Live Controls */}
+          <div className="lg:col-span-7 space-y-4">
+            <div className="flex flex-wrap items-center gap-2.5">
+              <span className="text-[11px] font-mono font-semibold uppercase tracking-wider text-muted-foreground">
+                Public Portfolio URL
+              </span>
+
+              {/* Status Badge */}
+              <span
+                className={cn(
+                  "inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold border",
+                  isPublished
+                    ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-500"
+                    : "bg-amber-500/10 border-amber-500/30 text-amber-500",
+                )}
+              >
+                <span
+                  className={cn(
+                    "w-1.5 h-1.5 rounded-full",
+                    isPublished ? "bg-emerald-500 animate-pulse" : "bg-amber-500",
+                  )}
+                />
+                {isPublished ? "Published (Live)" : "Draft (Private)"}
+              </span>
+
+              {/* Active Theme Badge */}
+              <Link
+                href="/admin/templates"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-primary/10 border border-primary/20 text-primary hover:bg-primary/20 transition-colors"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>
+                  Theme:{" "}
+                  {currentTemplate === "apex-studio"
+                    ? "Apex Studio"
+                    : currentTemplate === "nova-engine"
+                    ? "Nova Engine"
+                    : "Modern Minimal"}
+                </span>
+              </Link>
+            </div>
+
+            {/* Public Link Bar */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+              <div className="flex-1 flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-background border border-border text-xs font-mono text-foreground select-all overflow-hidden">
+                <Globe className="w-4 h-4 text-primary shrink-0" />
+                <span className="truncate">
+                  {typeof window !== "undefined" ? window.location.origin : "http://localhost:3000"}/{portfolioSlug}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleCopyLink}
+                  className="px-3.5 py-2.5 rounded-xl bg-card hover:bg-accent border border-border text-foreground text-xs font-medium transition-colors flex items-center justify-center gap-1.5 cursor-pointer shrink-0"
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-500" />
+                      <span className="text-emerald-500 font-semibold">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5 text-muted-foreground" />
+                      <span>Copy URL</span>
+                    </>
+                  )}
+                </button>
+
+                <Link
+                  href={`/${portfolioSlug}`}
+                  target="_blank"
+                  className="px-3.5 py-2.5 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold transition-all shadow-sm flex items-center justify-center gap-1.5 shrink-0"
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                  <span>Visit Live</span>
+                </Link>
+
+                <button
+                  onClick={handleTogglePublish}
+                  disabled={updatePortfolioMutation.isPending}
+                  className={cn(
+                    "px-3.5 py-2.5 rounded-xl text-xs font-semibold border transition-all cursor-pointer shrink-0",
+                    isPublished
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-500 hover:bg-amber-500/20"
+                      : "bg-emerald-500/10 border-emerald-500/30 text-emerald-500 hover:bg-emerald-500/20",
+                  )}
+                >
+                  {isPublished ? "Unpublish" : "Publish Now"}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Right Column: Portfolio Readiness Meter */}
+          <div className="lg:col-span-5 bg-background/50 border border-border/80 rounded-xl p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-foreground flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-primary" />
+                <span>Profile Readiness</span>
+              </span>
+              <span className="text-xs font-bold font-mono text-primary">
+                {completionPercentage}% Complete
+              </span>
+            </div>
+
+            {/* Meter Bar */}
+            <div className="w-full bg-muted rounded-full h-2 overflow-hidden">
+              <div
+                className="bg-gradient-to-r from-indigo-500 via-primary to-emerald-500 h-full rounded-full transition-all duration-500"
+                style={{ width: `${Math.max(completionPercentage, 10)}%` }}
+              />
+            </div>
+
+            {/* Checklist items */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 pt-1">
+              {completionSteps.slice(0, 4).map((step) => (
+                <div
+                  key={step.id}
+                  className={cn(
+                    "flex items-center gap-1.5 text-[11px] font-medium truncate",
+                    step.done ? "text-muted-foreground line-through opacity-80" : "text-foreground",
+                  )}
+                >
+                  {step.done ? (
+                    <CheckCircle2 className="w-3 h-3 text-emerald-500 shrink-0" />
+                  ) : (
+                    <Circle className="w-3 h-3 text-amber-500 shrink-0" />
+                  )}
+                  <span className="truncate">{step.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 

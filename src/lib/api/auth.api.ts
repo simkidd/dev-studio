@@ -3,11 +3,20 @@ import {
   ApiResponse,
   IUser,
   ILoginCredentials,
+  IRegisterCredentials,
   IAuthResponse,
   IChangePasswordPayload,
 } from "@/interfaces";
 
 export const authApi = {
+  register: async (credentials: IRegisterCredentials): Promise<ApiResponse<IAuthResponse>> => {
+    const { data } = await apiClient.post<ApiResponse<IAuthResponse>>(
+      "/auth/register",
+      credentials
+    );
+    return data;
+  },
+
   login: async (credentials: ILoginCredentials): Promise<ApiResponse<IAuthResponse>> => {
     const { data } = await apiClient.post<ApiResponse<IAuthResponse>>(
       "/auth/login",
@@ -15,6 +24,7 @@ export const authApi = {
     );
     return data;
   },
+
 
   refreshToken: async (refreshToken: string): Promise<ApiResponse<{ tokens: { accessToken: string; refreshToken: string } }>> => {
     const { data } = await apiClient.post<ApiResponse<{ tokens: { accessToken: string; refreshToken: string } }>>(

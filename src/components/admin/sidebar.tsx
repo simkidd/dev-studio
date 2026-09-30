@@ -15,6 +15,8 @@ import {
   Settings,
   Terminal,
   LogOut,
+  Palette,
+  Sparkles,
   ExternalLink,
   ChevronsUpDown,
 } from "lucide-react";
@@ -80,6 +82,16 @@ export function AdminSidebar() {
       ],
     },
     {
+      title: "DESIGN & THEMES",
+      items: [
+        {
+          title: "Templates",
+          href: "/admin/templates",
+          icon: Palette,
+        },
+      ],
+    },
+    {
       title: "CONTENT",
       items: [
         {
@@ -123,7 +135,7 @@ export function AdminSidebar() {
       title: "SYSTEM",
       items: [
         {
-          title: "Settings",
+          title: "Profile & Settings",
           href: "/admin/profile",
           icon: Settings,
         },
@@ -333,7 +345,7 @@ export function AdminSidebar() {
                     className="cursor-pointer text-xs py-1.5 px-2"
                   >
                     <Link
-                      href="/"
+                      href={user?.portfolioSlug ? `/${user.portfolioSlug}` : "/"}
                       target="_blank"
                       className="flex items-center gap-2"
                     >

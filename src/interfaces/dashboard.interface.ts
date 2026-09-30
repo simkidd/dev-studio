@@ -1,6 +1,12 @@
 import { IMessage } from "./message.interface";
 import { IProject } from "./project.interface";
 
+export interface ICompletionStep {
+  id: string;
+  label: string;
+  done: boolean;
+}
+
 export interface IDashboardStats {
   counts: {
     projects: {
@@ -26,4 +32,16 @@ export interface IDashboardStats {
     messages: IMessage[];
     projects: IProject[];
   };
+  portfolio?: {
+    slug: string;
+    templateId: string;
+    isPublished: boolean;
+    seoTitle?: string;
+    seoDescription?: string;
+  };
+  completion?: {
+    percentage: number;
+    steps: ICompletionStep[];
+  };
 }
+

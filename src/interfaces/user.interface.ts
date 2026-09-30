@@ -1,4 +1,4 @@
-export type UserRole = "admin" | "superadmin";
+export type UserRole = "user" | "admin" | "superadmin";
 
 export interface IUser {
   _id: string;
@@ -8,6 +8,7 @@ export interface IUser {
   avatarUrl?: string;
   headline?: string;
   role: UserRole;
+  portfolioSlug?: string;
   lastLogin?: string;
   createdAt: string;
   updatedAt: string;
@@ -28,7 +29,16 @@ export interface ILoginCredentials {
   password: string;
 }
 
+export interface IRegisterCredentials {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  desiredSlug?: string;
+}
+
 export interface IChangePasswordPayload {
   currentPassword: string;
   newPassword: string;
 }
+

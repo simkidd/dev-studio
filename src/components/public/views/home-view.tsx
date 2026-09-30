@@ -53,11 +53,6 @@ export function HomeView() {
   const avatarUrl = profile?.avatarUrl || "";
   const isAvailable = profile?.isAvailableForHire ?? true;
 
-  const headlineWords = (headline || "Software Engineer").trim().split(/\s+/);
-  const midpoint = Math.ceil(headlineWords.length / 2);
-  const titleLine1 = headlineWords.slice(0, midpoint).join(" ");
-  const titleLine2 = headlineWords.slice(midpoint).join(" ");
-
   return (
     <div className="space-y-28 sm:space-y-36">
       {/* ─────────────────────────────────────────────────────────────
@@ -77,22 +72,13 @@ export function HomeView() {
           </div>
 
           {/* Mega Typography Header with 3D Chrome Sparkles */}
-          <div className="space-y-3 relative">
-            <div className="flex items-center justify-center gap-3 sm:gap-6">
-              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0" />
-              <h1 className="text-3xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none">
-                {titleLine1}
-              </h1>
-              <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 hidden xs:block" />
-            </div>
-            {titleLine2 && (
-              <div className="flex items-center justify-center gap-3 sm:gap-6">
-                <h1 className="text-3xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-none select-none text-transparent bg-clip-text bg-linear-to-r from-foreground via-foreground/90 to-foreground/60">
-                  {titleLine2}
-                </h1>
-                <ChromeSparkleIcon className="w-5 h-5 sm:w-8 sm:h-8 text-primary animate-pulse shrink-0 block xs:hidden" />
-              </div>
-            )}
+          <div className="relative max-w-4xl mx-auto">
+            <h1 className="text-3xl xs:text-5xl sm:text-7xl lg:text-8xl font-black tracking-tight text-foreground uppercase leading-[1.05] select-none text-center">
+              <span className="inline-flex items-center justify-center gap-3 sm:gap-5 flex-wrap">
+                <span>{headline}</span>
+                <ChromeSparkleIcon className="w-6 h-6 sm:w-10 sm:h-10 text-primary animate-pulse inline-block shrink-0" />
+              </span>
+            </h1>
           </div>
 
           {/* Subtitle / Value Proposition */}

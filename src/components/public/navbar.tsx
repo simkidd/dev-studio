@@ -2,26 +2,22 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Menu, X, ArrowUpRight, Sparkles, Lock } from "lucide-react";
-import { useProfile } from "@/hooks";
+import { Menu, X, ArrowRight, Sparkles, Terminal, Flame } from "lucide-react";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
-  { label: "Works", href: "/projects" },
-  { label: "About", href: "/about" },
-  { label: "Services", href: "/services" },
-  { label: "Articles", href: "/blog" },
-  { label: "Contact", href: "/contact" },
+const PLATFORM_NAV_ITEMS = [
+  { label: "Templates", href: "/templates" },
+  { label: "Features", href: "/#features" },
+  { label: "Pricing", href: "/#pricing" },
+  { label: "Live Showcases", href: "/alex-morgan" },
 ];
 
 export function PublicNavbar() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const pathname = usePathname();
-  const { data: profile } = useProfile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -30,12 +26,6 @@ export function PublicNavbar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
-
-  const brandName =
-    profile?.brandName?.trim() ||
-    (profile?.firstName
-      ? `${profile.firstName} ${profile.lastName || ""}`.trim()
-      : "Developer");
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 flex items-center justify-center p-3 sm:p-5 pointer-events-none">
@@ -48,28 +38,27 @@ export function PublicNavbar() {
             : "bg-background/65 dark:bg-background/70 backdrop-blur-sm border-border/70 shadow-xs",
         )}
       >
-        {/* Brand / Logo */}
+        {/* SaaS Platform Brand */}
         <Link
           href="/"
           className="flex items-center gap-2.5 group text-foreground font-bold tracking-tight text-sm hover:opacity-90 transition-opacity shrink-0"
         >
-          {profile?.logoUrl ? (
-            <Image
-              src={profile.logoUrl}
-              alt={brandName}
-              width={28}
-              height={28}
-              className="w-7 h-7 rounded-lg object-contain shrink-0"
-            />
-          ) : null}
-          <span className="font-bold tracking-tight text-sm sm:text-base text-foreground">
-            {brandName}
-          </span>
+          <div className="w-7 h-7 rounded-lg bg-linear-to-tr from-primary to-indigo-600 flex items-center justify-center text-white font-mono text-xs shadow-md shadow-primary/20">
+            <Terminal className="w-3.5 h-3.5" />
+          </div>
+          <div className="flex items-center gap-1.5">
+            <span className="font-bold tracking-tight text-sm sm:text-base text-foreground">
+              DevPortfolio
+            </span>
+            <span className="px-1.5 py-0.2 rounded text-[9px] font-mono font-semibold bg-primary/10 text-primary border border-primary/20">
+              SaaS
+            </span>
+          </div>
         </Link>
 
         {/* Desktop Navigation Links */}
         <nav className="hidden md:flex items-center gap-1">
-          {NAV_ITEMS.map((item) => {
+          {PLATFORM_NAV_ITEMS.map((item) => {
             const isActive = pathname === item.href;
             return (
               <Link
@@ -88,89 +77,63 @@ export function PublicNavbar() {
           })}
         </nav>
 
-        {/* Actions: Theme Toggle, Admin, CTA */}
-        <div className="flex items-center gap-2">
-          <div className="hidden md:flex items-center">
-            <ThemeToggle size="sm" />
-          </div>
+        {/* Actions: Theme Toggle, Sign In, Get Started */}
+        <div className="flex items-center gap-2.5">
+          <ThemeToggle size="sm" className="hidden md:inline-flex" />
 
           <Link
             href="/admin/login"
-            className="hidden sm:inline-flex p-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-colors"
-            title="Admin CMS"
+            className="hidden sm:inline-flex text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-2 py-1"
           >
-            <Lock className="w-3.5 h-3.5" />
+            Sign In
           </Link>
 
           <Link
-            href="/contact"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-xs hover:shadow-primary/20 transition-all cursor-pointer"
+            href="/admin/login"
+            className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-semibold shadow-sm transition-all"
           >
-            <span>Let&apos;s Talk</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
+            <span>Get Started</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
 
-          {/* Mobile Menu Trigger */}
+          {/* Mobile menu trigger */}
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="md:hidden p-1.5 text-muted-foreground hover:text-foreground rounded-full hover:bg-muted transition-colors cursor-pointer"
-            aria-label="Toggle navigation menu"
+            className="md:hidden p-1.5 rounded-full text-foreground hover:bg-muted/80 transition-colors cursor-pointer"
           >
-            {mobileMenuOpen ? (
-              <X className="w-4 h-4" />
-            ) : (
-              <Menu className="w-4 h-4" />
-            )}
+            {mobileMenuOpen ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
           </button>
         </div>
       </div>
 
-      {/* Mobile Drawer Overlay */}
+      {/* Mobile Menu Dropdown */}
       {mobileMenuOpen && (
-        <div className="pointer-events-auto fixed top-20 left-4 right-4 max-w-sm mx-auto bg-popover border border-border rounded-2xl p-4 shadow-2xl space-y-3 z-50 animate-in fade-in zoom-in-95 duration-200">
-          <div className="flex items-center justify-between pb-2 border-b border-border">
-            <span className="text-xs font-semibold text-foreground">
-              Navigation
-            </span>
-            <button
-              onClick={() => setMobileMenuOpen(false)}
-              className="p-1 text-muted-foreground hover:text-foreground rounded-md"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-
-          <div className="flex flex-col space-y-1">
-            {NAV_ITEMS.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.label}
-                  href={item.href}
-                  onClick={() => setMobileMenuOpen(false)}
-                  className={cn(
-                    "px-3 py-2 rounded-xl text-xs font-medium transition-colors flex items-center justify-between",
-                    isActive
-                      ? "bg-primary/10 text-primary font-semibold border border-primary/20"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted",
-                  )}
-                >
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </div>
-
-          <div className="pt-2 border-t border-border flex items-center justify-between">
-            <Link
-              href="/admin/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="text-[11px] text-muted-foreground hover:text-foreground flex items-center gap-1 font-mono"
-            >
-              <Lock className="w-3 h-3" />
-              <span>Admin Portal</span>
-            </Link>
-            <ThemeToggle size="sm" />
+        <div className="md:hidden pointer-events-auto absolute top-16 inset-x-4 bg-popover/95 backdrop-blur-xl border border-border rounded-2xl p-5 shadow-2xl space-y-3 z-50 animate-in fade-in slide-in-from-top-2">
+          <div className="flex flex-col space-y-2">
+            {PLATFORM_NAV_ITEMS.map((item) => (
+              <Link
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileMenuOpen(false)}
+                className="px-3 py-2 rounded-lg text-sm font-medium text-foreground hover:bg-muted/60 transition-colors"
+              >
+                {item.label}
+              </Link>
+            ))}
+            <div className="pt-3 border-t border-border flex items-center justify-between">
+              <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
+              <ThemeToggle size="sm" />
+            </div>
+            <div className="pt-1">
+              <Link
+                href="/admin/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full py-2.5 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-semibold flex items-center justify-center gap-1.5 shadow-sm"
+              >
+                <span>Developer Login</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
       )}

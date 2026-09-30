@@ -10,6 +10,7 @@ import {
   Loader2,
   Globe,
   Mail,
+  Phone,
   Sparkles,
   FileText,
   Search,
@@ -63,8 +64,11 @@ export interface ProfileFormData {
   twitter: string;
   discord: string;
   youtube: string;
+  contactEmail: string;
+  contactPhone: string;
   website: string;
   email: string;
+  phone: string;
   seoTitle: string;
   seoDescription: string;
   seoKeywords: string;
@@ -109,8 +113,11 @@ export function ProfileView() {
       twitter: "",
       discord: "",
       youtube: "",
+      contactEmail: "",
+      contactPhone: "",
       website: "",
       email: "",
+      phone: "",
       seoTitle: "",
       seoDescription: "",
       seoKeywords: "",
@@ -153,8 +160,11 @@ export function ProfileView() {
         twitter: profile.socialLinks?.twitter || "",
         discord: profile.socialLinks?.discord || "",
         youtube: profile.socialLinks?.youtube || "",
+        contactEmail: profile.contactEmail || profile.socialLinks?.email || "",
+        contactPhone: profile.contactPhone || profile.socialLinks?.phone || "",
         website: profile.socialLinks?.website || "",
-        email: profile.socialLinks?.email || "",
+        email: profile.contactEmail || profile.socialLinks?.email || "",
+        phone: profile.contactPhone || profile.socialLinks?.phone || "",
         seoTitle: profile.seoTitle || "",
         seoDescription: profile.seoDescription || "",
         seoKeywords: Array.isArray(profile.seoKeywords)
@@ -244,6 +254,8 @@ export function ProfileView() {
         happyClients: Number(data.happyClients) || 0,
         codeCommits: Number(data.codeCommits) || 0,
       },
+      contactEmail: (data.contactEmail || data.email || "").trim() || undefined,
+      contactPhone: (data.contactPhone || data.phone || "").trim() || undefined,
       socialLinks: {
         github: data.github.trim(),
         linkedin: data.linkedin.trim(),
@@ -251,7 +263,8 @@ export function ProfileView() {
         discord: data.discord.trim(),
         youtube: data.youtube.trim(),
         website: data.website.trim(),
-        email: data.email.trim(),
+        email: (data.contactEmail || data.email || "").trim(),
+        phone: (data.contactPhone || data.phone || "").trim(),
       },
       seoTitle: data.seoTitle.trim(),
       seoDescription: data.seoDescription.trim(),
@@ -801,14 +814,33 @@ export function ProfileView() {
                 <div className="space-y-1.5">
                   <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
                     <Mail className="w-3.5 h-3.5 text-muted-foreground" />
-                    Direct Contact Email
+                    Public Contact Email
                   </label>
                   <Input
                     type="email"
-                    {...register("email")}
+                    {...register("contactEmail")}
                     placeholder="contact@yourdomain.com"
                     className="rounded-lg text-xs"
                   />
+                  <span className="text-[10px] text-muted-foreground block">
+                    Public inquiries email for portfolio contact page (distinct from account login email)
+                  </span>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-foreground flex items-center gap-1.5">
+                    <Phone className="w-3.5 h-3.5 text-muted-foreground" />
+                    Public Phone / WhatsApp Number
+                  </label>
+                  <Input
+                    type="tel"
+                    {...register("contactPhone")}
+                    placeholder="+1 (555) 000-0000"
+                    className="rounded-lg text-xs"
+                  />
+                  <span className="text-[10px] text-muted-foreground block">
+                    Direct phone or WhatsApp displayed on your contact page
+                  </span>
                 </div>
 
                 <div className="space-y-1.5">

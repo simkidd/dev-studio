@@ -9,3 +9,5 @@ export * from "./message.interface";
 export * from "./testimonial.interface";
 export * from "./dashboard.interface";
 export * from "./upload.interface";
+export * from "./portfolio.interface";
+

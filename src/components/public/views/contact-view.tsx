@@ -4,11 +4,10 @@ import React, { useState } from "react";
 import { useProfile, useSubmitContactMessage } from "@/hooks";
 import {
   Mail,
+  Phone,
   Send,
   Loader2,
   CheckCircle2,
-  Copy,
-  Check,
   MapPin,
 } from "lucide-react";
 import {
@@ -27,10 +26,10 @@ export function ContactView() {
   const [email, setEmail] = useState("");
   const [subject, setSubject] = useState("");
   const [message, setMessage] = useState("");
-  const [copied, setCopied] = useState(false);
 
-  const directEmail = profile?.socialLinks?.email || "hello@portfolio.dev";
-  const location = profile?.location || "Remote";
+  const directEmail = profile?.contactEmail || profile?.socialLinks?.email || "hello@portfolio.dev";
+  const directPhone = profile?.contactPhone || profile?.socialLinks?.phone;
+  const location = profile?.location || "Remote / Global";
   const isAvailable = profile?.isAvailableForHire ?? true;
   const availabilityNote =
     profile?.availabilityNote ||
@@ -39,15 +38,6 @@ export function ContactView() {
   const github = profile?.socialLinks?.github;
   const linkedin = profile?.socialLinks?.linkedin;
   const twitter = profile?.socialLinks?.twitter;
-
-  const handleCopyEmail = () => {
-    if (typeof window !== "undefined") {
-      navigator.clipboard.writeText(directEmail);
-      setCopied(true);
-      toast.success("Email address copied to clipboard!");
-      setTimeout(() => setCopied(false), 2500);
-    }
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,21 +91,20 @@ export function ContactView() {
       </div>
 
       {/* ─────────────────────────────────────────────────────────────
-          2. TWO-COLUMN LAYOUT: INFO CARDS & FORM
+          2. TWO-COLUMN LAYOUT: UNIFIED INFO CARD & FORM
       ───────────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-        {/* Left 2 Cols: Availability & Quick Channels */}
+        {/* Left 2 Cols: Unified Contact Card */}
         <div className="lg:col-span-2 space-y-4">
-          {/* Availability Card */}
-          <div className="p-6 rounded-3xl bg-card border border-border space-y-4 shadow-xs">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold font-mono text-foreground uppercase tracking-wider">
-                Availability Status
-              </span>
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-
-            <div className="space-y-1">
+          <div className="p-6 rounded-3xl bg-card border border-border space-y-5 shadow-xs">
+            {/* Availability */}
+            <div className="space-y-2 pb-4 border-b border-border/60">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold font-mono text-foreground uppercase tracking-wider">
+                  Availability Status
+                </span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              </div>
               <p className="text-sm font-bold text-foreground">
                 {isAvailable ? "Open for New Engagements" : "Currently Engaged"}
               </p>
@@ -124,77 +113,97 @@ export function ContactView() {
               </p>
             </div>
 
-            <div className="pt-3 border-t border-border/60 flex items-center gap-2 text-xs font-mono text-muted-foreground">
-              <MapPin className="w-3.5 h-3.5" />
-              <span>{location}</span>
-            </div>
-          </div>
-
-          {/* Copy Email Card */}
-          <div className="p-6 rounded-3xl bg-card border border-border space-y-3 shadow-xs">
-            <span className="text-xs font-bold font-mono text-muted-foreground uppercase tracking-wider">
-              Direct Contact
-            </span>
-
-            <div className="flex items-center justify-between gap-2 p-2.5 rounded-2xl bg-muted/60 border border-border">
-              <span className="text-xs font-mono text-foreground truncate pl-1">
-                {directEmail}
+            {/* Direct Channels */}
+            <div className="space-y-3">
+              <span className="text-xs font-bold font-mono text-muted-foreground uppercase tracking-wider block">
+                Direct Channels
               </span>
-              <button
-                onClick={handleCopyEmail}
-                className="p-2 rounded-xl bg-background hover:bg-muted text-muted-foreground hover:text-foreground border border-border transition-colors cursor-pointer shrink-0"
-                title="Copy email address"
+
+              {/* Email */}
+              <a
+                href={`mailto:${directEmail}`}
+                className="flex items-center gap-3 p-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-foreground hover:text-primary transition-colors group"
               >
-                {copied ? (
-                  <Check className="w-3.5 h-3.5 text-emerald-500" />
-                ) : (
-                  <Copy className="w-3.5 h-3.5" />
-                )}
-              </button>
-            </div>
-          </div>
+                <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-mono text-muted-foreground">Email</p>
+                  <p className="text-xs font-semibold truncate group-hover:underline">{directEmail}</p>
+                </div>
+              </a>
 
-          {/* Social Channels */}
-          <div className="p-6 rounded-3xl bg-card border border-border space-y-3 shadow-xs">
-            <span className="text-xs font-bold font-mono text-muted-foreground uppercase tracking-wider">
-              Social Channels
-            </span>
+              {/* Phone */}
+              {directPhone && (
+                <a
+                  href={`tel:${directPhone.replace(/\s+/g, "")}`}
+                  className="flex items-center gap-3 p-3 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-foreground hover:text-primary transition-colors group"
+                >
+                  <div className="w-8 h-8 rounded-xl bg-primary/10 text-primary flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[10px] font-mono text-muted-foreground">Phone / WhatsApp</p>
+                    <p className="text-xs font-semibold font-mono truncate group-hover:underline">{directPhone}</p>
+                  </div>
+                </a>
+              )}
 
-            <div className="flex flex-wrap gap-2 pt-1">
-              {github && (
-                <a
-                  href={github}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-2 text-xs font-medium"
-                >
-                  <GithubIcon className="w-4 h-4" />
-                  <span>GitHub</span>
-                </a>
-              )}
-              {linkedin && (
-                <a
-                  href={linkedin}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-2 text-xs font-medium"
-                >
-                  <LinkedinIcon className="w-4 h-4" />
-                  <span>LinkedIn</span>
-                </a>
-              )}
-              {twitter && (
-                <a
-                  href={twitter}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="p-2.5 rounded-2xl bg-muted/60 hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-2 text-xs font-medium"
-                >
-                  <TwitterIcon className="w-4 h-4" />
-                  <span>X (Twitter)</span>
-                </a>
-              )}
+              {/* Location */}
+              <div className="flex items-center gap-3 p-3 rounded-2xl bg-muted/60 border border-border text-foreground">
+                <div className="w-8 h-8 rounded-xl bg-background text-muted-foreground flex items-center justify-center shrink-0">
+                  <MapPin className="w-4 h-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-[10px] font-mono text-muted-foreground">Location</p>
+                  <p className="text-xs font-semibold truncate">{location}</p>
+                </div>
+              </div>
             </div>
+
+            {/* Social Channels */}
+            {(github || linkedin || twitter) && (
+              <div className="pt-4 border-t border-border/60 space-y-2.5">
+                <span className="text-xs font-bold font-mono text-muted-foreground uppercase tracking-wider block">
+                  Social Channels
+                </span>
+                <div className="flex flex-wrap gap-2">
+                  {github && (
+                    <a
+                      href={github}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-background hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-1.5 text-xs font-medium"
+                    >
+                      <GithubIcon className="w-3.5 h-3.5" />
+                      <span>GitHub</span>
+                    </a>
+                  )}
+                  {linkedin && (
+                    <a
+                      href={linkedin}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-background hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-1.5 text-xs font-medium"
+                    >
+                      <LinkedinIcon className="w-3.5 h-3.5" />
+                      <span>LinkedIn</span>
+                    </a>
+                  )}
+                  {twitter && (
+                    <a
+                      href={twitter}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="px-3 py-1.5 rounded-xl bg-background hover:bg-muted border border-border text-foreground transition-colors flex items-center gap-1.5 text-xs font-medium"
+                    >
+                      <TwitterIcon className="w-3.5 h-3.5" />
+                      <span>X</span>
+                    </a>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
         </div>
 

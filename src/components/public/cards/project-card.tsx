@@ -33,11 +33,15 @@ export function ProjectCard({
             src={project.thumbnailUrl}
             alt={project.title}
             fill
+            unoptimized
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground font-mono text-xs">
-            No Preview Available
+          <div className="w-full h-full flex flex-col items-center justify-center bg-gradient-to-br from-primary/5 via-muted to-primary/10 text-muted-foreground gap-2 p-4 text-center">
+            <div className="w-10 h-10 rounded-2xl bg-background/80 border border-border flex items-center justify-center shadow-xs">
+              <span className="text-xs font-mono font-bold text-primary">&lt;/&gt;</span>
+            </div>
+            <span className="font-mono text-[11px] opacity-70">Project Preview</span>
           </div>
         )}
 

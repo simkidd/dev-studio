@@ -16,3 +16,5 @@ export const useCurrentUser = () => {
     retry: 1,
   });
 };
+
+export const useUser = useCurrentUser;
