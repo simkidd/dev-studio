@@ -180,7 +180,7 @@ export function MarketingHomeView() {
               whileTap={{ scale: 0.97 }}
             >
               <Link
-                href="/admin/login"
+                href="/register"
                 className="w-full sm:w-auto px-8 py-3.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-95 shadow-md shadow-primary/20 transition-all flex items-center justify-center gap-2 group"
               >
                 <span>Create Your Portfolio</span>
@@ -838,7 +838,7 @@ export function MarketingHomeView() {
             </div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
-                href="/admin/login"
+                href="/register"
                 className="w-full py-3.5 rounded-full text-xs font-semibold bg-muted hover:bg-muted/80 text-foreground text-center block transition-colors border border-border shadow-2xs"
               >
                 Get Started Free
@@ -897,7 +897,7 @@ export function MarketingHomeView() {
             </div>
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Link
-                href="/admin/login"
+                href="/register"
                 className="w-full py-3.5 rounded-full text-xs font-semibold bg-primary text-primary-foreground hover:opacity-95 text-center block transition-opacity shadow-md shadow-primary/20"
               >
                 Upgrade to Pro
@@ -931,7 +931,7 @@ export function MarketingHomeView() {
               whileTap={{ scale: 0.97 }}
             >
               <Link
-                href="/admin/login"
+                href="/register"
                 className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full text-sm font-semibold bg-primary text-primary-foreground hover:opacity-95 shadow-md shadow-primary/20 transition-all"
               >
                 <span>Create Your Portfolio</span>

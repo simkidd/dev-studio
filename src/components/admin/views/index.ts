@@ -10,4 +10,3 @@ export * from "./post-detail-view";
 export * from "./testimonials-view";
 export * from "./profile-view";
 export * from "./templates-view";
-export * from "./login-view";

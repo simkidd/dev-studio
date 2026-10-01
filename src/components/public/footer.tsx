@@ -85,12 +85,12 @@ export function PublicFooter() {
             </h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/admin/login" className="hover:text-foreground transition-colors">
+                <Link href="/login" className="hover:text-foreground transition-colors">
                   Sign In
                 </Link>
               </li>
               <li>
-                <Link href="/admin/login" className="hover:text-foreground transition-colors">
+                <Link href="/register" className="hover:text-foreground transition-colors">
                   Create Account
                 </Link>
               </li>
@@ -115,7 +115,7 @@ export function PublicFooter() {
             <Link href="/templates" className="hover:text-foreground transition-colors">
               Templates
             </Link>
-            <Link href="/admin/login" className="hover:text-foreground transition-colors">
+            <Link href="/admin" className="hover:text-foreground transition-colors">
               Dashboard
             </Link>
           </div>

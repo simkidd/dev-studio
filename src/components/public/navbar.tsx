@@ -81,14 +81,14 @@ export function PublicNavbar() {
           <ThemeToggle size="sm" className="hidden md:inline-flex" />
 
           <Link
-            href="/admin/login"
+            href="/login"
             className="hidden sm:inline-flex text-xs font-medium text-muted-foreground hover:text-foreground transition-colors px-3 py-1.5 rounded-full hover:bg-muted/50"
           >
             Sign In
           </Link>
 
           <Link
-            href="/admin/login"
+            href="/register"
             className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-primary hover:bg-primary/90 text-primary-foreground text-xs font-medium shadow-xs transition-all"
           >
             <span>Get Started</span>
@@ -131,14 +131,21 @@ export function PublicNavbar() {
                 <span className="text-xs font-medium text-muted-foreground">Theme Mode</span>
                 <ThemeToggle size="sm" />
               </div>
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-2">
                 <Link
-                  href="/admin/login"
+                  href="/register"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full py-2 px-4 rounded-xl bg-primary text-primary-foreground text-xs font-medium flex items-center justify-center gap-1.5 shadow-xs"
                 >
-                  <span>Developer Login</span>
+                  <span>Get Started Free</span>
                   <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full py-2 px-4 rounded-xl bg-muted text-muted-foreground hover:text-foreground text-xs font-medium flex items-center justify-center"
+                >
+                  <span>Sign In</span>
                 </Link>
               </div>
             </div>

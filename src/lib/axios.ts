@@ -84,8 +84,8 @@ apiClient.interceptors.response.use(
     const refreshToken = getRefreshToken();
     if (!refreshToken) {
       clearAuthCookies();
-      if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
-        window.location.href = "/admin/login";
+      if (typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.pathname === "/onboarding")) {
+        window.location.href = "/login";
       }
       return Promise.reject(error);
     }
@@ -107,8 +107,8 @@ apiClient.interceptors.response.use(
     } catch (refreshError: any) {
       processQueue(refreshError, null);
       clearAuthCookies();
-      if (typeof window !== "undefined" && window.location.pathname.startsWith("/admin")) {
-        window.location.href = "/admin/login";
+      if (typeof window !== "undefined" && (window.location.pathname.startsWith("/admin") || window.location.pathname === "/onboarding")) {
+        window.location.href = "/login";
       }
       return Promise.reject(refreshError);
     } finally {

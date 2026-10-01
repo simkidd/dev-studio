@@ -139,7 +139,7 @@ export function TemplatesGalleryView() {
                 <div className="flex items-center gap-3 pt-4 border-t border-border/60">
                   <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex-1">
                     <Link
-                      href="/admin/login"
+                      href="/register"
                       className="w-full py-2.5 px-4 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:opacity-95 transition-opacity flex items-center justify-center gap-1.5 shadow-md shadow-primary/20"
                     >
                       <span>Use Template</span>
@@ -179,7 +179,7 @@ export function TemplatesGalleryView() {
           </div>
           <motion.div whileHover={{ scale: 1.03, y: -2 }} whileTap={{ scale: 0.97 }}>
             <Link
-              href="/admin/login"
+              href="/register"
               className="px-6 py-3 rounded-full text-xs sm:text-sm font-semibold bg-primary text-primary-foreground hover:opacity-95 transition-all shrink-0 shadow-lg shadow-primary/20 inline-block"
             >
               Get Started Free

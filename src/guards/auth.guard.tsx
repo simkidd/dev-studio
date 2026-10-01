@@ -21,19 +21,16 @@ export const AuthGuard: React.FC<AuthGuardProps> = ({ children }) => {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
-      router.replace("/admin/login");
+      router.replace("/login");
     }
   }, [isAuthenticated, isLoading, router]);
 
-  // Sync fresh server user data to auth store and verify admin role
+  // Sync fresh server user data to auth store
   useEffect(() => {
     if (serverUser) {
       setUser(serverUser);
-      if (serverUser.role !== "admin" && serverUser.role !== "superadmin") {
-        router.replace("/");
-      }
     }
-  }, [serverUser, setUser, router]);
+  }, [serverUser, setUser]);
 
   // Handle server-side session expiry or invalidation
   useEffect(() => {

@@ -13,9 +13,9 @@ export interface AdminDashboardShellProps {
 export function AdminDashboardShell({ children }: AdminDashboardShellProps) {
   const pathname = usePathname();
 
-  // If on login page, render plain content without sidebar/header/guard
-  if (pathname === "/admin/login") {
-    return <>{children}</>;
+  // If on onboarding setup wizard, protect route with AuthGuard without rendering sidebar/header
+  if (pathname === "/onboarding") {
+    return <AuthGuard>{children}</AuthGuard>;
   }
 
   return (
