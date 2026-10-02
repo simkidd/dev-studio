@@ -9,4 +9,4 @@ export * from "./profile.api";
 export * from "./dashboard.api";
 export * from "./upload.api";
 export * from "./portfolio.api";
-
+export * from "./platform.api";

@@ -9,6 +9,7 @@ export * from "./queries/use-testimonials";
 export * from "./queries/use-profile";
 export * from "./queries/use-user";
 export * from "./queries/use-portfolio";
+export * from "./queries/use-platform";
 
 export * from "./mutations/use-project-mutations";
 export * from "./mutations/use-message-mutations";
@@ -20,4 +21,4 @@ export * from "./mutations/use-profile-mutations";
 export * from "./mutations/use-upload-mutation";
 export * from "./mutations/use-auth-mutations";
 export * from "./mutations/use-portfolio-mutations";
-
+export * from "./mutations/use-platform-mutations";

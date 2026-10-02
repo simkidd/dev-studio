@@ -19,6 +19,11 @@ import {
   Sparkles,
   ExternalLink,
   ChevronsUpDown,
+  ShieldCheck,
+  Users,
+  Globe,
+  Megaphone,
+  FileText,
 } from "lucide-react";
 import { useAuthStore } from "@/stores";
 import {
@@ -71,6 +76,46 @@ export function AdminSidebar() {
   };
 
   const navSections: NavSection[] = [
+    ...(user?.role === "superadmin"
+      ? [
+          {
+            title: "PLATFORM (SUPERADMIN)",
+            items: [
+              {
+                title: "Platform Hub",
+                href: "/admin/platform",
+                icon: ShieldCheck,
+                badge: "OVERVIEW",
+              },
+              {
+                title: "Developer Fleet",
+                href: "/admin/platform/users",
+                icon: Users,
+              },
+              {
+                title: "Domain & Slugs",
+                href: "/admin/platform/domains",
+                icon: Globe,
+              },
+              {
+                title: "Global Templates",
+                href: "/admin/platform/templates",
+                icon: Palette,
+              },
+              {
+                title: "Broadcasts & Alerts",
+                href: "/admin/platform/announcements",
+                icon: Megaphone,
+              },
+              {
+                title: "Security Logs",
+                href: "/admin/platform/logs",
+                icon: FileText,
+              },
+            ],
+          },
+        ]
+      : []),
     {
       title: "GENERAL",
       items: [
@@ -159,31 +204,33 @@ export function AdminSidebar() {
               <h1 className="text-sm font-semibold text-sidebar-foreground group-hover:text-primary transition-colors leading-none">
                 Dev Studio
               </h1>
-              <p className="text-[10px] text-muted-foreground font-mono mt-0.5">
-                Portfolio CMS
+              <p className="text-[10px] text-muted-foreground mt-0.5 leading-none">
+                {user?.role === "superadmin" ? "Platform Control" : "Portfolio Command"}
               </p>
             </div>
           </Link>
         </div>
       </SidebarHeader>
 
-      {/* Navigation Sections */}
-      <SidebarContent className="px-2 py-3 space-y-3 group-data-[collapsible=icon]:px-1 group-data-[collapsible=icon]:py-2">
+      {/* Nav Content */}
+      <SidebarContent className="p-2 gap-4">
         {navSections.map((section, idx) => (
-          <SidebarGroup key={idx} className="p-0">
+          <SidebarGroup key={section.title || idx} className="p-0">
             {section.title && (
-              <SidebarGroupLabel className="px-2 pb-1 text-[10px] font-mono font-semibold tracking-wider text-muted-foreground uppercase h-auto group-data-[collapsible=icon]:hidden">
+              <SidebarGroupLabel className="text-[10px] font-mono tracking-wider text-muted-foreground uppercase px-2 mb-1">
                 {section.title}
               </SidebarGroupLabel>
             )}
             <SidebarGroupContent>
-              <SidebarMenu className="space-y-0.5">
+              <SidebarMenu>
                 {section.items.map((item) => {
+                  const Icon = item.icon;
                   const isActive =
                     item.href === "/admin"
                       ? pathname === "/admin"
-                      : pathname.startsWith(item.href);
-                  const Icon = item.icon;
+                      : item.href === "/admin/platform"
+                      ? pathname === "/admin/platform"
+                      : pathname === item.href || pathname.startsWith(`${item.href}/`);
 
                   return (
                     <SidebarMenuItem key={item.href}>
@@ -191,39 +238,31 @@ export function AdminSidebar() {
                         asChild
                         isActive={isActive}
                         tooltip={item.title}
-                        className={cn(
-                          "flex items-center justify-between px-2.5 py-2 rounded-md text-xs font-medium transition-all group h-9",
-                          "group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:p-0 group-data-[collapsible=icon]:justify-center mx-auto",
-                          isActive
-                            ? "bg-sidebar-accent text-sidebar-accent-foreground shadow-sm border border-sidebar-border"
-                            : "text-sidebar-foreground/70 hover:text-sidebar-foreground hover:bg-sidebar-accent/60",
-                        )}
                         onClick={closeMobileSidebar}
+                        className={cn(
+                          "transition-colors text-xs font-medium rounded-lg h-9 px-2.5",
+                          isActive
+                            ? "bg-primary/10 text-primary hover:bg-primary/15 font-semibold"
+                            : "text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
+                        )}
                       >
-                        <Link
-                          href={item.href}
-                          className="flex items-center justify-between w-full"
-                        >
-                          <div className="flex items-center gap-2.5 group-data-[collapsible=icon]:gap-0 group-data-[collapsible=icon]:justify-center">
+                        <Link href={item.href} className="flex items-center justify-between w-full">
+                          <div className="flex items-center gap-2.5 min-w-0">
                             <Icon
                               className={cn(
-                                "w-4 h-4 shrink-0 transition-colors",
-                                isActive
-                                  ? "text-primary"
-                                  : "text-muted-foreground group-hover:text-sidebar-foreground",
+                                "w-4 h-4 shrink-0",
+                                isActive ? "text-primary" : "text-muted-foreground",
                               )}
                             />
-                            <span className="group-data-[collapsible=icon]:hidden truncate">
-                              {item.title}
-                            </span>
+                            <span className="truncate">{item.title}</span>
                           </div>
-                          {item.badge !== undefined && (
+                          {item.badge && (
                             <span
                               className={cn(
-                                "text-[10px] font-mono px-1.5 py-0.5 rounded group-data-[collapsible=icon]:hidden",
+                                "px-1.5 py-0.5 text-[9px] font-mono rounded-full font-bold uppercase tracking-wider group-data-[collapsible=icon]:hidden shrink-0",
                                 isActive
-                                  ? "bg-primary/15 text-primary"
-                                  : "bg-sidebar-accent text-muted-foreground",
+                                  ? "bg-primary text-primary-foreground"
+                                  : "bg-muted text-muted-foreground",
                               )}
                             >
                               {item.badge}
@@ -240,71 +279,60 @@ export function AdminSidebar() {
         ))}
       </SidebarContent>
 
-      {/* Footer User Profile & Dropdown Menu */}
-      <SidebarFooter className="p-2 border-t border-sidebar-border bg-sidebar/50">
+      {/* Footer / User Profile */}
+      <SidebarFooter className="p-2 border-t border-sidebar-border">
         <SidebarMenu>
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton
                   size="lg"
-                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground hover:bg-sidebar-accent/80 transition-colors cursor-pointer rounded-lg p-1.5 w-full flex items-center justify-between"
+                  className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground rounded-lg h-12"
                 >
-                  <div className="flex items-center gap-2.5 min-w-0">
-                    <Avatar className="w-8 h-8 shrink-0">
-                      <AvatarImage
-                        src={user?.avatarUrl}
-                        alt={user?.firstName || "Admin"}
-                      />
-                      <AvatarFallback className="bg-primary/15 text-primary font-bold text-xs">
-                        {user?.firstName?.charAt(0).toUpperCase() ||
-                          user?.email?.charAt(0).toUpperCase() ||
-                          "A"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-xs leading-tight group-data-[collapsible=icon]:hidden">
-                      <span className="truncate font-semibold text-sidebar-foreground">
-                        {user?.firstName && user?.lastName
-                          ? `${user.firstName} ${user.lastName}`
-                          : user?.firstName ||
-                            user?.email?.split("@")[0] ||
-                            "Admin"}
-                      </span>
-                      <span className="truncate text-[10px] text-muted-foreground font-mono">
-                        {user?.email || "admin@portfolio.dev"}
-                      </span>
-                    </div>
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage
+                      src={user?.avatarUrl}
+                      alt={user?.firstName || "Admin"}
+                    />
+                    <AvatarFallback className="rounded-lg bg-primary/15 text-primary text-xs font-bold">
+                      {user?.firstName?.charAt(0).toUpperCase() ||
+                        user?.email?.charAt(0).toUpperCase() ||
+                        "A"}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-xs leading-tight group-data-[collapsible=icon]:hidden">
+                    <span className="truncate font-semibold text-sidebar-foreground">
+                      {user?.firstName && user?.lastName
+                        ? `${user.firstName} ${user.lastName}`
+                        : user?.firstName || user?.email?.split("@")[0] || "Admin"}
+                    </span>
+                    <span className="truncate text-[10px] text-muted-foreground font-mono">
+                      {user?.email}
+                    </span>
                   </div>
-                  <ChevronsUpDown className="ml-auto size-4 text-muted-foreground group-data-[collapsible=icon]:hidden shrink-0" />
+                  <ChevronsUpDown className="ml-auto size-4 group-data-[collapsible=icon]:hidden text-muted-foreground" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
-
               <DropdownMenuContent
-                className="w-64 min-w-56 rounded-xl bg-popover border-border p-2 text-popover-foreground shadow-2xl"
-                side="top"
-                align="start"
-                sideOffset={8}
+                className="w-56 rounded-lg"
+                side={isMobile ? "bottom" : "right"}
+                align="end"
+                sideOffset={4}
               >
-                {/* User Info Header */}
                 <DropdownMenuLabel className="p-0 font-normal">
-                  <div className="flex items-center gap-2.5 px-1 py-1.5 text-left text-xs">
-                    <Avatar className="h-8 w-8 rounded-lg border border-border">
+                  <div className="flex items-center gap-2 px-1 py-1.5 text-left text-xs">
+                    <Avatar className="h-8 w-8 rounded-lg">
                       <AvatarImage
                         src={user?.avatarUrl}
                         alt={user?.firstName || "Admin"}
-                        className="object-cover rounded-lg"
                       />
                       <AvatarFallback className="rounded-lg bg-primary/15 text-primary text-xs font-bold">
-                        {user?.firstName?.charAt(0).toUpperCase() ||
-                          user?.email?.charAt(0).toUpperCase() ||
-                          "A"}
+                        {user?.firstName?.charAt(0).toUpperCase() || "A"}
                       </AvatarFallback>
                     </Avatar>
                     <div className="grid flex-1 text-left text-xs leading-tight">
-                      <span className="truncate font-semibold text-foreground">
-                        {user?.firstName && user?.lastName
-                          ? `${user.firstName} ${user.lastName}`
-                          : user?.firstName || "Admin"}
+                      <span className="truncate font-semibold">
+                        {user?.firstName} {user?.lastName}
                       </span>
                       <span className="truncate text-[10px] text-muted-foreground font-mono">
                         {user?.email}
@@ -312,55 +340,37 @@ export function AdminSidebar() {
                     </div>
                   </div>
                 </DropdownMenuLabel>
-
-                <DropdownMenuSeparator className="my-1.5 bg-border" />
-
-                {/* Theme Selector Section */}
-                <div className="px-2 py-1.5 flex items-center justify-between">
-                  <span className="text-xs text-muted-foreground font-medium">
-                    Theme
-                  </span>
-                  <ThemeToggle size="sm" />
-                </div>
-
-                <DropdownMenuSeparator className="my-1.5 bg-border" />
-
-                {/* Quick Navigation Items */}
+                <DropdownMenuSeparator />
                 <DropdownMenuGroup>
-                  <DropdownMenuItem
-                    asChild
-                    className="cursor-pointer text-xs py-1.5 px-2"
-                    onClick={closeMobileSidebar}
-                  >
+                  <DropdownMenuItem asChild>
                     <Link
-                      href="/admin/profile"
-                      className="flex items-center gap-2"
+                      href="/"
+                      target="_blank"
+                      className="cursor-pointer text-xs flex items-center justify-between"
                     >
-                      <Settings className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>Account Settings</span>
+                      <span>Public Platform</span>
+                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
                     </Link>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    asChild
-                    className="cursor-pointer text-xs py-1.5 px-2"
-                  >
+                  <DropdownMenuItem asChild>
                     <Link
-                      href={user?.portfolioSlug ? `/${user.portfolioSlug}` : "/"}
-                      target="_blank"
-                      className="flex items-center gap-2"
+                      href="/admin/profile"
+                      className="cursor-pointer text-xs flex items-center justify-between"
                     >
-                      <ExternalLink className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>View Live Portfolio</span>
+                      <span>Settings & Bio</span>
+                      <Settings className="w-3.5 h-3.5 text-muted-foreground" />
                     </Link>
                   </DropdownMenuItem>
                 </DropdownMenuGroup>
-
-                <DropdownMenuSeparator className="my-1.5 bg-border" />
-
-                {/* Logout Action */}
+                <DropdownMenuSeparator />
+                <div className="p-1.5 flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">Theme</span>
+                  <ThemeToggle />
+                </div>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={() => logout()}
-                  className="cursor-pointer text-xs py-1.5 px-2 text-destructive focus:bg-destructive/10 focus:text-destructive flex items-center gap-2"
+                  className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer text-xs flex items-center gap-2"
                 >
                   <LogOut className="w-3.5 h-3.5" />
                   <span>Log out</span>
@@ -370,7 +380,6 @@ export function AdminSidebar() {
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
-
       <SidebarRail />
     </Sidebar>
   );
